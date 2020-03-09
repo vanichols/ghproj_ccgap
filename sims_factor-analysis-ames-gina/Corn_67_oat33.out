@@ -1,0 +1,6 @@
+ApsimVersion = 7.9 r4044
+Title = Corn_67_oat33
+           Date           year      CropYield   CropBiomamas      RootDepth     FlowerDate   MaturityDate    LAI_maximum      TotalNupt  AvgWTInseason     RainSeason NfertilizerAmount     GrossMiner       NetMiner SowingNO3_60cm
+   (dd/mm/yyyy)         (year)             ()        (kg/ha)           (mm)          (doy)          (doy)      (m^2/m^2)        (g/m^2)           (mm)           (mm)           (kg/ha)        (kg/ha)        (kg/ha)             ()
+     31/12/2000           2000        203.960        19361.9       1485.600        210.000        268.000          3.788          18.32       1993.576        341.300              67.4          133.8          121.5         65.197
+     31/12/2001           2001        192.517        18841.2       1383.920        198.000        251.000          4.364          16.43       1754.710        403.098              67.4          137.3          127.8         69.111
