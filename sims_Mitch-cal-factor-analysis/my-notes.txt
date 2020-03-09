@@ -1,3 +1,0 @@
-I'm taking Mitch's calibrated simulations.
-
-For oat1, I reduced the number of plants planted by 1 for each year in both the CS_oat1 and CS_oat2 sims.
