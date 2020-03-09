@@ -1,6 +1,6 @@
 # Created:      3/9/2020
 # last edited:   
-#
+# notes: keep apsim sims in box, all r code in github
 # purpose: evaluate each factor individually and in combination using CALIBRATED APSIM sims
 # author: gina vnichols@iastate.edu
 
@@ -14,7 +14,8 @@ library(janitor)
 # keeping track of oats ---------------------------------------------------
 
 oat_key <-
-  read_csv("sims_Mitch-cal-factor-analysis/data-raw/rd_oats-calibrated-v1.csv") %>% 
+  read_csv("../../../Box/Gina_APSIM_modeling/sims_Mitch-cal-factor-analysis/data-raw/rd_oats-calibrated-v1.csv") %>% 
+  #read_csv("sims_Mitch-cal-factor-analysis/data-raw/rd_oats-calibrated-v1.csv") %>% 
   separate_rows(category, sep = ",") %>% 
   remove_empty("rows") %>% 
   remove_empty("cols")
@@ -22,7 +23,7 @@ oat_key <-
 
 # read in .out files ------------------------------------------------------
 
-my_dir <- "sims_Mitch-cal-factor-analysis/"
+my_dir <- "../../../Box/Gina_APSIM_modeling/sims_Mitch-cal-factor-analysis/"
 
 apraw <-
   saf_readapout(my_dir) %>%
