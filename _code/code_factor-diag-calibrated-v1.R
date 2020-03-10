@@ -100,9 +100,11 @@ gaps <-
 # look at gaps ------------------------------------------------------------
 
 gaps %>% 
-  ggplot(aes(oat_what, gap_kgha)) + 
+  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
+  geom_boxplot(aes(color = oat_what == "exp gap")) +
   geom_point() + 
-  coord_flip()
+  coord_flip() + 
+  guides(color = F)
 
 
 # get exp data in same form -----------------------------------------------
