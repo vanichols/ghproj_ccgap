@@ -23,7 +23,7 @@ oat_key <-
 
 # read in .out files ------------------------------------------------------
 
-my_dir <- "../../../Box/Gina_APSIM_modeling/sims_Mitch-cal-factor-analysis/"
+my_dir <- "../../../Box/Gina_APSIM_modeling/sims-cal-factor-analysis-CCbase/"
 
 apraw <-
   saf_readapout(my_dir) %>%
@@ -40,7 +40,7 @@ apraw <-
 
 # keep base files separate ------------------------------------------------
 
-#--this is just for reference, isn't used in any yield gap calcs
+
 base_contc <- 
   apraw %>%
   mutate(oat_nu = parse_number(apsim_oat)) %>%
@@ -49,6 +49,7 @@ base_contc <-
          oat_nu = 0) %>% 
   select(dtype, oat_nu, year, yield_kgha)
 
+#--this is just for reference, isn't used in any yield gap calcs
 base_rotc <- 
   apraw %>%
   mutate(oat_nu = parse_number(apsim_oat)) %>%
@@ -66,7 +67,7 @@ apw <-
   filter(!grepl("base", apsim_oat), 
          yield_kgha != 0) %>% 
   mutate(oat_nu = parse_number(apsim_oat),
-         dtype = "ap_rotcoat") %>% 
+         dtype = "ap_contcoat") %>% 
   select(dtype, oat_nu, year, yield_kgha) %>% 
   arrange(oat_nu, year)
 
@@ -89,10 +90,19 @@ agap <-
          dtype = "oat_gap") %>% 
   select(dtype, oat_nu, year, gap_kgha)
 
+agap_notweaks <- 
+  base_rotc %>% 
+  left_join(select(base_contc, -dtype), by = c("year", "oat_nu")) %>% 
+  mutate(gap_kgha = yield_kgha.x - yield_kgha.y,
+         dtype = "oat_gapnotweaks",
+         oat_nu = 99) %>% 
+  select(dtype, oat_nu, year, gap_kgha)
+
 
 gaps <- 
   ewgap %>% 
   bind_rows(agap) %>% 
+  bind_rows(agap_notweaks) %>% 
   left_join(oat_key)
 
 
