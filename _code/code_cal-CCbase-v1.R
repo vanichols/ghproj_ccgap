@@ -1,13 +1,16 @@
 # Created:      3/12/2020
 # last edited:   
-# notes: keep apsim sims in box, all r code in github
+#
 # purpose: evaluate each factor individually and in combination using CALIBRATED APSIM sims using CC sim as base, tweaking from that
+#
 # author: gina vnichols@iastate.edu
+#
+# notes: keep apsim sims in box, all r code in github
 
 
 rm(list = ls())
 #devtools::install_github("vanichols/saapsim", force = T)
-library(saapsim) #--my package, has exp data in it
+library(saapsim) #--my package, has exp data in it (haha js :P)
 library(tidyverse)
 library(janitor)
 
@@ -36,10 +39,9 @@ apraw <-
          year < 2017) #--exp data stops in 2016 
 
 
-
+#NOTE: Need to evaluate combinations!!!!!
 
 # keep base files separate ------------------------------------------------
-
 
 base_contc <- 
   apraw %>%
@@ -49,7 +51,7 @@ base_contc <-
          oat_nu = 0) %>% 
   select(dtype, oat_nu, year, yield_kgha)
 
-#--this is just for reference, isn't used in any yield gap calcs
+#--this is just for reference
 base_rotc <- 
   apraw %>%
   mutate(oat_nu = parse_number(apsim_oat)) %>%
@@ -114,7 +116,24 @@ gaps %>%
   geom_boxplot(aes(color = oat_what == "exp gap")) +
   geom_point() + 
   coord_flip() + 
-  guides(color = F)
+  guides(color = F) +
+  labs(title = "ames")
+
+
+
+# gaps by year ------------------------------------------------------------
+
+ewgap %>% 
+  rename(expgap = gap_kgha) %>% 
+  select(year, expgap) %>% 
+  left_join(agap, by = "year") %>% 
+  left_join(oat_key) %>% 
+  ggplot(aes(expgap, gap_kgha)) +
+  geom_point(aes(color = year)) + 
+  geom_abline() +
+  facet_grid(.~oat_what)
+
+
 
 
 # get exp data in same form -----------------------------------------------

@@ -5,6 +5,7 @@
 # purpose: diagnose john sawyer's data
 #
 # notes: sotiris wants a bunch of stuff...need to work on that
+#  are the gaps related to weather? ie disease? I tried the soil N thing, didn't work
 
 
 rm(list = ls())
