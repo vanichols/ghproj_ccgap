@@ -1,31 +1,22 @@
-# Created:       2/17/2020
-# last edited:   3/16/2020
-#                3/20/2020
+# Created:       3/23/2020
+# last edited:   3/23/2020
 # 
-# purpose: diagnose john sawyer's data
+# purpose: look at yield gaps compard to weather
 #
-# notes: sotiris wants a bunch of stuff...need to work on that
-#  are the gaps related to weather? ie disease? I tried the soil N thing, didn't work
+# notes: are the gaps related to weather? ie disease? I tried the soil N thing, didn't work
 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
+devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--my package, has his data in it :P
 library(tidyverse)
 library(lme4)
 
 
-# do i have site-specific soil data already? ------------------------------
 
-soiraw <- read_csv("_data/td_pred-soil-from-root-study.csv") 
+# weather -----------------------------------------------------------------
 
-soi <- soiraw %>% 
-  separate(site_yr, into = c("site", "year")) %>% 
-  filter(profile_cm == "0-30") %>% 
-  group_by(site) %>% 
-  summarise_if(is.numeric, mean, na.rm = T) %>% 
-  mutate(site = str_sub(tolower(site), 1, 4)) 
-
+wea <- sad_wea %>% as_tibble()
 
 # calc sawyer things ------------------------------------------------------
 
