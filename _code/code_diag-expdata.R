@@ -43,6 +43,9 @@ sad_filt <-
   sad_tidysawyer %>% 
     filter(! (year == 2013 & site == "lewi"))
 
+d_max <- 
+  sad_cgap %>% 
+  filter(! (year == 2013 & site == "lewi"))
 
 # penalty at mid-N rate
 d_mid <-  
@@ -54,19 +57,6 @@ d_mid <-
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
   mutate(cgap_mid = sc-cc) %>% 
   filter(!is.na(cgap_mid)) %>% 
-  select(-cc, -sc)
-
-
-# penalty at max N rate
-d_max <- 
-  sad_filt %>% 
-  group_by(crop, site, rotation) %>% 
-  mutate(nmax = max(nrate_kgha)) %>% 
-  filter(nrate_kgha == nmax) %>% 
-  select(crop, site, year, rotation, yield_kgha) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(cgap_max = sc-cc) %>% 
-  filter(!is.na(cgap_max)) %>% 
   select(-cc, -sc)
 
 # gap at 0N
@@ -116,6 +106,9 @@ figyr <-
        x = NULL,
        y = "yield gap")
   
+
+figyr
+ggsave("_figs/diag_cgap-vs-year.png")
 
 library(patchwork)
 
