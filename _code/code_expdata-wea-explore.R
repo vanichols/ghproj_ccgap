@@ -4,6 +4,7 @@
 # purpose: look at yield gaps compard to weather (year explains more variance than site in JS data)
 #
 # notes: are the gaps related to weather? ie disease? I tried the soil N thing, didn't work
+#   I need to create predictors. Weather, soil, like the root thing
 
 
 rm(list = ls())
@@ -43,6 +44,10 @@ scale_this <- function(x){
 
 wea <- sad_wea %>% as_tibble() %>% 
   mutate(year = paste0("Y", year))
+
+sad_cgap <- sad_cgap %>% 
+  mutate(year = paste0("Y", year))
+
 
 
 #--yearly weather
@@ -90,11 +95,6 @@ wealt %>%
 #--teasdale and cavigelli 2017 paper (always in reference to planting)
 #--others?
 
-
-#--when is july? doy 182-212
-#--may? 121-150
-doy_tib %>% 
-  filter(date == "2001-05-30")
 
 #--mean july max temp
 wea_july <- 
@@ -151,7 +151,6 @@ wea_parms <-
 gap_wea <- 
   sad_cgap %>% 
   filter(cgap_max > 0) %>% 
-  mutate(year = paste("Y", year)) %>% 
   left_join(wea_parms) %>% 
   ungroup()
 
@@ -163,8 +162,36 @@ gap_wea_year <-
   summarise(cgap_max = mean(cgap_max)) %>% 
   left_join(weay) %>% 
   ungroup() %>% 
-  mutate(year = paste0("Y", year)) %>%
   mutate_if(is.numeric, scale_this)
+
+
+
+
+# ok back up, let's concentrate on understanding ames? ---------------------
+
+gap_ame <- 
+  gap_wea %>% 
+  filter(site == "ames")
+
+
+gap_ame %>% 
+  pivot_longer(radn:rain) %>% 
+  ggplot(aes(reorder(year, value), value)) + 
+  geom_point(aes(size = cgap_max)) +
+  facet_wrap(~name, scales = "free") + 
+  coord_flip()
+
+gap_ame %>% 
+  ggplot(aes(reorder(year, cgap_max), cgap_max)) + 
+  geom_point() + 
+  coord_flip()
+
+
+sad_cgap %>% 
+  ggplot(aes(reorder(year, cgap_max), cgap_max)) + 
+  geom_point(aes(color = site, size = cgap_max)) + 
+  coord_flip() + 
+  facet_wrap(~site)
 
 
 # should look at corrs at some point --------------------------------------
