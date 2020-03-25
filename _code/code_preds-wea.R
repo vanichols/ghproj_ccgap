@@ -101,7 +101,6 @@ wea_hs <-
   summarise(heatstress_n = n())
 
 
-
 # weather w/respect to planting -------------------------------------------
 
 #NEEDS UPDATED
