@@ -1,0 +1,53 @@
+structgrade,structsize,structtype,structid,structpartsto,chstructgrpkey,chstructkey
+Moderate,Medium,Granular,NA,NA,27442174,33559317
+Moderate,Fine,Granular,NA,NA,27442174,33559318
+Weak,Medium,Subangular blocky,2,NA,27442172,33559312
+Weak,Medium,Prismatic,1,2,27442172,33559313
+Weak,Fine,Subangular blocky,2,NA,27442172,33559314
+Moderate,Medium,Granular,NA,NA,27442388,33559593
+Moderate,Fine,Granular,NA,NA,27442388,33559594
+Moderate,Very fine,Subangular blocky,NA,NA,27442389,33559595
+Moderate,Fine,Subangular blocky,NA,NA,27442389,33559596
+Moderate,Medium,Granular,2,NA,27442486,33559731
+Weak,Fine,Subangular blocky,1,2,27442486,33559732
+Weak,Fine,Granular,NA,NA,27442492,33559738
+Moderate,Fine,Subangular blocky,NA,NA,27442493,33559739
+Weak,Medium,Prismatic,1,2,27442494,33559740
+Weak,Medium,Subangular blocky,2,NA,27442494,33559741
+Weak,Fine,Granular,NA,NA,27442495,33559742
+Moderate,Fine,Granular,NA,NA,27442531,33559790
+Moderate,Medium,Granular,NA,NA,27442531,33559791
+Moderate,Fine,Subangular blocky,1,2,27442532,33559792
+Moderate,Medium,Granular,2,NA,27442532,33559793
+Moderate,Fine,Subangular blocky,NA,NA,27442699,33560010
+Moderate,Very fine,Subangular blocky,NA,NA,27442699,33560011
+Weak,Coarse,Prismatic,NA,NA,27442898,33560255
+Weak,Very coarse,Prismatic,NA,NA,27442970,33560352
+Moderate,Medium,Granular,NA,NA,27443068,33560471
+Weak,Medium,Prismatic,1,2,27443069,33560472
+Weak,Medium,Subangular blocky,2,NA,27443069,33560473
+Weak,Very coarse,Prismatic,NA,NA,27443075,33560481
+Moderate,Medium,Subangular blocky,NA,NA,27443076,33560482
+Moderate,Very fine,Subangular blocky,NA,NA,27442173,33559315
+Moderate,Fine,Subangular blocky,NA,NA,27442173,33559316
+Moderate,Medium,Granular,NA,NA,27442340,33559538
+Moderate,Fine,Granular,NA,NA,27442340,33559539
+,,Massive,1,2,27442341,33559540
+Weak,Coarse,Prismatic,2,NA,27442341,33559541
+Weak,Medium,Prismatic,1,2,27442269,33559454
+Moderate,Medium,Subangular blocky,2,NA,27442269,33559455
+Moderate,Medium,Granular,NA,NA,27442483,33559727
+Moderate,Medium,Subangular blocky,NA,NA,27442484,33559728
+,,Massive,NA,NA,27442485,33559729
+Weak,Coarse,Prismatic,NA,NA,27442485,33559730
+Moderate,Fine,Subangular blocky,NA,NA,27442698,33560008
+Moderate,Medium,Subangular blocky,NA,NA,27442698,33560009
+Weak,Fine,Subangular blocky,2,NA,27442899,33560256
+Weak,Medium,Prismatic,1,2,27442899,33560257
+Weak,Medium,Subangular blocky,2,NA,27442899,33560258
+Weak,Fine,Granular,NA,NA,27442971,33560353
+Moderate,Medium,Granular,NA,NA,27442972,33560354
+Moderate,Fine,Subangular blocky,NA,NA,27442969,33560351
+Moderate,Fine,Subangular blocky,NA,NA,27443212,33560671
+Moderate,Fine,Subangular blocky,NA,NA,27443202,33560658
+,,Massive,NA,NA,27443213,33560672
