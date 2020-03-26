@@ -15,20 +15,27 @@ library(sf)
 library(glue)
 
 
+hm <- read_csv("EXTRACTIONS/ames/SSURGO/ames_SSURGO_component.csv") 
+  
+hm %>% select(drainagecl)
+
 
 # a helper function -------------------------------------------------------
 
 fun_summarize_ssurgo <- function(f_mychoice = "ames") {
   
-  my_dir <- glue('EXTRACTIONS/{mychoice}/SSURGO/') %>% as.character()
+  ########--for trouble
+  #f_mychoice <- "ames"
+  
+  my_dir <- glue('EXTRACTIONS/{f_mychoice}/SSURGO/') %>% as.character()
   my_shp <-
-    glue('{my_dir}{mychoice}_SSURGO_Mapunits.shp') %>% as.character()
+    glue('{my_dir}{f_mychoice}_SSURGO_Mapunits.shp') %>% as.character()
   my_mu <-
-    glue('{my_dir}{mychoice}_SSURGO_mapunit.csv') %>% as.character()
+    glue('{my_dir}{f_mychoice}_SSURGO_mapunit.csv') %>% as.character()
   my_cmpnt <-
-    glue('{my_dir}{mychoice}_SSURGO_component.csv') %>% as.character()
+    glue('{my_dir}{f_mychoice}_SSURGO_component.csv') %>% as.character()
   my_chor <-
-    glue('{my_dir}{mychoice}_SSURGO_chorizon.csv') %>% as.character()
+    glue('{my_dir}{f_mychoice}_SSURGO_chorizon.csv') %>% as.character()
   
   # look at what we got -----------------------------------------------------
   
@@ -38,7 +45,7 @@ fun_summarize_ssurgo <- function(f_mychoice = "ames") {
   
   # read in csv files -------------------------------------------------------
   
-  # 1. mapunit descriptions, has iacornsr
+  # 1. mapunit descriptions, has iacornsr, I think that's it
   
   mu_dat <- read_csv(my_mu) %>%
     remove_empty("cols") #--removes empty columns
@@ -76,12 +83,28 @@ fun_summarize_ssurgo <- function(f_mychoice = "ames") {
     select(mukey, cokey)
   
   
+  draincl_major <- cmpnt_dat %>% 
+    filter(majcompflag == "Yes") %>% 
+    select(mukey, cokey, drainagecl) %>% 
+    left_join(mu_dat) %>% 
+    filter(muacres == max(muacres)) %>%
+    select(drainagecl) %>%
+    rename(draincl_maj = drainagecl)
+  
+  
+  
   # 3. chorizon
   #  Horizon depths, sand, silt, clay, organic matter, water holding capacity, etc.
   # .r means reference value, .l means low value, .h means high value
-  # we just want depth to b horizon
+  
+  #--we just want depth to b horizon? can I get wt stuff here?
   chor_dat <- read_csv(my_chor) %>%
-    remove_empty("cols")
+    remove_empty("cols") %>% 
+    select(cokey,
+           chkey,
+           hzname,
+           desgnmaster,
+           contains(".r")) 
   
   ahorz_dat <-
     chor_dat %>%
@@ -124,8 +147,9 @@ fun_summarize_ssurgo <- function(f_mychoice = "ames") {
   
   dat <-
     bind_cols(iasr_maj, iasr_wgt,
-              hzb_maj, hzb_wgt) %>%
-    mutate(site = mychoice)
+              hzb_maj, hzb_wgt,
+              draincl_major) %>%
+    mutate(site = f_mychoice)
   
   return(dat)
 }
@@ -164,5 +188,8 @@ for (i in 2:length(sll) ) {
    i <- i + 1
 }
 
-dat  
+dat %>% 
+  select(site, everything()) %>% 
+  write_csv("_data/td_ssurgo-vals.csv")
+  
 

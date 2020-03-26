@@ -48,6 +48,14 @@ wea <- sad_wea %>% as_tibble() %>%
 sad_cgap <- sad_cgap %>% 
   mutate(year = paste0("Y", year))
 
+sad_tidysawyer %>% 
+  mutate(year = paste0("Y", year)) %>% 
+  group_by(site, year) %>% 
+  summarise(myield_kgha = mean(yield_kgha)) %>% 
+  left_join(sad_cgap) %>% 
+  ggplot(aes(myield_kgha, cgap_max)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
 
 
 #--yearly weather
