@@ -7,7 +7,7 @@
 # notes: 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
+devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--my package, has his data in it :P
 library(tidyverse)
 library(lubridate)
