@@ -1,5 +1,6 @@
 # Created:       3/25/2020
 # last edited:   3/25/2020
+#                3/27/2020 (include planting dates)
 # 
 # purpose: Create pred tibble for weather variables
 #
