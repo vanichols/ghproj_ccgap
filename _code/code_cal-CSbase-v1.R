@@ -108,8 +108,9 @@ gaps %>%
   geom_point() + 
   coord_flip() + 
   guides(color = F) + 
-  labs(title = "Gap using CS as base sim with tweaks")
+  labs(title = "Gap using CS as base sim with tweaks in Ames")
 
+ggsave("_figs/fctrs_cs-base-oat-ames.png")
 
 
 

@@ -1,13 +1,14 @@
 # Created:       3/25/2020
 # last edited:   3/25/2020
 #                3/27/2020 (include planting dates)
+#                3/30/2020
 # 
 # purpose: Create pred tibble for weather variables
 #
 # notes: 
 
 rm(list = ls())
-devtools::install_github("vanichols/saapsim", force = T)
+#devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--my package, has his data in it :P
 library(tidyverse)
 library(lubridate)
@@ -17,6 +18,9 @@ library(lubridate)
 
 wea <- sad_wea %>% as_tibble() 
 
+pwea <- wea %>% 
+  left_join(sad_plant) %>% 
+  select(-plant_date, -crop) 
 
 #--site yearly weather
 weasy <- wea %>% 
@@ -36,13 +40,17 @@ wealt <-
             mint_15y = mean(mint),
             rain_15y = mean(rain))
 
+library(GGally)
+# wealt %>% 
+#   pivot_longer(radn_15y:rain_15y) %>% 
+#   ggplot(aes(reorder(site, value, mean), value)) +
+#   geom_point(size = 5) +
+#   coord_flip() +
+#   facet_grid(~name, scales = "free")
 
-wealt %>% 
-  pivot_longer(radn_15y:rain_15y) %>% 
-  ggplot(aes(reorder(site, value, mean), value)) +
-  geom_point(size = 5) +
-  coord_flip() +
-  facet_grid(~name, scales = "free")
+# lets me look at all weather relations at once
+GGally::ggparcoord(data = wealt, columns = 2:5, groupColumn = 1, order = "skewness") +
+  geom_line(size = 2, alpha = 0.5)
 
 
 # weather metrics ---------------------------------------------------------
@@ -50,6 +58,7 @@ wealt %>%
 #--rafa's scirep paper
 #--teasdale and cavigelli 2017 paper (always in reference to planting....)
 #--others?
+#--sa uses rainy days > 1inch, growing season GDD, heat days (Tmax > 34C), cold days (Tmin < 4), rad, avg T
 
 
 #--mean july max temp
