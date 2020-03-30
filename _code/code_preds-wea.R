@@ -1,7 +1,7 @@
 # Created:       3/25/2020
 # last edited:   3/25/2020
 #                3/27/2020 (include planting dates)
-#                3/30/2020
+#                3/30/2020 (added planting-date-referenced weather)
 # 
 # purpose: Create pred tibble for weather variables
 #
@@ -53,12 +53,87 @@ GGally::ggparcoord(data = wealt, columns = 2:5, groupColumn = 1, order = "skewne
   geom_line(size = 2, alpha = 0.5)
 
 
+
+# weather in reference to planting ----------------------------------------
+
+#--rain tot 2 weeks after planting
+wea_2wkp <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy, 
+         day < plant_doy + 14) %>% 
+  summarise(p2wk_rain_tot = sum(rain))
+
+wea_3wkp <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy, 
+         day < plant_doy + 21) %>% 
+  summarise(p3wk_rain_tot = sum(rain))
+
+wea_4wkp <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy, 
+         day < plant_doy + 28) %>% 
+  summarise(p4wk_rain_tot = sum(rain))
+
+#--2 weeks before planting
+wea_2wkpp <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day < plant_doy, 
+         day > plant_doy - 14) %>% 
+  summarise(prep2wk_rain_tot = sum(rain))
+
+wea_3wkpp <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day < plant_doy, 
+         day > plant_doy - 21) %>% 
+  summarise(prep3wk_rain_tot = sum(rain))
+
+wea_4wkpp <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day < plant_doy, 
+         day > plant_doy - 28) %>% 
+  summarise(prep4wk_rain_tot = sum(rain))
+
+#--avg high temp in the month 2 months after planting
+wea_8wkt <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy + 56, 
+         day < plant_doy + 56 + 28) %>% 
+  summarise(p2mo_tx_mean = mean(maxt))
+
+
+#--avg low temp in the month surrounding planting
+wea_4wkt <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy - 14, 
+         day < plant_doy + 14) %>% 
+  summarise(pre2wkp2wk_tl_mean = mean(mint))
+
+#--number of days < 4degF (-15C) before planting
+wea_cold <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day < plant_doy) %>% 
+  filter(mint < -15) %>% 
+  summarise(wintcolddays_n = n())
+
+
+
 # weather metrics ---------------------------------------------------------
 
 #--rafa's scirep paper
 #--teasdale and cavigelli 2017 paper (always in reference to planting....)
 #--others?
 #--sa uses rainy days > 1inch, growing season GDD, heat days (Tmax > 34C), cold days (Tmin < 4), rad, avg T
+
 
 
 #--mean july max temp
@@ -113,15 +188,24 @@ wea_hs <-
 
 # weather w/respect to planting -------------------------------------------
 
-#NEEDS UPDATED
-
 
 wea_parms <- 
   weasy %>% 
+  left_join(wea_2wkp) %>% 
+  left_join(wea_2wkpp) %>% 
+  left_join(wea_3wkp) %>% 
+  left_join(wea_3wkpp) %>% 
+  left_join(wea_4wkp) %>% 
+  left_join(wea_4wkpp) %>% 
+  left_join(wea_8wkt) %>%
+  left_join(wea_4wkt) %>% 
+  left_join(wea_cold) %>% 
   left_join(wea_july) %>%
   left_join(wea_may) %>% 
   left_join(wea_apr) %>% 
   left_join(wea_aprmay) %>% 
   left_join(wea_gs) %>% 
   left_join(wea_hs) 
-  
+
+
+wea_parms %>% write_csv("_data/td_pred-wea.csv")  
