@@ -1,12 +1,14 @@
 # Created:      3/9/2020
-# last edited:   
-# notes: keep apsim sims in box, all r code in github
 # purpose: evaluate each factor individually and in combination using CALIBRATED APSIM sims
 # author: gina vnichols@iastate.edu
+#
+# notes: keep apsim sims in box, all r code in github
+#
+# last edited:   3/30/2020 (first time looking at it since covid-19)
 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
+#remotes::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--my package, has exp data in it
 library(tidyverse)
 library(janitor)
@@ -75,6 +77,7 @@ apw <-
 ewgap <-
   sad_tidysawyer %>% 
   filter(site == "ames", nrate_kgha == max(nrate_kgha)) %>% 
+  select(-sd_kgha) %>% #--this needs updated w/new pkg
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
   mutate(gap_kgha = sc - cc,
          dtype = "exp_gap", 
@@ -108,30 +111,6 @@ gaps %>%
   labs(title = "Gap using CS as base sim with tweaks")
 
 
-# get exp data in same form -----------------------------------------------
-
-ew <- 
-  sad_tidysawyer %>% 
-  filter(site == "ames", nrate_kgha == max(nrate_kgha)) %>% 
-  mutate(dtype = ifelse(rotation == "cc", "exp_contc", "exp_rotc"),
-         oat_nu = 0) %>% 
-  select(dtype, oat_nu, year, yield_kgha) 
-  
-
-
-# combine and look at exp vs apsim ----------------------------------------
-
-apw %>% 
-  bind_rows(ew) %>% 
-  bind_rows(base_rotc) %>% 
-  bind_rows(base_contc) %>% 
-  filter(!grepl("oat", dtype)) %>% 
-  separate(dtype, into = c("source", "rot_type")) %>% 
-  ggplot(aes(source, yield_kgha)) +
-  geom_point(aes(color = as.factor(year), shape = as.factor(oat_nu))) + 
-  facet_grid(.~ rot_type)
-
-#---it looks fine
 
 
   
