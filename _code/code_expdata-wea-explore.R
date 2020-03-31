@@ -1,162 +1,300 @@
 # Created:       3/23/2020
-# last edited:   3/23/2020
+# last edited:   3/24/2020
 # 
-# purpose: look at yield gaps compard to weather
+# purpose: look at yield gaps compard to weather (year explains more variance than site in JS data)
 #
 # notes: are the gaps related to weather? ie disease? I tried the soil N thing, didn't work
+#   I need to create predictors. Weather, soil, like the root thing
 
 
 rm(list = ls())
-devtools::install_github("vanichols/saapsim", force = T)
+#devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--my package, has his data in it :P
 library(tidyverse)
-library(lme4)
+library(lubridate)
+library(corrplot)
+library(plotly)
 
 
+# cheater for doy ---------------------------------------------------------
 
-# weather -----------------------------------------------------------------
+fun_doy <- function(mydate = "2001-01-01"){
+  
+  doy_tib0 <- tibble(
+    date = seq.Date(from = as.Date("2001-01-01"), to = as.Date("2001-12-31"), by = "day"))
+  
+  daysinyear <- nrow(doy_tib0)
+  
+  doy_tib <- doy_tib0 %>% 
+    mutate(doy = 1:daysinyear)
+  
+  res <- doy_tib %>% 
+    filter(date == mydate)
+ 
+   return(res)
+}
 
-wea <- sad_wea %>% as_tibble()
+#--scale wants matrices....
+scale_this <- function(x){
+  (x - mean(x, na.rm=TRUE)) / sd(x, na.rm=TRUE)
+}
 
-# calc sawyer things ------------------------------------------------------
 
-#--lewis has a weired 2013 year
-#--normal gap at 0, no gap at mid, neg gap at high. 
+#--data
+
+wea <- sad_wea %>% as_tibble() %>% 
+  mutate(year = paste0("Y", year))
+
+sad_cgap <- sad_cgap %>% 
+  mutate(year = paste0("Y", year))
+
 sad_tidysawyer %>% 
-  filter(site == "lewi") %>% 
-  ggplot(aes(nrate_kgha, yield_kgha)) + 
-  geom_point(aes(color = rotation)) + 
-  facet_wrap(~year)
-
-#--remove that year for now
-
-sad_filt <- 
-  sad_tidysawyer %>% 
-    filter(! (year == 2013 & site == "lewi"))
+  mutate(year = paste0("Y", year)) %>% 
+  group_by(site, year) %>% 
+  summarise(myield_kgha = mean(yield_kgha)) %>% 
+  left_join(sad_cgap) %>% 
+  ggplot(aes(myield_kgha, cgap_max)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
 
 
-# penalty at mid-N rate
-d_mid <-  
-  sad_filt %>% 
-  group_by(crop, site, rotation) %>% 
-  filter(nrate_kgha > 100,
-         nrate_kgha < 150) %>% 
-  select(crop, site, year, rotation, yield_kgha) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(cgap_mid = sc-cc) %>% 
-  filter(!is.na(cgap_mid)) %>% 
-  select(-cc, -sc)
-
-
-# penalty at max N rate
-d_max <- 
-  sad_filt %>% 
-  group_by(crop, site, rotation) %>% 
-  mutate(nmax = max(nrate_kgha)) %>% 
-  filter(nrate_kgha == nmax) %>% 
-  select(crop, site, year, rotation, yield_kgha) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(cgap_max = sc-cc) %>% 
-  filter(!is.na(cgap_max)) %>% 
-  select(-cc, -sc)
-
-# gap at 0N
-d_0 <- 
-  sad_filt %>% 
-  group_by(crop, site, rotation) %>% 
-  mutate(nmin = min(nrate_kgha)) %>% 
-  filter(nrate_kgha == nmin) %>% 
-  select(crop, site, year, rotation, yield_kgha) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(cgap_0 = sc-cc) %>% 
-  filter(!is.na(cgap_0)) %>% 
-  select(-cc, -sc)
-
-
-d_gaps <- 
-  d_max %>% 
-  left_join(d_mid) %>% 
-  left_join(d_0)
+#--yearly weather
+weay <- wea %>% 
+  group_by(year) %>%
+  summarise(radn = sum(radn, na.rm = T),
+            maxt = mean(maxt, na.rm = T),
+            mint = mean(mint, na.rm = T),
+            rain = sum(rain, na.rm = T)) 
 
 
 
-# how do yield gaps vary by loc? by year? ---------------------------------
-
-# note: there are 7 sites for 2006-2016 only
-
-figloc <- 
-  d_gaps %>% 
-  filter(year > 2005) %>% 
-  ggplot(aes(reorder(site, cgap_max, mean), cgap_max)) + 
-  geom_boxplot() + 
-  geom_point() +
-  coord_flip() + 
-  labs(title = '2006-2016',
-       y = "yield gap")
+#--site yearly weather
+weasy <- wea %>% 
+  group_by(site, year) %>%
+  summarise(radn = sum(radn, na.rm = T),
+            maxt = mean(maxt, na.rm = T),
+            mint = mean(mint, na.rm = T),
+            rain = sum(rain, na.rm = T)) 
   
-figyr <- 
-  d_gaps %>% 
+
+#--look at averages across sites
+wealt <- 
+  weasy %>% 
+  group_by(site) %>% 
+  summarise(radn_lt = mean(radn),
+            maxt_lt = mean(maxt),
+            mint_lt = mean(mint),
+            rain_lt = mean(rain))
+
+
+wealt %>% 
+  pivot_longer(radn_lt:rain_lt) %>% 
+  ggplot(aes(reorder(site, value, mean), value)) +
+  geom_point(size = 5) +
+  coord_flip() +
+  facet_grid(~name, scales = "free")
+
+
+
+
+# weather metrics ---------------------------------------------------------
+
+#--rafa's scirep paper
+#--teasdale and cavigelli 2017 paper (always in reference to planting)
+#--others?
+
+
+#--mean july max temp
+wea_july <- 
+  wea %>% 
+  filter(day < 212, day > 181) %>% 
+  group_by(site, year) %>% 
+  summarise(julymint_mean = mean(mint),
+            julymaxt_mean = mean(maxt),
+            julyrain_tot = sum(rain))
+
+wea_may <- 
+  wea %>% 
+  filter(day < 151, day > 121) %>% 
+  group_by(site, year) %>% 
+  summarise(maymint_mean = mean(mint),
+            maymaxt_mean = mean(maxt),
+            mayrain_tot = sum(rain))
+
+wea_apr <- 
+  wea %>% 
+  filter(day < 120, day > 91) %>% 
+  group_by(site, year) %>% 
+  summarise(arpmint_mean = mean(mint),
+            arpmaxt_mean = mean(maxt),
+            arprain_tot = sum(rain))
+
+wea_gs <- 
+  wea %>% 
+  filter(day < 244, day > 91) %>% 
+  group_by(site, year) %>% 
+  summarise(gsrain_tot = sum(rain),
+            gst = mean((maxt + mint)/2))
+
+fun_doy("2001-05-01")
+
+wea_hs <- 
+  wea %>% 
+  filter(day < 244, day > 91) %>%
+  filter(maxt > 30) %>% 
+  group_by(site, year) %>% 
+  summarise(heatstress_n = n())
+
+
+wea_parms <- 
+  weasy %>% 
+  left_join(wea_july) %>%
+  left_join(wea_may) %>% 
+  left_join(wea_gs) %>% 
+  left_join(wea_hs)
+
+
+# combine cgap and wea ----------------------------------------------------
+
+gap_wea <- 
+  sad_cgap %>% 
+  filter(cgap_max > 0) %>% 
+  left_join(wea_parms) %>% 
+  ungroup()
+
+
+gap_wea_year <- 
+  sad_cgap %>% 
+  filter(cgap_max > 0) %>%
   group_by(year) %>% 
-  mutate(n = n()) %>% 
-  filter(n == 7) %>% 
-  ggplot(aes(reorder(year, cgap_max, mean), cgap_max)) + 
-  geom_boxplot() + 
-  geom_point() +
+  summarise(cgap_max = mean(cgap_max)) %>% 
+  left_join(weay) %>% 
+  ungroup() %>% 
+  mutate_if(is.numeric, scale_this)
+
+
+
+
+# ok back up, let's concentrate on understanding ames? ---------------------
+
+gap_ame <- 
+  gap_wea %>% 
+  filter(site == "ames")
+
+
+gap_ame %>% 
+  pivot_longer(radn:rain) %>% 
+  ggplot(aes(reorder(year, value), value)) + 
+  geom_point(aes(size = cgap_max)) +
+  facet_wrap(~name, scales = "free") + 
+  coord_flip()
+
+gap_ame %>% 
+  ggplot(aes(reorder(year, cgap_max), cgap_max)) + 
+  geom_point() + 
+  coord_flip()
+
+
+sad_cgap %>% 
+  ggplot(aes(reorder(year, cgap_max), cgap_max)) + 
+  geom_point(aes(color = site, size = cgap_max)) + 
   coord_flip() + 
-  labs(title = "7 sites",
-       x = NULL,
-       y = "yield gap")
-  
-
-library(patchwork)
-
-figloc / figyr
+  facet_wrap(~site)
 
 
+# should look at corrs at some point --------------------------------------
 
-# how to quantify variation explained by year vs site? --------------------
+
+gap_cor <- gap_wea_year %>%
+  select_if(is.numeric)
+
+corres <- cor(gap_cor, use="complete.obs")
+corrplot::corrplot(corres, type = "lower")
+corrplot::corrplot.mixed(corres)
 
 
-#--assign site and year as random effects?
-library(lme4)
-library(broom)
-d_gaps
-m1 <- lmer(cgap_max ~ 1 + (1|site) + (1|year), data = d_gaps)
-summary(m1)
-
-m1err <- 
-  tidy(m1) %>% 
-  filter(term != "(Intercept)") %>% 
-  select(group, estimate)
-
-#--can I include their interaction? Does it even matter?
-
-#--look at variance 'components' (?)
-m1err %>% 
-  ggplot(aes(x = "", y = estimate, fill = group)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y", start = 0) + 
-  theme_bw() +
-  labs(fill = NULL,
-       x = NULL,
-       y = NULL,
-       title = "Variance Components") + 
-  theme(axis.text = element_blank())
-
-#--what if I assume they are fixed effects?
-m2 <- lm(cgap_max ~ site*year, data = d_gaps)
-anova(m2)
-
-#--nothing is even significant. 
-
-# are yield gpas at min and max N rates related? --------------------------
-
-#--no. put that in the 'draft'. It's contrary to Gentry et al. 
-d_gaps %>% 
-  ggplot(aes(cgap_0, cgap_max)) + 
+p1 <- gap_wea %>% 
+  ggplot(aes(radn, cgap_max)) +
   geom_point(aes(color = site)) + 
-#  facet_grid(.~site) + 
-  geom_smooth(method = "lm", aes(color = site), se = F) + 
-  labs(x = "Yield gap at 0 Nrate (kg/ha)", 
-       y = "Yield gap at max Nrate (kg/ha)") + 
-  theme_bw()
+  facet_wrap(~year, scales = "free")
+ggplotly(p1)
+
+gap_wea %>% 
+  pivot_longer(radn:rain) %>% 
+  ggplot(aes(cgap_max, value)) + 
+  geom_point(size = 5) + 
+  geom_smooth(method = "lm") +
+  facet_wrap(~name, scales = "free")
+
+
+#--biplot of max t and rain
+gap_wea %>% 
+  ggplot(aes(rain, maxt)) + 
+  geom_point(aes(size = cgap_max))
+
+
+
+
+
+# try pls -----------------------------------------------------------------
+
+
+# Preds
+prd_tmp <- gap_wea %>%
+  ungroup() %>% 
+  select(-crop, -site, -year, -cgap_max) %>%
+  mutate_all(funs(scale))
+
+myr_tmp <- gap_wea %>%
+  select(cgap_max)
+
+sdat_tmp <- bind_cols(myr_tmp, prd_tmp) %>%
+  replace(is.na(.), NA)
+
+
+library(pls)
+library(caret)
+
+# Code copied from blog....
+#~~~~~~~~~~~~~~~~~~~~~
+set.seed(951983)
+# Fit a PLS model on d90
+# plsr = partial least squares regression
+pls_tmp <- plsr(cgap_max ~., data = sdat_tmp, validation = "LOO")
+
+# Find the number of dimensions with lowest cross validation error
+# RMSEP = root mean squared error prediction
+cvs_tmp <- RMSEP(pls_tmp)
+generous <- which.min(cvs_tmp$val[estimate = "adjCV", , ]) - 1 # Subtract 1 bc it's counting the intercept
+
+# Use other methods
+sebars <- selectNcomp(pls_tmp, method = "onesigma", plot = TRUE)
+targets <- selectNcomp(pls_tmp, method = "randomization", plot = TRUE)
+
+mylow <- 2
+
+# Rerun the model
+pls_tmp2 <- plsr(cgap_max ~., data = sdat_tmp, ncomp = mylow) # I really only need 1 says lowsig
+
+# Look at explained variance
+explvar(pls_tmp2)
+
+imps_tmp <- varImp(pls_tmp2) %>%
+  rownames_to_column() %>%
+  rename(var = rowname, 
+         imp = Overall) %>%
+  mutate(impT = sum(imp),
+         imps = imp / impT * 100) 
+
+
+# PLS says it's minT
+library(lme4)
+m1 <- lmer(cgap_max ~ radn*maxt*mint*rain + (1|site) + (1|year), data = gap_wea)
+anova(m1)
+
+library(pls
+        
+        
+        
+        
+        
