@@ -8,18 +8,19 @@
 # notes: 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
-library(saapsim) #--my package, has his data in it :P
+#devtools::install_github("vanichols/tidysawyer2", force = T)
+#library(saapsim) #--my package, has some soil data in it, not needed here?
+library(tidysawyer2)
 library(tidyverse)
 library(lubridate)
 
 
 # weather data, from package ----------------------------------------------
 
-wea <- sad_wea %>% as_tibble() 
+wea <- saw_wea %>% as_tibble() 
 
 pwea <- wea %>% 
-  left_join(sad_plant) %>% 
+  left_join(saw_plant) %>% 
   select(-plant_date, -crop) 
 
 #--site yearly weather
@@ -40,7 +41,7 @@ wealt <-
             mint_15y = mean(mint),
             rain_15y = mean(rain))
 
-library(GGally)
+#library(GGally)
 # wealt %>% 
 #   pivot_longer(radn_15y:rain_15y) %>% 
 #   ggplot(aes(reorder(site, value, mean), value)) +
@@ -49,8 +50,8 @@ library(GGally)
 #   facet_grid(~name, scales = "free")
 
 # lets me look at all weather relations at once
-GGally::ggparcoord(data = wealt, columns = 2:5, groupColumn = 1, order = "skewness") +
-  geom_line(size = 2, alpha = 0.5)
+#GGally::ggparcoord(data = wealt, columns = 2:5, groupColumn = 1, order = "skewness") +
+#  geom_line(size = 2, alpha = 0.5)
 
 
 
