@@ -24,8 +24,8 @@ soi <- read_csv("_data/td_pred-soil.csv")
 # summarize ---------------------------------------------------------------
 
 saw_cgap %>% 
-  group_by(site) %>% 
-  summarise(cgap_max = median(cgap_max)) %>% 
+  #group_by(site) %>% 
+  #summarise(cgap_max = median(cgap_max)) %>% 
   filter(cgap_max > -1000) %>% 
   left_join(soi) %>% 
   left_join(wea) %>%
@@ -34,3 +34,4 @@ saw_cgap %>%
   geom_point(aes(color = site)) + 
   geom_smooth(method = "lm", se = F, color = "red") +
   facet_wrap(~name, scales = "free")
+

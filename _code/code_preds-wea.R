@@ -7,6 +7,12 @@
 #
 # notes: 
 
+
+# 
+# The set of weather covariates for corn was as follows: aver-
+#   age vapor pressure deficit (VPD) from 61 to 90 d after plant- ing, maximum air temperature 91 to 120 d after sowing, maximum air temperature in the 30 d leading up to planting, and precipitation 31 to 60 d after planting. For
+
+
 rm(list = ls())
 #devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--my package, has his data in it :P
