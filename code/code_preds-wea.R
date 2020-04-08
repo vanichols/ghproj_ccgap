@@ -173,7 +173,7 @@ wea12 <-
          day < plant_doy + 14) %>% 
   summarise(pre2wkp2wk_tl_mean = mean(mint))
 
-#--number of days < 4degF (-15C) before planting
+#--number of days < 4degF (-15C) before planting. Why 4 deg? Anna? Don't remember...
 wea13 <- 
   pwea %>% 
   group_by(site, year) %>% 
@@ -181,6 +181,9 @@ wea13 <-
   filter(mint < -15) %>% 
   summarise(wintcolddays_n = n())
 
+wea13 %>% 
+  ggplot(aes(wintcolddays_n)) + 
+  geom_histogram()
 
 
 # weather metrics ---------------------------------------------------------
@@ -283,67 +286,3 @@ corrplot::corrplot(corres)
 
 wea_parms %>% write_csv("_data/td_pred-wea.csv")  
 
-
-# try a decision tree -----------------------------------------------------
-
-library(rpart) # Decision tree package
-library(partykit)
-library(tree)
-library(randomForest)
-#library(gbm)
-#library(caret)
-
-
-# need to think about how to evaluate this. What makes it more likely to fall into a WW category?
-ydat <-  
-  saw_cgap %>% 
-  left_join(wea_parms) %>% 
-  ungroup() %>% 
-  select_if(is.numeric)
-
-ydatsc <- ydat %>% 
-  mutate_if(is.numeric, scale)
-
-ydat <- na.omit(ydat)
-
-
-f_tree <- tree::tree(cgap_max~., ydatsc)
-summary(f_tree)
-plot(f_tree)
-text(f_tree, pretty = 0)
-
-cv_tree <- cv.tree(f_tree)
-plot(cv_tree$size, cv_tree$dev, type = 'b') #--this is terrible
-
-prune_tree <- prune.tree(f_tree, best = 2)
-plot(prune_tree)
-text(prune_tree, pretty = 0)
-
-# pls ---------------------------------------------------------------------
-library(pls)
-library(caret)
-
-# Fit a PLS model on CN ratios
-plsm <- plsr(cgap_max ~., data = ydatsc, validation = "LOO")
-
-# Find the number of dimensions with lowest cross validation error
-cv <- RMSEP(plsm)
-best.dims = which.min(cv$val[estimate = "adjCV", , ]) - 1
-
-# Use other methods, see what they say...
-sebars <- selectNcomp(pls_tmp, method = "onesigma", plot = TRUE)
-targets <- selectNcomp(pls_tmp, method = "randomization", plot = TRUE)
-
-
-# Rerun the model
-plsmn <- plsr(cgap_max ~., data = ydatsc, ncomp = best.dims)
-
-# Code copied from Ranae, stupid rownames
-varImp(plsmn) %>%
-  rownames_to_column() %>%
-  rename(var = rowname,
-         imp = Overall) %>% 
-  ggplot(aes(x = reorder(var, imp), y = imp)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  ggtitle("PLS")
