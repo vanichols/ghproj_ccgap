@@ -35,3 +35,21 @@ saw_cgap %>%
   geom_smooth(method = "lm", se = F, color = "red") +
   facet_wrap(~name, scales = "free")
 
+
+# days to reach 140 -------------------------------------------------------
+
+saw_cgap %>% 
+  filter(cgap_max > -1000) %>% 
+  left_join(wea) %>% 
+  ggplot(aes(ndays_gdd140, cgap_max)) + 
+  geom_point(aes(color = site)) + 
+  geom_smooth(method = "lm") + 
+  facet_grid(.~site)
+
+
+saw_cgap %>% 
+  filter(cgap_max > -1000) %>% 
+  left_join(wea) %>% 
+  ggplot(aes(ndays_gdd140, cgap_max)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")

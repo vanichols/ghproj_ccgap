@@ -2,6 +2,7 @@
 # last edited:   3/25/2020
 #                3/27/2020 (include planting dates)
 #                3/30/2020 (added planting-date-referenced weather)
+#                4/8/2020 (add Alison suggestions, play w/machine learning)
 # 
 # purpose: Create pred tibble for weather variables
 #
@@ -29,24 +30,21 @@ pwea <- wea %>%
   left_join(saw_plant) %>% 
   select(-plant_date, -crop) 
 
-#--site yearly weather
-weasy <- wea %>% 
-  group_by(site, year) %>%
-  summarise(radn = sum(radn, na.rm = T),
-            maxt = mean(maxt, na.rm = T),
-            mint = mean(mint, na.rm = T),
-            rain = sum(rain, na.rm = T)) 
-  
+#--check, all sites/years?
+pwea %>% 
+  select(site, year) %>% 
+  distinct() 
 
-#--look at 15-year averages (I know this isn't right, but it's ok for now) across sites
-wealt <- 
-  weasy %>% 
-  group_by(site) %>% 
-  summarise(radn_15y = mean(radn),
-            maxt_15y = mean(maxt),
-            mint_15y = mean(mint),
-            rain_15y = mean(rain))
 
+# #--look at 15-year averages (I know this isn't right, but it's ok for now) across sites
+# wealt <- 
+#   weasy %>% 
+#   group_by(site) %>% 
+#   summarise(radn_15y = mean(radn),
+#             maxt_15y = mean(maxt),
+#             mint_15y = mean(mint),
+#             rain_15y = mean(rain))
+# 
 #library(GGally)
 # wealt %>% 
 #   pivot_longer(radn_15y:rain_15y) %>% 
@@ -63,22 +61,73 @@ wealt <-
 
 # weather in reference to planting ----------------------------------------
 
+#--days w/max temp < 50 up to 30 days after planting
+wea1 <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy, 
+         day < plant_doy + 28) %>%
+  filter(maxt <= 10) %>% #--temp is in C
+  summarise(p4wk_less50_maxt = n())
+
+wea1 %>% 
+  ggplot(aes(p4wk_less50_maxt)) + 
+  geom_histogram()
+
+
+#--days w/avg temp < 50 up to 30 dap
+wea2 <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy,
+         day < plant_doy + 30) %>% 
+  mutate(tav = (maxt + mint)/2) %>% 
+  filter(tav < 10) %>% 
+  summarise(wintcolddays_n = n())
+
+#--rainy days >1" from planting to 60 DAP
+wea3 <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy, 
+         day < plant_doy + 30) %>%
+  filter(rain >= 25.4) %>% #--rain more than an inch
+  summarise(p4wk_1inrain = n())
+
+wea3 %>% 
+  ggplot(aes(p4wk_1inrain)) + 
+  geom_histogram()
+
+#--days to reach 140
+wea4 <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy) %>% 
+  mutate(gdd = (maxt + mint)/2 - 10,
+         gdd_cum = cumsum(gdd)) %>% 
+  filter(gdd_cum < 140) %>% 
+  summarise(ndays_gdd140 = n())
+
+wea4 %>% 
+  ggplot(aes(ndays_gdd140)) + 
+  geom_histogram()
+
 #--rain tot 2 weeks after planting
-wea_2wkp <- 
+wea5 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 14) %>% 
   summarise(p2wk_rain_tot = sum(rain))
 
-wea_3wkp <- 
+wea6 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 21) %>% 
   summarise(p3wk_rain_tot = sum(rain))
 
-wea_4wkp <- 
+wea7 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
@@ -86,21 +135,21 @@ wea_4wkp <-
   summarise(p4wk_rain_tot = sum(rain))
 
 #--2 weeks before planting
-wea_2wkpp <- 
+wea8 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 14) %>% 
   summarise(prep2wk_rain_tot = sum(rain))
 
-wea_3wkpp <- 
+wea9 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 21) %>% 
   summarise(prep3wk_rain_tot = sum(rain))
 
-wea_4wkpp <- 
+wea10 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
@@ -108,7 +157,7 @@ wea_4wkpp <-
   summarise(prep4wk_rain_tot = sum(rain))
 
 #--avg high temp in the month 2 months after planting
-wea_8wkt <- 
+wea11 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy + 56, 
@@ -117,7 +166,7 @@ wea_8wkt <-
 
 
 #--avg low temp in the month surrounding planting
-wea_4wkt <- 
+wea12 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy - 14, 
@@ -125,7 +174,7 @@ wea_4wkt <-
   summarise(pre2wkp2wk_tl_mean = mean(mint))
 
 #--number of days < 4degF (-15C) before planting
-wea_cold <- 
+wea13 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy) %>% 
@@ -140,7 +189,6 @@ wea_cold <-
 #--teasdale and cavigelli 2017 paper (always in reference to planting....)
 #--others?
 #--sa uses rainy days > 1inch, growing season GDD, heat days (Tmax > 34C), cold days (Tmin < 4), rad, avg T
-
 
 
 #--mean july max temp
@@ -193,26 +241,109 @@ wea_hs <-
   summarise(heatstress_n = n())
 
 
+
 # weather w/respect to planting -------------------------------------------
 
 
 wea_parms <- 
-  weasy %>% 
-  left_join(wea_2wkp) %>% 
-  left_join(wea_2wkpp) %>% 
-  left_join(wea_3wkp) %>% 
-  left_join(wea_3wkpp) %>% 
-  left_join(wea_4wkp) %>% 
-  left_join(wea_4wkpp) %>% 
-  left_join(wea_8wkt) %>%
-  left_join(wea_4wkt) %>% 
-  left_join(wea_cold) %>% 
-  left_join(wea_july) %>%
-  left_join(wea_may) %>% 
-  left_join(wea_apr) %>% 
-  left_join(wea_aprmay) %>% 
-  left_join(wea_gs) %>% 
-  left_join(wea_hs) 
+  wea_gs %>% 
+  left_join(wea1) %>% 
+  left_join(wea2) %>% 
+  left_join(wea3) %>% 
+  left_join(wea4) %>% 
+  left_join(wea5) %>% 
+  left_join(wea6) %>% 
+  left_join(wea7) %>% 
+  left_join(wea8) %>% 
+  left_join(wea9) %>%
+  left_join(wea10) %>% 
+  left_join(wea11) %>% 
+  left_join(wea12) %>% 
+  left_join(wea13) %>% 
+  #left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
+  #left_join(wea_may) %>% 
+  #left_join(wea_apr) %>% 
+  #left_join(wea_aprmay) %>%
+  left_join(wea_hs) %>%
+  ungroup() %>% 
+  mutate_if(is.numeric, list(~replace_na(., 0)))
 
+# what is correlated? -----------------------------------------------------
+library(corrplot)
+
+wea_cor <- 
+  wea_parms %>%
+  ungroup() %>% 
+  select_if(is.numeric) 
+corres <- cor(wea_cor, use="complete.obs")
+corrplot::corrplot.mixed(corres)
+corrplot::corrplot(corres)
+
+# write what i like -------------------------------------------------------
 
 wea_parms %>% write_csv("_data/td_pred-wea.csv")  
+
+
+# try a decision tree -----------------------------------------------------
+
+library(rpart) # Decision tree package
+library(partykit)
+library(tree)
+library(randomForest)
+#library(gbm)
+#library(caret)
+
+
+# need to think about how to evaluate this. What makes it more likely to fall into a WW category?
+ydat <-  
+  saw_cgap %>% 
+  left_join(wea_parms) %>% 
+  ungroup() %>% 
+  select_if(is.numeric)
+
+ydatsc <- ydat %>% 
+  mutate_if(is.numeric, scale)
+
+ydat <- na.omit(ydat)
+
+
+f_tree <- tree::tree(cgap_max~., ydatsc)
+summary(f_tree)
+plot(f_tree)
+text(f_tree, pretty = 0)
+
+cv_tree <- cv.tree(f_tree)
+plot(cv_tree$size, cv_tree$dev, type = 'b') #--this is terrible
+
+prune_tree <- prune.tree(f_tree, best = 2)
+plot(prune_tree)
+text(prune_tree, pretty = 0)
+
+# pls ---------------------------------------------------------------------
+library(pls)
+library(caret)
+
+# Fit a PLS model on CN ratios
+plsm <- plsr(cgap_max ~., data = ydatsc, validation = "LOO")
+
+# Find the number of dimensions with lowest cross validation error
+cv <- RMSEP(plsm)
+best.dims = which.min(cv$val[estimate = "adjCV", , ]) - 1
+
+# Use other methods, see what they say...
+sebars <- selectNcomp(pls_tmp, method = "onesigma", plot = TRUE)
+targets <- selectNcomp(pls_tmp, method = "randomization", plot = TRUE)
+
+
+# Rerun the model
+plsmn <- plsr(cgap_max ~., data = ydatsc, ncomp = best.dims)
+
+# Code copied from Ranae, stupid rownames
+varImp(plsmn) %>%
+  rownames_to_column() %>%
+  rename(var = rowname,
+         imp = Overall) %>% 
+  ggplot(aes(x = reorder(var, imp), y = imp)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  ggtitle("PLS")
