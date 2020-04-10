@@ -1,12 +1,11 @@
-# Created:       4/1/2020
+# Created:       4/10/2020
 # last edited:   
 # 
-# purpose: Create pred summary (soil and wea)
+# purpose: Look at random forests
 #
 # notes: 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--has functios
 library(tidysawyer2) #--has data
 library(tidyverse)
@@ -95,29 +94,6 @@ corrplot::corrplot(corres)
 
 #hmm. Some correlation problems. Get rid of PAW? Or clay and soc?
 
-# # summarize ---------------------------------------------------------------
-library(gt)
-
-#https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/
-library(psych)
-dat_sum <- psych::describe(dat)
-
-dat_vars <- rownames(dat_sum)
-
-dat_sum_tib <- 
-  dat_sum %>%
-  as_tibble() %>% 
-  mutate(vars = dat_vars) %>% 
-  select(vars, min, max, mean) %>% 
-  filter(!is.infinite(min)) %>% 
-  mutate_if(is.numeric, round, 0)
-
-gt(dat_sum_tib)
-
-
-
-# ML ----------------------------------------------------------------------
-
 
 # try a decision tree -----------------------------------------------------
 
@@ -128,19 +104,123 @@ library(randomForest)
 #library(gbm)
 #library(caret)
 
+library(iml)
 
-ydat <- 
-  dat %>% 
+bike <- load("data/bike.RData")
+data(bike)
+# Fit a random forest
+bike %>% as_tibble()
+bike_mod = randomForest::randomForest(x = bike %>% dplyr::select(-cnt), y = bike$cnt)
+
+# Create a "predictor" object that 
+# holds the model and the data
+bike_pred = 
+  Predictor$new(
+    model = bike_mod,
+    data = bike)
+# Compute the partial dependence 
+# function for temp and windspeed
+# takes a looooooooong time
+pdp = 
+  FeatureEffect$new(
+    predictor = bike_pred, 
+    feature = c("hum", "temp"), 
+    method = "pdp") 
+# Create the partial dependence plot
+pdp$plot() +
+  viridis::scale_fill_viridis(
+    option = "D") + 
+  labs(x = "Humidity", 
+       y = "Temperature", 
+       fill = "Prediction")
+
+
+
+
+# hmmm --------------------------------------------------------------------
+
+ccgap <- dat %>% 
   ungroup() %>% 
-  select_if(is.numeric)
+  select(-crop, -site, -year) %>% 
+  filter(!is.na(prev_ccyield))
+         
 
-ydatsc <- ydat %>% 
-  mutate_if(is.numeric, scale)
+ccgap <- na.omit(ccgap)
+library(skimr)
+skim(ccgap)
 
-ydat <- na.omit(ydat)
+gap_mod = randomForest::randomForest(x = ccgap %>% dplyr::select(-cgap_max), y = ccgap$cgap_max)
 
 
-f_tree <- tree::tree(cgap_max~., ydat)
+# Create a "predictor" object that 
+# holds the model and the data
+gap_pred = 
+  Predictor$new(
+    model = gap_mod,
+    data = ccgap)
+# Compute the partial dependence 
+# function for temp and windspeed
+# takes a looooooooong time
+pdp = 
+  FeatureEffect$new(
+    predictor = gap_pred, 
+    feature = c("avg_ccyield", "prep2wk_precip_mm_tot"), 
+    method = "pdp") 
+# Create the partial dependence plot
+pdp$plot() +
+  viridis::scale_fill_viridis(
+     option = "D")# + 
+  # labs(x = "Humidity", 
+  #      y = "Temperature", 
+  #      fill = "Prediction")
+
+# Compute the ICE function
+ice = 
+  FeatureEffect$new(
+    predictor = gap_pred,
+    feature = "p2mo_gdd",
+    method = "ice")
+# Create the plot
+plot(ice)
+
+# Create the predictor 
+# (seemingly FeatureImp 
+# requires y)
+gap_pred = 
+  Predictor$new(
+    model = gap_mod, 
+    data = ccgap, 
+    y = ccgap$cgap_max)
+# Compute the feature
+# importance values
+gap_imp = 
+  FeatureImp$new(
+    predictor = gap_pred, 
+    loss = 'mae')
+# Plot the feature
+# importance values
+plot(gap_imp)
+
+
+# Center the ICE function for 
+# temperature at the 
+# minimum temperature and 
+# include the pdp
+ice_centered = 
+  FeatureEffect$new(
+    predictor = gap_pred,
+    feature = "avg_ccyield",
+    center.at = max(ccgap$avg_ccyield),
+    method = "pdp+ice")
+# Create the plot
+plot(ice_centered)
+
+
+
+
+
+
+f_tree <- tree::tree(cgap_max~., ccgap)
 summary(f_tree)
 plot(f_tree)
 text(f_tree, pretty = 0)
@@ -191,21 +271,7 @@ dat %>%
 
 library(glmnet)
 
-ydat <- 
-  dat %>% 
-  ungroup() %>% 
-  select_if(is.numeric) %>% 
-  select(years_in_corn,
-         p2mo_gdd,
-         pre2wkp2wk_tl_mean,
-         prep2wk_precip_mm_tot,
-         prev_ccyield,
-         heatstress_n,
-         p2wk_precip_mm_tot,
-         wintcolddays_n,
-         avg_ccyield,
-         cgap_max)
-
+ydatsc
 
 # Scale and center predictors
 pred_tmp <-
