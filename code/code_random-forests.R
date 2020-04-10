@@ -95,6 +95,12 @@ corrplot::corrplot(corres)
 #hmm. Some correlation problems. Get rid of PAW? Or clay and soc?
 
 
+dat %>% 
+  ggplot(aes(avg_ccyield,
+             prep2wk_precip_mm_tot)) +
+  geom_jitter(aes(color = cgap_max), size = 5) + 
+  scale_color_viridis_c()
+
 # try a decision tree -----------------------------------------------------
 
 library(rpart) # Decision tree package
