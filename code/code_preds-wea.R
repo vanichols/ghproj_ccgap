@@ -41,13 +41,13 @@ pwea %>%
 #   weasy %>% 
 #   group_by(site) %>% 
 #   summarise(radn_15y = mean(radn),
-#             maxt_15y = mean(maxt),
-#             mint_15y = mean(mint),
-#             rain_15y = mean(rain))
+#             tmax_c_15y = mean(tmax_c),
+#             tmin_c_15y = mean(tmin_c),
+#             precip_mm_15y = mean(precip_mm))
 # 
 #library(GGally)
 # wealt %>% 
-#   pivot_longer(radn_15y:rain_15y) %>% 
+#   pivot_longer(radn_15y:precip_mm_15y) %>% 
 #   ggplot(aes(reorder(site, value, mean), value)) +
 #   geom_point(size = 5) +
 #   coord_flip() +
@@ -62,77 +62,80 @@ pwea %>%
 # weather in reference to planting ----------------------------------------
 
 #--days w/max temp < 50 up to 30 days after planting
-wea1 <- 
-  pwea %>% 
-  group_by(site, year) %>% 
-  filter(day > plant_doy, 
-         day < plant_doy + 28) %>%
-  filter(maxt <= 10) %>% #--temp is in C
-  summarise(p4wk_less50_maxt = n())
+# wea1 <- 
+#   pwea %>% 
+#   group_by(site, year) %>% 
+#   filter(day > plant_doy, 
+#          day < plant_doy + 28) %>%
+#   filter(tmax_c <= 10) %>% #--temp is in C
+#   summarise(p4wk_less50_tmax_c = n())
 
-wea1 %>% 
-  ggplot(aes(p4wk_less50_maxt)) + 
-  geom_histogram()
+# wea1 %>% 
+#   ggplot(aes(p4wk_less50_tmax_c)) + 
+#   geom_histogram()
 
+#--I don't like this one, bad distribution
 
 #--days w/avg temp < 50 up to 30 dap
-wea2 <- 
-  pwea %>% 
-  group_by(site, year) %>% 
-  filter(day > plant_doy,
-         day < plant_doy + 30) %>% 
-  mutate(tav = (maxt + mint)/2) %>% 
-  filter(tav < 10) %>% 
-  summarise(wintcolddays_n = n())
+# wea2 <- 
+#   pwea %>% 
+#   group_by(site, year) %>% 
+#   filter(day > plant_doy,
+#          day < plant_doy + 30) %>% 
+#   mutate(tav = (tmax_c + tmin_c)/2) %>% 
+#   filter(tav < 10) %>% 
+#   summarise(wintcolddays_n = n())
 
-#--rainy days >1" from planting to 60 DAP
+#--precip_mmy days >1" from planting to 60 DAP
 wea3 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 30) %>%
-  filter(rain >= 25.4) %>% #--rain more than an inch
-  summarise(p4wk_1inrain = n())
+  filter(precip_mm >= 25.4) %>% #--precip_mm more than an inch
+  summarise(p4wk_1inprecip_mm = n())
 
 wea3 %>% 
-  ggplot(aes(p4wk_1inrain)) + 
+  ggplot(aes(p4wk_1inprecip_mm)) + 
   geom_histogram()
 
-#--days to reach 140
+# also bad distribution
+
+#--days to reach 140 (or 120?)
 wea4 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy) %>% 
-  mutate(gdd = (maxt + mint)/2 - 10,
+  mutate(gdd = (tmax_c + tmin_c)/2 - 10,
          gdd_cum = cumsum(gdd)) %>% 
-  filter(gdd_cum < 140) %>% 
+  filter(gdd_cum <= 140) %>% 
   summarise(ndays_gdd140 = n())
 
 wea4 %>% 
   ggplot(aes(ndays_gdd140)) + 
   geom_histogram()
 
-#--rain tot 2 weeks after planting
+#--precip_mm tot 2 weeks after planting
 wea5 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 14) %>% 
-  summarise(p2wk_rain_tot = sum(rain))
+  summarise(p2wk_precip_mm_tot = sum(precip_mm))
 
 wea6 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 21) %>% 
-  summarise(p3wk_rain_tot = sum(rain))
+  summarise(p3wk_precip_mm_tot = sum(precip_mm))
 
 wea7 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 28) %>% 
-  summarise(p4wk_rain_tot = sum(rain))
+  summarise(p4wk_precip_mm_tot = sum(precip_mm))
 
 #--2 weeks before planting
 wea8 <- 
@@ -140,21 +143,21 @@ wea8 <-
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 14) %>% 
-  summarise(prep2wk_rain_tot = sum(rain))
+  summarise(prep2wk_precip_mm_tot = sum(precip_mm))
 
 wea9 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 21) %>% 
-  summarise(prep3wk_rain_tot = sum(rain))
+  summarise(prep3wk_precip_mm_tot = sum(precip_mm))
 
 wea10 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 28) %>% 
-  summarise(prep4wk_rain_tot = sum(rain))
+  summarise(prep4wk_precip_mm_tot = sum(precip_mm))
 
 #--avg high temp in the month 2 months after planting
 wea11 <- 
@@ -162,7 +165,7 @@ wea11 <-
   group_by(site, year) %>% 
   filter(day > plant_doy + 56, 
          day < plant_doy + 56 + 28) %>% 
-  summarise(p2mo_tx_mean = mean(maxt))
+  summarise(p2mo_tx_mean = mean(tmax_c))
 
 
 #--avg low temp in the month surrounding planting
@@ -171,14 +174,14 @@ wea12 <-
   group_by(site, year) %>% 
   filter(day > plant_doy - 14, 
          day < plant_doy + 14) %>% 
-  summarise(pre2wkp2wk_tl_mean = mean(mint))
+  summarise(pre2wkp2wk_tl_mean = mean(tmin_c))
 
 #--number of days < 4degF (-15C) before planting. Why 4 deg? Anna? Don't remember...
 wea13 <- 
   pwea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy) %>% 
-  filter(mint < -15) %>% 
+  filter(tmin_c < -15) %>% 
   summarise(wintcolddays_n = n())
 
 wea13 %>% 
@@ -191,7 +194,7 @@ wea13 %>%
 #--rafa's scirep paper
 #--teasdale and cavigelli 2017 paper (always in reference to planting....)
 #--others?
-#--sa uses rainy days > 1inch, growing season GDD, heat days (Tmax > 34C), cold days (Tmin < 4), rad, avg T
+#--sa uses precip_mmy days > 1inch, growing season GDD, heat days (Tmax > 34C), cold days (Tmin < 4), rad, avg T
 
 
 #--mean july max temp
@@ -199,75 +202,77 @@ wea_july <-
   wea %>% 
   filter(day < 212, day > 181) %>% 
   group_by(site, year) %>% 
-  summarise(jul_mint_mean = mean(mint),
-            jul_maxt_mean = mean(maxt),
-            jul_rain_tot = sum(rain))
+  summarise(jul_tmin_c_mean = mean(tmin_c),
+            jul_tmax_c_mean = mean(tmax_c),
+            jul_precip_mm_tot = sum(precip_mm))
 
 wea_may <- 
   wea %>% 
   filter(day < 151, day > 121) %>% 
   group_by(site, year) %>% 
-  summarise(may_mint_mean = mean(mint),
-            may_maxt_mean = mean(maxt),
-            may_rain_tot = sum(rain))
+  summarise(may_tmin_c_mean = mean(tmin_c),
+            may_tmax_c_mean = mean(tmax_c),
+            may_precip_mm_tot = sum(precip_mm))
 
 wea_apr <- 
   wea %>% 
   filter(day < 120, day > 91) %>% 
   group_by(site, year) %>% 
-  summarise(apr_mint_mean = mean(mint),
-            apr_maxt_mean = mean(maxt),
-            apr_rain_tot = sum(rain))
+  summarise(apr_tmin_c_mean = mean(tmin_c),
+            apr_tmax_c_mean = mean(tmax_c),
+            apr_precip_mm_tot = sum(precip_mm))
 
 wea_aprmay <- 
   wea %>% 
   filter(day < 151, day > 91) %>% 
   group_by(site, year) %>% 
-  summarise(aprmay_mint_mean = mean(mint),
-            aprmay_maxt_mean = mean(maxt),
-            aprmay_rain_tot = sum(rain))
+  summarise(aprmay_tmin_c_mean = mean(tmin_c),
+            aprmay_tmax_c_mean = mean(tmax_c),
+            aprmay_precip_mm_tot = sum(precip_mm))
 
 
 wea_gs <- 
   wea %>% 
   filter(day < 244, day > 91) %>% 
   group_by(site, year) %>% 
-  summarise(gs_rain_tot = sum(rain),
-            gs_tavg = mean((maxt + mint)/2))
+  summarise(gs_precip_mm_tot = sum(precip_mm),
+            gs_tavg = mean((tmax_c + tmin_c)/2))
 
 
 wea_hs <- 
   wea %>% 
   filter(day < 244, day > 91) %>%
-  filter(maxt > 30) %>% 
+  filter(tmax_c > 30) %>% 
   group_by(site, year) %>% 
   summarise(heatstress_n = n())
 
-
+wea_hs %>% 
+  ggplot(aes(heatstress_n)) + 
+  geom_histogram()
 
 # weather w/respect to planting -------------------------------------------
 
 
 wea_parms <- 
-  wea_gs %>% 
-  left_join(wea1) %>% 
-  left_join(wea2) %>% 
-  left_join(wea3) %>% 
+  wea_hs %>% 
+  #left_join(wea1) %>% 
+  #left_join(wea2) %>% #--not a lot of variation
+  #left_join(wea3) %>% #--not much variation
   left_join(wea4) %>% 
   left_join(wea5) %>% 
-  left_join(wea6) %>% 
-  left_join(wea7) %>% 
+  #left_join(wea6) %>% 
+  #left_join(wea7) %>% 
   left_join(wea8) %>% 
-  left_join(wea9) %>%
-  left_join(wea10) %>% 
-  left_join(wea11) %>% 
+  #left_join(wea9) %>%
+  #left_join(wea10) %>% 
+  #left_join(wea11) %>% #--correlated w/days to gdd140 for some reason
   left_join(wea12) %>% 
   left_join(wea13) %>% 
   #left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
   #left_join(wea_may) %>% 
   #left_join(wea_apr) %>% 
   #left_join(wea_aprmay) %>%
-  left_join(wea_hs) %>%
+  #left_join(wea_gs) %>%
   ungroup() %>% 
   mutate_if(is.numeric, list(~replace_na(., 0)))
 
@@ -282,7 +287,9 @@ corres <- cor(wea_cor, use="complete.obs")
 corrplot::corrplot.mixed(corres)
 corrplot::corrplot(corres)
 
+# i like heatstress more than gs_tavg I think, comment out line 272
+
 # write what i like -------------------------------------------------------
 
-wea_parms %>% write_csv("_data/td_pred-wea.csv")  
+wea_parms %>% write_csv("data/td_pred-wea.csv")  
 

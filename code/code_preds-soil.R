@@ -67,6 +67,9 @@ soil_dat <-
   mutate(wtdepth_cm = as.numeric(wtdepth_cm))
 
 
+soil_dat %>% 
+  ggplot(aes(soc_30cm_pct)) + 
+  geom_histogram()
 
 # write -------------------------------------------------------------------
 

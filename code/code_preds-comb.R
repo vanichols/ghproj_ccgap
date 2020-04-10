@@ -17,8 +17,26 @@ library(lubridate)
 # data --------------------------------------------------------------------
 
 
-wea <- read_csv("_data/td_pred-wea.csv")  
-soi <- read_csv("_data/td_pred-soil.csv")
+wea <- read_csv("data/td_pred-wea.csv")  
+soi <- read_csv("data/td_pred-soil.csv")
+
+
+#--add previous year's continuous corn yield as covariate?
+prev_yield <- 
+  saw_tidysawyer %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  select(site, year, rotation, yield_kgha) %>%
+  filter(rotation == "cc") %>% 
+  mutate(prev_ccyield = lag(yield_kgha)) %>% 
+  select(site, year, prev_ccyield)
+
+dat <-  
+  saw_cgap %>%
+  filter(cgap_max > -1500) %>% 
+  left_join(prev_yield) %>% 
+  left_join(wea) %>% 
+  left_join(soi) 
 
 
 # summarize ---------------------------------------------------------------
@@ -69,12 +87,6 @@ library(randomForest)
 #library(caret)
 
 
-# need to think about how to evaluate this. What makes it more likely to fall into a WW category?
-dat <-  
-  saw_cgap %>%
-  filter(cgap_max > -1500) %>% 
-  left_join(wea) %>% 
-  left_join(soi) 
 
 
 ydat <- 
@@ -96,7 +108,7 @@ text(f_tree, pretty = 0)
 cv_tree <- cv.tree(f_tree)
 plot(cv_tree$size, cv_tree$dev, type = 'b') #--this is terrible
 
-prune_tree <- prune.tree(f_tree, best = 3)
+prune_tree <- prune.tree(f_tree, best = 4)
 plot(prune_tree)
 text(prune_tree, pretty = 0)
 
@@ -240,13 +252,29 @@ myres <- left_join(myRR_res, myL_res) %>%
 #                  warm gs = lower gap (??), this might be indicative of something else....
 
 myres %>% 
+  filter(LSO_value != 0) %>% 
+  mutate(pred = recode(pred,
+                       p2mo_tx_mean = "Mean Max T planting-V12",
+                       wintcolddays_n = "Number of Days <-15 Before Planting",
+                       prep2wk_rain_tot = "Amount of Rain 2 weeks Before Planting",
+                       gs_tavg = "April 1 - Sept 1 Average Temperature",
+                       bhzdepth_cm = "Depth to B Horizon",
+                       wtdepth_cm = "Depth to Water Table",
+                       p4wk_1inrain = "Days planting-1 mo with 1 inch of rain",
+                       soc_30cm_pct = "Soil Carbon in top 30 cm",
+                       ndays_gdd140 = "Number of DAP to reach 140GDD",
+                       iascr = "Iowa Corn Suitability Rating")
+  ) %>% 
   ggplot(aes(reorder(pred, LSO_value, mean), LSO_value)) + 
   geom_col() + 
   coord_flip()
 
-getridof <- myres %>% 
-  filter(LSO_value == 0) %>% 
-  select(pred)
+myres %>% 
+  ggplot(aes(reorder(pred, RR_value, mean), RR_value)) + 
+  geom_col() + 
+  coord_flip()
+
+
 
 #--sooo higher p2mo_tx_mean and ndays_gdd140 means bigger gap
 #--     lower gs_tavg and wintcolddays_n means lower gap
