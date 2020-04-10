@@ -73,6 +73,7 @@ dat <-
   left_join(soi) %>% 
   mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
 
+
 dat %>% 
   ggplot(aes(iacsr, avg_ccyield)) + 
   geom_point()
@@ -83,7 +84,36 @@ dat %>%
   geom_point()
 
 
+
+dat_cor <- 
+  dat %>%
+  ungroup() %>% 
+  select_if(is.numeric) 
+corres <- cor(dat_cor, use="complete.obs")
+#corrplot::corrplot.mixed(corres)
+corrplot::corrplot(corres)
+
+#hmm. Some correlation problems. Get rid of PAW? Or clay and soc?
+
 # # summarize ---------------------------------------------------------------
+library(gt)
+
+#https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/
+library(psych)
+dat_sum <- psych::describe(dat)
+
+dat_vars <- rownames(dat_sum)
+
+dat_sum_tib <- 
+  dat_sum %>%
+  as_tibble() %>% 
+  mutate(vars = dat_vars) %>% 
+  select(vars, min, max, mean) %>% 
+  filter(!is.infinite(min)) %>% 
+  mutate_if(is.numeric, round, 0)
+
+gt(dat_sum_tib)
+
 # 
 # saw_cgap %>% 
 #   #group_by(site) %>% 
@@ -131,8 +161,6 @@ library(randomForest)
 #library(caret)
 
 
-
-
 ydat <- 
   dat %>% 
   ungroup() %>% 
@@ -144,15 +172,15 @@ ydatsc <- ydat %>%
 ydat <- na.omit(ydat)
 
 
-f_tree <- tree::tree(cgap_max~., ydatsc)
+f_tree <- tree::tree(cgap_max~., ydat)
 summary(f_tree)
 plot(f_tree)
 text(f_tree, pretty = 0)
 
-cv_tree <- cv.tree(f_tree)
+cv_tree <- tree::cv.tree(f_tree)
 plot(cv_tree$size, cv_tree$dev, type = 'b') #--this is terrible
 
-prune_tree <- prune.tree(f_tree, best = 4)
+prune_tree <- tree::prune.tree(f_tree, best = 3)
 plot(prune_tree)
 text(prune_tree, pretty = 0)
 

@@ -107,6 +107,7 @@ wea4 <-
   group_by(site, year) %>% 
   filter(day > plant_doy) %>% 
   mutate(gdd = (tmax_c + tmin_c)/2 - 10,
+         gdd = ifelse(gdd < 0, 0, gdd),
          gdd_cum = cumsum(gdd)) %>% 
   filter(gdd_cum <= 140) %>% 
   summarise(ndays_gdd140 = n())
@@ -194,6 +195,22 @@ wea13 %>%
   geom_histogram()
 
 
+#--gdd in 2 months after planting
+wea14 <- 
+  pwea %>% 
+  group_by(site, year) %>% 
+  filter(day > plant_doy,
+         day < plant_doy + 60) %>%
+  mutate(tmax_c = ifelse(tmax_c > 30, 30, tmax_c),
+         gdd = (tmin_c + tmax_c)/2 - 10,
+         gdd = ifelse(gdd < 0, 0, gdd)) %>% 
+  summarise(p2mo_gdd = sum(gdd))
+
+wea14 %>% 
+  ggplot(aes(p2mo_gdd)) + 
+  geom_histogram()
+
+
 # weather metrics ---------------------------------------------------------
 
 #--rafa's scirep paper
@@ -273,6 +290,7 @@ wea_parms <-
   #left_join(wea11) %>% #--correlated w/days to gdd140 for some reason
   left_join(wea12) %>% 
   left_join(wea13) %>% 
+  left_join(wea14) %>% 
   #left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
   #left_join(wea_may) %>% 
   #left_join(wea_apr) %>% 
