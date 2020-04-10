@@ -21,6 +21,11 @@ wea <- read_csv("data/td_pred-wea.csv")
 soi <- read_csv("data/td_pred-soil.csv")
 
 
+#--what does the corn suitability rating look like?
+soi %>% 
+  ggplot(aes(iacsr)) +
+  geom_histogram()
+
 #--add previous year's continuous corn yield as covariate?
 prev_yield <- 
   saw_tidysawyer %>% 
@@ -31,46 +36,85 @@ prev_yield <-
   mutate(prev_ccyield = lag(yield_kgha)) %>% 
   select(site, year, prev_ccyield)
 
+#--use 'site production index' instead of soil things?
+avg_yield <- 
+  saw_tidysawyer %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  #--make sure it's taken over the same time frame
+  filter(year > 2006,
+         year < 2017) %>% 
+  select(site, year, rotation, yield_kgha) %>%
+  filter(rotation == "cc") %>% 
+  summarise(avg_ccyield = mean(yield_kgha, na.rm = T)) %>% 
+  select(site, avg_ccyield)
+
+#--include # of years in corn
+
+yrs_corn <- 
+  saw_tidysawyer %>% 
+  filter(rotation == "cc") %>% 
+  group_by(site) %>% 
+  group_modify(~{
+    .x %>% mutate(years_in_corn = group_indices(., year))
+  }) %>% 
+  select(site, year, years_in_corn) %>% 
+  distinct()
+  
+
+
 dat <-  
   saw_cgap %>%
   filter(cgap_max > -1500) %>% 
   left_join(prev_yield) %>% 
+  left_join(avg_yield) %>% 
+  left_join(yrs_corn) %>% 
   left_join(wea) %>% 
-  left_join(soi) 
-
-
-# summarize ---------------------------------------------------------------
-
-saw_cgap %>% 
-  #group_by(site) %>% 
-  #summarise(cgap_max = median(cgap_max)) %>% 
-  filter(cgap_max > -1000) %>% 
   left_join(soi) %>% 
-  left_join(wea) %>%
-  pivot_longer(wtdepth_cm:heatstress_n) %>% 
-  ggplot(aes(value, cgap_max)) + 
-  geom_point(aes(color = site)) + 
-  geom_smooth(method = "lm", se = F, color = "red") +
-  facet_wrap(~name, scales = "free")
+  mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
+
+dat %>% 
+  ggplot(aes(iacsr, avg_ccyield)) + 
+  geom_point()
 
 
-# days to reach 140 -------------------------------------------------------
-
-saw_cgap %>% 
-  filter(cgap_max > -1000) %>% 
-  left_join(wea) %>% 
-  ggplot(aes(ndays_gdd140, cgap_max)) + 
-  geom_point(aes(color = site)) + 
-  geom_smooth(method = "lm") + 
-  facet_grid(.~site)
+dat %>% 
+  ggplot(aes(bhzdepth_cm, avg_ccyield)) + 
+  geom_point()
 
 
-saw_cgap %>% 
-  filter(cgap_max > -1000) %>% 
-  left_join(wea) %>% 
-  ggplot(aes(ndays_gdd140, cgap_max)) + 
-  geom_point() + 
-  geom_smooth(method = "lm")
+# # summarize ---------------------------------------------------------------
+# 
+# saw_cgap %>% 
+#   #group_by(site) %>% 
+#   #summarise(cgap_max = median(cgap_max)) %>% 
+#   filter(cgap_max > -1000) %>% 
+#   left_join(soi) %>% 
+#   left_join(wea) %>%
+#   pivot_longer(wtdepth_cm:heatstress_n) %>% 
+#   ggplot(aes(value, cgap_max)) + 
+#   geom_point(aes(color = site)) + 
+#   geom_smooth(method = "lm", se = F, color = "red") +
+#   facet_wrap(~name, scales = "free")
+# 
+# 
+# # days to reach 140 -------------------------------------------------------
+# 
+# saw_cgap %>% 
+#   filter(cgap_max > -1000) %>% 
+#   left_join(wea) %>% 
+#   ggplot(aes(ndays_gdd140, cgap_max)) + 
+#   geom_point(aes(color = site)) + 
+#   geom_smooth(method = "lm") + 
+#   facet_grid(.~site)
+# 
+# 
+# saw_cgap %>% 
+#   filter(cgap_max > -1000) %>% 
+#   left_join(wea) %>% 
+#   ggplot(aes(ndays_gdd140, cgap_max)) + 
+#   geom_point() + 
+#   geom_smooth(method = "lm")
 
 
 
@@ -142,7 +186,7 @@ varImp(plsmn) %>%
 
 
 dat %>% 
-  ggplot(aes(prep2wk_rain_tot, cgap_max)) + 
+  ggplot(aes(prep2wk_precip_mm_tot, cgap_max)) + 
   geom_point() + 
   geom_smooth(method = "lm") + 
   facet_grid(.~site)
@@ -156,7 +200,7 @@ ydatsc
 # Scale and center predictors
 pred_tmp <-
   ydat %>%
-  select(-cgap_max, -year) %>%
+  select(-cgap_max) %>%
   select_if(is.numeric) %>%
   mutate_all(funs(scale))
 
@@ -256,18 +300,28 @@ myres %>%
   mutate(pred = recode(pred,
                        p2mo_tx_mean = "Mean Max T planting-V12",
                        wintcolddays_n = "Number of Days <-15 Before Planting",
-                       prep2wk_rain_tot = "Amount of Rain 2 weeks Before Planting",
+                       prep2wk_precip_mm_tot = "Amount of Rain 2 weeks Before Planting",
                        gs_tavg = "April 1 - Sept 1 Average Temperature",
                        bhzdepth_cm = "Depth to B Horizon",
                        wtdepth_cm = "Depth to Water Table",
                        p4wk_1inrain = "Days planting-1 mo with 1 inch of rain",
                        soc_30cm_pct = "Soil Carbon in top 30 cm",
                        ndays_gdd140 = "Number of DAP to reach 140GDD",
-                       iascr = "Iowa Corn Suitability Rating")
+                       iascr = "Iowa Corn Suitability Rating",
+                       avg_ccyield = "Site Average Corn Yield")
   ) %>% 
+  mutate(effect = ifelse(LSO_value < 0, "Drives Penalty Smaller", "Drives Penalty Larger")) %>% 
   ggplot(aes(reorder(pred, LSO_value, mean), LSO_value)) + 
-  geom_col() + 
-  coord_flip()
+  geom_col(aes(fill = effect)) + 
+  coord_flip() + 
+  scale_fill_manual(values = c("red", "blue")) +
+  labs(y = "Effect on Penalty", 
+       fill = NULL,
+       x = NULL,
+       title = "LASSO Regression, What Drives Continuous Corn Penalty?")
+
+ggsave("figs/stats_lasso.png")
+ggsave("../../../Box/Gina_APSIM_modeling/figs-from-repo/stats_lasso.png")
 
 myres %>% 
   ggplot(aes(reorder(pred, RR_value, mean), RR_value)) + 

@@ -145,6 +145,11 @@ wea8 <-
          day > plant_doy - 14) %>% 
   summarise(prep2wk_precip_mm_tot = sum(precip_mm))
 
+wea8 %>% 
+  ggplot(aes(prep2wk_precip_mm_tot)) + 
+  geom_histogram()
+
+
 wea9 <- 
   pwea %>% 
   group_by(site, year) %>% 
