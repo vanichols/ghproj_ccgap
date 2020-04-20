@@ -1,13 +1,12 @@
-# Created:       4/10/2020
+# Created:       4/1/2020
+# last edited:   
 # 
-# purpose: Look at random forests
+# purpose: Create pred summary (soil and wea)
 #
 # notes: 
-#
-# last edited: 4/20/2020 (make a summary of what I did for SA)
-
 
 rm(list = ls())
+#devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--has functios
 library(tidysawyer2) #--has data
 library(tidyverse)
@@ -16,6 +15,7 @@ library(lubridate)
 
 
 # data --------------------------------------------------------------------
+
 
 wea <- read_csv("data/td_pred-wea.csv")  
 soi <- read_csv("data/td_pred-soil.csv")
@@ -73,21 +73,18 @@ dat <-
   left_join(soi) %>% 
   mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
 
-#--is iacsr and site-index related? yes
+
 dat %>% 
   ggplot(aes(iacsr, avg_ccyield)) + 
   geom_point()
 
-#--is A horizon depth related to ste-index? not really
+
 dat %>% 
   ggplot(aes(bhzdepth_cm, avg_ccyield)) + 
   geom_point()
 
 
 
-# what is too correlated -------------------------------------------
-
-#--can only do numeric things
 dat_cor <- 
   dat %>%
   ungroup() %>% 
@@ -97,7 +94,29 @@ corres <- cor(dat_cor, use="complete.obs")
 corrplot::corrplot(corres)
 
 #hmm. Some correlation problems. Get rid of PAW? Or clay and soc?
-# random forests are more robust to things being correlated, I believe
+
+# # summarize ---------------------------------------------------------------
+library(gt)
+
+#https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/
+library(psych)
+dat_sum <- psych::describe(dat)
+
+dat_vars <- rownames(dat_sum)
+
+dat_sum_tib <- 
+  dat_sum %>%
+  as_tibble() %>% 
+  mutate(vars = dat_vars) %>% 
+  select(vars, min, max, mean) %>% 
+  filter(!is.infinite(min)) %>% 
+  mutate_if(is.numeric, round, 0)
+
+gt(dat_sum_tib)
+
+
+
+# ML ----------------------------------------------------------------------
 
 
 # try a decision tree -----------------------------------------------------
@@ -108,116 +127,20 @@ library(tree)
 library(randomForest)
 #library(gbm)
 #library(caret)
-library(iml)
 
 
-ccgap <- dat %>% 
+ydat <- 
+  dat %>% 
   ungroup() %>% 
-  select(-crop, -site, -year) %>% 
-  filter(!is.na(prev_ccyield))
+  select_if(is.numeric)
 
-ccgap <- na.omit(ccgap)
+ydatsc <- ydat %>% 
+  mutate_if(is.numeric, scale)
 
-#--create a summary table of what I'm feeding into the random forest
-#https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/
-library(gt)
-library(psych)
-dat_sum <- psych::describe(ccgap)
-
-dat_vars <- rownames(dat_sum)
-
-dat_sum_tib <- 
-  dat_sum %>%
-  as_tibble() %>% 
-  mutate(vars = dat_vars) %>% 
-  select(vars, min, max, mean) %>% 
-  filter(!is.infinite(min)) %>% 
-  mutate_if(is.numeric, round, 0) 
+ydat <- na.omit(ydat)
 
 
-
-                    
-
-gt(dat_sum_tib)
-
-
-gap_mod = randomForest::randomForest(x = ccgap %>% dplyr::select(-cgap_max), y = ccgap$cgap_max)
-
-
-# feature importance ------------------------------------------------------
-
-# Create the predictor 
-# (seemingly FeatureImp 
-# requires y)
-gap_pred = 
-  Predictor$new(
-    model = gap_mod, 
-    data = ccgap, 
-    y = ccgap$cgap_max)
-# Compute the feature
-# importance values
-gap_imp = 
-  FeatureImp$new(
-    predictor = gap_pred, 
-    loss = 'mae')
-# Plot the feature
-# importance values
-plot(gap_imp)
-
-
-
-
-# Create a "predictor" object that 
-# holds the model and the data
-gap_pred = 
-  Predictor$new(
-    model = gap_mod,
-    data = ccgap)
-# Compute the partial dependence 
-# function for temp and windspeed
-# takes a looooooooong time
-pdp = 
-  FeatureEffect$new(
-    predictor = gap_pred, 
-    feature = c("avg_ccyield", "prep2wk_precip_mm_tot"), 
-    method = "pdp") 
-# Create the partial dependence plot
-pdp$plot() +
-  viridis::scale_fill_viridis(
-     option = "D") + 
-  labs(fill = "Prediction")
-
-
-# Compute the ICE function
-ice = 
-  FeatureEffect$new(
-    predictor = gap_pred,
-    feature = "p2mo_gdd",
-    method = "ice")
-# Create the plot
-plot(ice)
-
-
-
-# Center the ICE function for 
-# temperature at the 
-# minimum temperature and 
-# include the pdp
-ice_centered = 
-  FeatureEffect$new(
-    predictor = gap_pred,
-    feature = "avg_ccyield",
-    center.at = max(ccgap$avg_ccyield),
-    method = "pdp+ice")
-# Create the plot
-plot(ice_centered)
-
-
-
-
-
-
-f_tree <- tree::tree(cgap_max~., ccgap)
+f_tree <- tree::tree(cgap_max~., ydat)
 summary(f_tree)
 plot(f_tree)
 text(f_tree, pretty = 0)
@@ -228,16 +151,6 @@ plot(cv_tree$size, cv_tree$dev, type = 'b') #--this is terrible
 prune_tree <- tree::prune.tree(f_tree, best = 3)
 plot(prune_tree)
 text(prune_tree, pretty = 0)
-
-
-
-dat %>% 
-  ggplot(aes(avg_ccyield,
-             prep2wk_precip_mm_tot)) +
-  geom_jitter(aes(color = cgap_max), size = 5) + 
-  scale_color_viridis_c()
-
-
 
 # pls ---------------------------------------------------------------------
 library(pls)
@@ -278,7 +191,21 @@ dat %>%
 
 library(glmnet)
 
-ydatsc
+ydat <- 
+  dat %>% 
+  ungroup() %>% 
+  select_if(is.numeric) %>% 
+  select(years_in_corn,
+         p2mo_gdd,
+         pre2wkp2wk_tl_mean,
+         prep2wk_precip_mm_tot,
+         prev_ccyield,
+         heatstress_n,
+         p2wk_precip_mm_tot,
+         wintcolddays_n,
+         avg_ccyield,
+         cgap_max)
+
 
 # Scale and center predictors
 pred_tmp <-
