@@ -36,29 +36,6 @@ pwea %>%
   distinct() 
 
 
-# #--look at 15-year averages (I know this isn't right, but it's ok for now) across sites
-# wealt <- 
-#   weasy %>% 
-#   group_by(site) %>% 
-#   summarise(radn_15y = mean(radn),
-#             tmax_c_15y = mean(tmax_c),
-#             tmin_c_15y = mean(tmin_c),
-#             precip_mm_15y = mean(precip_mm))
-# 
-#library(GGally)
-# wealt %>% 
-#   pivot_longer(radn_15y:precip_mm_15y) %>% 
-#   ggplot(aes(reorder(site, value, mean), value)) +
-#   geom_point(size = 5) +
-#   coord_flip() +
-#   facet_grid(~name, scales = "free")
-
-# lets me look at all weather relations at once
-#GGally::ggparcoord(data = wealt, columns = 2:5, groupColumn = 1, order = "skewness") +
-#  geom_line(size = 2, alpha = 0.5)
-
-
-
 # weather in reference to planting ----------------------------------------
 
 #--days w/max temp < 50 up to 30 days after planting
