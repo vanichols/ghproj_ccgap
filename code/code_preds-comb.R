@@ -5,6 +5,10 @@
 # notes: 
 # last edited:  4/20/2020 cleaning up code, separating data things from stats things
 
+source("code/code_preds-soil.R")
+source("code/code_preds-wea.R")
+
+
 rm(list = ls())
 #devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--has functios
@@ -16,18 +20,11 @@ library(lubridate)
 
 # data --------------------------------------------------------------------
 
-
-wea <- read_csv("data/td_pred-wea.csv")  
-soi <- read_csv("data/td_pred-soil.csv")
-
+soi <- read_csv("data/tidy/td_pred-soil.csv")
+wea <- read_csv("data/tidy/td_pred-wea.csv") 
 
 
 # what else should we add? ------------------------------------------------
-
-#--what does the corn suitability rating look like?
-soi %>% 
-  ggplot(aes(iacsr)) +
-  geom_histogram()
 
 #--add previous year's continuous corn yield at max nrate (indicative of residue amt)
 prev_yield <- 
@@ -107,6 +104,8 @@ yrs_corn <-
   
 
 
+# put it all together -----------------------------------------------------
+
 dat <-  
   saw_cgap %>%
   filter(cgap_max > -1500) %>% #--that one lewis point, just seems weird
@@ -116,6 +115,10 @@ dat <-
   left_join(wea) %>% 
   left_join(soi) %>% 
   mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
+
+
+dat %>% 
+  write_csv("data/tidy/td_preds.csv")
 
 
 # summarize ---------------------------------------------------------------
