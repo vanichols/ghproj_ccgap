@@ -1,162 +1,67 @@
 # Created:       4/1/2020
-# last edited:   
 # 
 # purpose: Create pred summary (soil and wea)
 #
 # notes: 
+#
+# last edited:   
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
-library(saapsim) #--has functios
-library(tidysawyer2) #--has data
 library(tidyverse)
-library(lubridate)
 
 
 
 # data --------------------------------------------------------------------
 
+datraw <- read_csv("data/tidy/td_preds.csv")
 
-wea <- read_csv("data/td_pred-wea.csv")  
-soi <- read_csv("data/td_pred-soil.csv")
-
-
-#--what does the corn suitability rating look like?
-soi %>% 
-  ggplot(aes(iacsr)) +
-  geom_histogram()
-
-#--add previous year's continuous corn yield as covariate?
-prev_yield <- 
-  saw_tidysawyer %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "cc") %>% 
-  mutate(prev_ccyield = lag(yield_kgha)) %>% 
-  select(site, year, prev_ccyield)
-
-#--use 'site production index' instead of soil things?
-avg_yield <- 
-  saw_tidysawyer %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  #--make sure it's taken over the same time frame
-  filter(year > 2006,
-         year < 2017) %>% 
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "cc") %>% 
-  summarise(avg_ccyield = mean(yield_kgha, na.rm = T)) %>% 
-  select(site, avg_ccyield)
-
-#--include # of years in corn
-
-yrs_corn <- 
-  saw_tidysawyer %>% 
-  filter(rotation == "cc") %>% 
-  group_by(site) %>% 
-  group_modify(~{
-    .x %>% mutate(years_in_corn = group_indices(., year))
-  }) %>% 
-  select(site, year, years_in_corn) %>% 
-  distinct()
-  
+imps <- read_csv("data/smy/sd_rf-feat-imp.csv")
 
 
-dat <-  
-  saw_cgap %>%
-  filter(cgap_max > -1500) %>% 
-  left_join(prev_yield) %>% 
-  left_join(avg_yield) %>% 
-  left_join(yrs_corn) %>% 
-  left_join(wea) %>% 
-  left_join(soi) %>% 
-  mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
+# adjust data -------------------------------------------------------------
 
+imps_lst <- 
+  imps %>% 
+  select(feature) %>% 
+  pull()
 
-dat %>% 
-  ggplot(aes(iacsr, avg_ccyield)) + 
-  geom_point()
-
-
-dat %>% 
-  ggplot(aes(bhzdepth_cm, avg_ccyield)) + 
-  geom_point()
-
-
+dat <- 
+  datraw %>% 
+  pivot_longer(prev_ccyield:paw_150cm_mm) %>% 
+  filter(name %in% imps_lst) %>% 
+  pivot_wider(names_from = name,
+              values_from = value)
 
 dat_cor <- 
   dat %>%
   ungroup() %>% 
   select_if(is.numeric) 
 corres <- cor(dat_cor, use="complete.obs")
-#corrplot::corrplot.mixed(corres)
 corrplot::corrplot(corres)
 
-#hmm. Some correlation problems. Get rid of PAW? Or clay and soc?
+#hmm. Some correlation problems still in there. SEe what happens
 
-# # summarize ---------------------------------------------------------------
-library(gt)
-
-#https://dabblingwithdata.wordpress.com/2018/01/02/my-favourite-r-package-for-summarising-data/
-library(psych)
-dat_sum <- psych::describe(dat)
-
-dat_vars <- rownames(dat_sum)
-
-dat_sum_tib <- 
-  dat_sum %>%
-  as_tibble() %>% 
-  mutate(vars = dat_vars) %>% 
-  select(vars, min, max, mean) %>% 
-  filter(!is.infinite(min)) %>% 
-  mutate_if(is.numeric, round, 0)
-
-gt(dat_sum_tib)
-
-
-
-# ML ----------------------------------------------------------------------
-
-
-# try a decision tree -----------------------------------------------------
-
-library(rpart) # Decision tree package
-library(partykit)
-library(tree)
-library(randomForest)
-#library(gbm)
-#library(caret)
-
-
+#--keep only numeric things
 ydat <- 
   dat %>% 
   ungroup() %>% 
   select_if(is.numeric)
 
+#--scale
 ydatsc <- ydat %>% 
   mutate_if(is.numeric, scale)
 
+#--get rid of any na rows (shouldn't be any)
 ydat <- na.omit(ydat)
 
-
-f_tree <- tree::tree(cgap_max~., ydat)
-summary(f_tree)
-plot(f_tree)
-text(f_tree, pretty = 0)
-
-cv_tree <- tree::cv.tree(f_tree)
-plot(cv_tree$size, cv_tree$dev, type = 'b') #--this is terrible
-
-prune_tree <- tree::prune.tree(f_tree, best = 3)
-plot(prune_tree)
-text(prune_tree, pretty = 0)
-
 # pls ---------------------------------------------------------------------
+
+
+# CRAP
+
 library(pls)
 library(caret)
 
-# Fit a PLS model on CN ratios
 plsm <- plsr(cgap_max ~., data = ydatsc, validation = "LOO")
 
 # Find the number of dimensions with lowest cross validation error
@@ -164,11 +69,11 @@ cv <- RMSEP(plsm)
 best.dims = which.min(cv$val[estimate = "adjCV", , ]) - 1
 best.dims
 # Use other methods, see what they say...
-#sebars <- selectNcomp(pls_tmp, method = "onesigma", plot = TRUE)
+sebars <- selectNcomp(plsm, method = "onesigma", plot = TRUE)
 #targets <- selectNcomp(pls_tmp, method = "randomization", plot = TRUE)
 
 # Rerun the model
-plsmn <- plsr(cgap_max ~., data = ydatsc, ncomp = best.dims)
+#plsmn <- plsr(cgap_max ~., data = ydatsc, ncomp = best.dims)
 
 # Code copied from Ranae, stupid rownames
 varImp(plsmn) %>%
@@ -191,21 +96,6 @@ dat %>%
 
 library(glmnet)
 
-ydat <- 
-  dat %>% 
-  ungroup() %>% 
-  select_if(is.numeric) %>% 
-  select(years_in_corn,
-         p2mo_gdd,
-         pre2wkp2wk_tl_mean,
-         prep2wk_precip_mm_tot,
-         prev_ccyield,
-         heatstress_n,
-         p2wk_precip_mm_tot,
-         wintcolddays_n,
-         avg_ccyield,
-         cgap_max)
-
 
 # Scale and center predictors
 pred_tmp <-
@@ -216,7 +106,7 @@ pred_tmp <-
 
 myr_tmp <- ydat %>%
   select(cgap_max) %>%
-  mutate(cgap_max = cgap_max / 1000)
+  mutate(cgap_max = cgap_max / 1000) #--Mg just easier to look at
 
 sdat_tmp <- bind_cols(myr_tmp, pred_tmp)
   
@@ -299,17 +189,11 @@ myL_res <- myL_coef[-1, 1] %>%
 myres <- left_join(myRR_res, myL_res) %>%
     select(pred, RR_value, RR_absval, everything())
   
-
-#--interesting. so hot planting-V12 = bigger gap
-#                  extended emergence (cold, wet) = bigger gap
-#                  colder winter = smaller gap
-#                  warm gs = lower gap (??), this might be indicative of something else....
-
 myres %>% 
   filter(LSO_value != 0) %>% 
   mutate(pred = recode(pred,
                        p2mo_tx_mean = "Mean Max T planting-V12",
-                       wintcolddays_n = "Number of Days <-15 Before Planting",
+                       wintcolddays_n = "Number of Days less than 4 degF Before Planting",
                        prep2wk_precip_mm_tot = "Amount of Rain 2 weeks Before Planting",
                        gs_tavg = "April 1 - Sept 1 Average Temperature",
                        bhzdepth_cm = "Depth to B Horizon",
@@ -340,6 +224,14 @@ myres %>%
 
 
 
-#--sooo higher p2mo_tx_mean and ndays_gdd140 means bigger gap
-#--     lower gs_tavg and wintcolddays_n means lower gap
+# is the lesser penalty across time superfluous? --------------------------
 
+library(tidysawyer2)
+
+# yes
+saw_tidysawyer %>% 
+  group_by(site, year) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  ggplot(aes(year, yield_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
