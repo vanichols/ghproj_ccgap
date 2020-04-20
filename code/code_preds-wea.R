@@ -211,6 +211,19 @@ wea14 %>%
   geom_histogram()
 
 
+
+wea_hs <- 
+  pwea %>% 
+  filter(day < plant_doy + 120, day > plant_doy) %>%
+  filter(tmax_c > 30) %>% 
+  group_by(site, year) %>% 
+  summarise(heatstress_n = n())
+
+wea_hs %>% 
+  ggplot(aes(heatstress_n)) + 
+  geom_histogram()
+
+
 # weather metrics ---------------------------------------------------------
 
 #--rafa's scirep paper
@@ -261,18 +274,8 @@ wea_gs <-
             gs_tavg = mean((tmax_c + tmin_c)/2))
 
 
-wea_hs <- 
-  wea %>% 
-  filter(day < 244, day > 91) %>%
-  filter(tmax_c > 30) %>% 
-  group_by(site, year) %>% 
-  summarise(heatstress_n = n())
 
-wea_hs %>% 
-  ggplot(aes(heatstress_n)) + 
-  geom_histogram()
-
-# weather w/respect to planting -------------------------------------------
+# combine wea metrics -------------------------------------------
 
 
 wea_parms <- 
