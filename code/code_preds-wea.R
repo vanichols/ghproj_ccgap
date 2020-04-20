@@ -294,5 +294,5 @@ corrplot::corrplot(corres)
 
 # write what i like -------------------------------------------------------
 
-wea_parms %>% write_csv("data/td_pred-wea.csv")  
+wea_parms %>% write_csv("data/tidy/td_pred-wea.csv")  
 

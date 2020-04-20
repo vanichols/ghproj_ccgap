@@ -73,7 +73,7 @@ soil_dat %>%
 
 # write -------------------------------------------------------------------
 
-soil_dat %>% write_csv("_data/td_pred-soil.csv")
+soil_dat %>% write_csv("data/tidy/td_pred-soil.csv")
 
 
 
