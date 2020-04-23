@@ -1,14 +1,13 @@
 # Created:       4/1/2020
 # 
-# purpose: Create pred summary (soil and wea)
+# purpose: stats on pct gap (rather than raw gap)
 #
 # notes: 
 #
-# last edited:   
+# last edited:   4/23/2020
 
 rm(list = ls())
 library(tidyverse)
-
 
 
 # data --------------------------------------------------------------------
@@ -16,12 +15,10 @@ library(tidyverse)
 datraw <- read_csv("data/tidy/td_preds.csv") %>% 
   select(-year)
 
-imps <- read_csv("data/smy/sd_rf-feat-imp.csv")
-imps2 <- read_csv("data/smy/sd_rf-feat-imp-pct.csv")
+imps <- read_csv("data/smy/sd_rf-feat-imp-pct.csv")
 
 
-
-# do raw gaps -------------------------------------------------------------
+# do percent gaps -------------------------------------------------------------
 
 imps_lst <- 
   imps %>% 
@@ -30,7 +27,7 @@ imps_lst <-
 
 dat <- 
   datraw %>% 
-  select(-cgap_max_pct) %>% 
+  select(-cgap_max) %>% 
   pivot_longer(prev_ccyield:paw_150cm_mm) %>% 
   filter(name %in% imps_lst) %>% 
   pivot_wider(names_from = name,
@@ -42,6 +39,7 @@ dat_cor <-
   select_if(is.numeric) 
 corres <- cor(dat_cor, use="complete.obs")
 corrplot::corrplot(corres)
+
 
 #hmm. Some correlation problems still in there. SEe what happens
 
@@ -66,7 +64,7 @@ ydat <- na.omit(ydat)
 library(pls)
 library(caret)
 
-plsm <- plsr(cgap_max ~., data = ydatsc, validation = "LOO")
+plsm <- plsr(cgap_max_pct ~., data = ydatsc, validation = "LOO")
 
 # Find the number of dimensions with lowest cross validation error
 cv <- RMSEP(plsm)
@@ -77,7 +75,7 @@ sebars <- selectNcomp(plsm, method = "onesigma", plot = TRUE)
 #targets <- selectNcomp(pls_tmp, method = "randomization", plot = TRUE)
 
 # Rerun the model
-#plsmn <- plsr(cgap_max ~., data = ydatsc, ncomp = best.dims)
+plsmn <- plsr(cgap_max_pct ~., data = ydatsc, ncomp = best.dims)
 
 # Code copied from Ranae, stupid rownames
 varImp(plsmn) %>%
@@ -90,12 +88,6 @@ varImp(plsmn) %>%
   ggtitle("PLS")
 
 
-dat %>% 
-  ggplot(aes(prep2wk_precip_mm_tot, cgap_max)) + 
-  geom_point() + 
-  geom_smooth(method = "lm") + 
-  facet_grid(.~site)
-
 # lasso/RR ----------------------------------------------------------------
 
 library(glmnet)
@@ -104,13 +96,12 @@ library(glmnet)
 # Scale and center predictors
 pred_tmp <-
   ydat %>%
-  select(-cgap_max) %>%
+  select(-cgap_max_pct) %>%
   select_if(is.numeric) %>%
   mutate_all(funs(scale))
 
 myr_tmp <- ydat %>%
-  select(cgap_max) %>%
-  mutate(cgap_max = cgap_max / 1000) #--Mg just easier to look at
+  select(cgap_max_pct) 
 
 sdat_tmp <- bind_cols(myr_tmp, pred_tmp)
   
@@ -118,12 +109,12 @@ sdat_tmp <- bind_cols(myr_tmp, pred_tmp)
 sdat_tmp <- na.omit(sdat_tmp)
   
 # Make predictor matrix
-myx_tmp <- model.matrix(cgap_max~., sdat_tmp)[,-1] # trim off the first column
+myx_tmp <- model.matrix(cgap_max_pct~., sdat_tmp)[,-1] # trim off the first column
   
 # Make response vector
 myy_tmp <- 
   sdat_tmp %>%
-    select(cgap_max) %>%
+    select(cgap_max_pct) %>%
     unlist() %>%
     as.numeric()
 
@@ -195,6 +186,7 @@ myres <- left_join(myRR_res, myL_res) %>%
   
 myres %>% 
   filter(LSO_value != 0) %>% 
+  filter(abs(LSO_value) > 1) %>% 
   mutate(pred = recode(pred,
                        p2mo_tx_mean = "Mean Max T planting-V12",
                        wintcolddays_n = "Number of Days less than 4 degF Before Planting",
@@ -205,22 +197,43 @@ myres %>%
                        p4wk_1inrain = "Days planting-1 mo with 1 inch of rain",
                        soc_30cm_pct = "Soil Carbon in top 30 cm",
                        ndays_gdd140 = "Number of DAP to reach 140GDD",
-                       iascr = "Iowa Corn Suitability Rating",
+                       heatstress_n = "Number of days w/Tmax > 30degC 0-120 DAP",
+                       iacsr = "Iowa Corn Suitability Rating",
+                       years_in_corn = "Years In Experiment",
                        avg_ccyield = "Site Average Corn Yield")
   ) %>% 
-  mutate(effect = ifelse(LSO_value < 0, "Drives Penalty Smaller", "Drives Penalty Larger")) %>% 
+  mutate(effect = ifelse(LSO_value < 0, "Decreases Penalty", "Increases Penalty")) %>% 
   ggplot(aes(reorder(pred, LSO_value, mean), LSO_value)) + 
   geom_col(aes(fill = effect)) + 
   coord_flip() + 
-  scale_fill_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("Decreases Penalty" = "blue",
+                               "Increases Penalty" = "red")) +
   labs(y = "Effect on Penalty", 
        fill = NULL,
        x = NULL,
-       title = "LASSO Regression,\nWhat Drives Raw Continuous Corn Penalty?")
+       title = "LASSO Regression,\nWhat Drives Contin Corn Penalty on a Percent Basis?")
 
 
-ggsave("figs/stats_lasso.png")
-ggsave("../../../Box/Gina_APSIM_modeling/figs-from-repo/stats_lasso-rawgap.png")
+ggsave("figs/stats_lasso-pct.png")
+ggsave("../../../Box/Gina_APSIM_modeling/figs-from-repo/stats_lasso-pctgap.png")
+
+
+#--yeah, it's a relationship just w/pct. 
+#--it seems like if it is >50
+datraw %>%
+  select(heatstress_n, cgap_max, cgap_max_pct) %>% 
+#  filter(heatstress_n < 50) %>% 
+  pivot_longer(-heatstress_n) %>% 
+  ggplot(aes(heatstress_n, value)) + 
+  geom_point() +
+  geom_smooth(method  = "lm") +
+  facet_grid(name~., scales = "free")
+
+
+#--which sites had more than 50 days of heatstress?
+datraw %>%
+  filter(heatstress_n > 50) %>% 
+  select(yearF, everything())
 
 myres %>% 
   ggplot(aes(reorder(pred, RR_value, mean), RR_value)) + 

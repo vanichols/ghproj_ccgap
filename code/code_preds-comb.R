@@ -102,20 +102,46 @@ yrs_corn <-
   select(site, year, years_in_corn) %>% 
   distinct()
   
-
+#--instead of raw gap, do a pct
+cgap_pct <- 
+  saw_tidysawyer %>% 
+  group_by(site, year) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  select(site, year, rotation, yield_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(gap = sc - cc,
+         cgap_max_pct = gap/sc*100) %>% 
+  select(site, year, cgap_max_pct)
+         
 
 # put it all together -----------------------------------------------------
 
 dat <-  
   saw_cgap %>%
   filter(cgap_max > -1500) %>% #--that one lewis point, just seems weird
+  left_join(cgap_pct) %>% 
   left_join(prev_yield) %>% 
   left_join(avg_yield) %>% 
   left_join(yrs_corn) %>% 
   left_join(wea) %>% 
   left_join(soi) %>% 
-  mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
+  mutate(yearF = paste0("Y", year)) #--to ensure it isn't numeric
 
+
+#--does pct gap dec over years? yes.
+dat %>% 
+  ggplot(aes(year, cgap_max_pct)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+
+#--do raw yields inc over years, if I start in 2006? NOt as badly. 
+saw_tidysawyer %>%
+  group_by(site, year) %>% 
+  filter(year > 2005) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  ggplot(aes(year, yield_kgha))  + 
+           geom_point() + 
+  geom_smooth(method = "lm")
 
 dat %>% 
   write_csv("data/tidy/td_preds.csv")
@@ -144,7 +170,9 @@ dat_sum_tib <-
 dat_tab <- 
   dat_sum_tib %>% 
   mutate(vars_nice = recode(vars,
+                            "year" = "Year, all years included",
                             "cgap_max" = "CC/SC gap at max N rate",
+                            "cgap_max_pct" = "CC/SC gap at max N rate as % of SC yield",
                             "prev_ccyield" = "Prev year CC yield at max N rate\n (indicative of residue amount)",
                             "avg_yield" = "Avg yield at max N at that site",
                             "years_in_corn" = "Number of Years in Cont Corn",
@@ -156,7 +184,7 @@ dat_tab <-
                             "wintcolddays_n" = "# of days < 4degF before Jan 1 - planting",
                             "p2mo_gdd" = "GDDs 0-2mo after planting")
                             ) %>% 
-  select(vars_nice, min, max, mean) %>% 
+  select(vars_nice, min, max, mean, vars) %>% 
   gt() %>% 
   tab_header(
     title = "Variables Included In Models")
