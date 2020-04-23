@@ -62,7 +62,29 @@ gap_imp =
 # importance values
 plot(gap_imp)
 
+# look at it --------------------------------------------------------------
 
+# Create a "predictor" object that 
+# holds the model and the data
+gap_pred <- 
+  Predictor$new(
+    model = gap_mod,
+    data = ccgap)
+# Compute the partial dependence 
+# function for temp and windspeed
+# takes a looooooooong time
+pdp <- 
+  FeatureEffect$new(
+    predictor = gap_pred, 
+    feature = c("heatstress_n", "soc_30cm_pct"), 
+    method = "pdp") 
+# Create the partial dependence plot
+pdp$plot() +
+  viridis::scale_fill_viridis(
+    option = "D") + 
+  labs(fill = "Prediction")
+
+ggsave("figs/stats_rf-pdpnd-pct.png")
 
 # try just > 2005 years ---------------------------------------------------
 
