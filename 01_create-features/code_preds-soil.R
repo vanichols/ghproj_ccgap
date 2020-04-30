@@ -7,8 +7,7 @@
 
 rm(list = ls())
 
-#devtools::install_github("vanichols/saapsim", force = T)
-library(saapsim) #--my package, has 'sad_xxx' data
+library(tidysawyer2)
 library(lubridate)
 library(dplyr)
 library(tibble)
@@ -19,12 +18,14 @@ library(readr)
 
 #--these things come from ssurgo
 sc <- 
-  sad_soilchar %>% #--from saapsim pkg
+  saw_soilchar %>% #--from tidysawyer2 pkg
   as_tibble() %>% 
-  select(-cropprodindex_maj, -cropprodindex_wgt)
+  select(-cropprodindex_maj, -cropprodindex_wgt, -om_wgt)
 
 #--these from measurements
-sprof <- sad_soilprof %>% as_tibble()
+sprof <- 
+  saw_soilprof %>% 
+  as_tibble()
 
 #--this might be a problem, and might be why IACSR is not related to SOC%
 
@@ -63,6 +64,7 @@ soil_dat <-
   select(site, wtdepth_cm,
          iacsr_wgt,
          bhz_wt,
+         om_maj,
          clay_pct,
          soc_pct,
          paw_mm) %>% 
@@ -74,9 +76,20 @@ soil_dat <-
   mutate(wtdepth_cm = as.numeric(wtdepth_cm))
 
 
-soil_dat %>% 
-  ggplot(aes(soc_30cm_pct)) + 
-  geom_histogram()
+soil_dat %>%
+  mutate(soc_maj = om_maj/1.58) %>% 
+  ggplot(aes(soc_30cm_pct, soc_maj)) + 
+  geom_point()
+
+soil_dat %>%
+  mutate(soc_maj = om_maj/1.58) %>% 
+  ggplot(aes(iacsr, soc_maj)) + 
+  geom_point(size = 3) + 
+  labs(x = "Iowa Corn Suitability Rating",
+       y = "% SOC",
+       title = "Why isn't ICSR related to SOC %")
+
+ggsave("01_create-features/fig_soil-iacsr-soc.png")
 
 # write -------------------------------------------------------------------
 
