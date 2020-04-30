@@ -17,12 +17,16 @@ library(readr)
 
 # soil data, from package ----------------------------------------------
 
-sc <- sad_soilchar %>% #--from saapsim pkg
+#--these things come from ssurgo
+sc <- 
+  sad_soilchar %>% #--from saapsim pkg
   as_tibble() %>% 
   select(-cropprodindex_maj, -cropprodindex_wgt)
 
+#--these from measurements
 sprof <- sad_soilprof %>% as_tibble()
 
+#--this might be a problem, and might be why IACSR is not related to SOC%
 
 # wrangle -----------------------------------------------------------------
 

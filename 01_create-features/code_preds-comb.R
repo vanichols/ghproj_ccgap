@@ -6,23 +6,20 @@
 # last edited:  4/20/2020 cleaning up code, separating data things from stats things
 #               4/30/2020 trying new folder structure
 
-source("code/code_preds-soil.R")
-source("code/code_preds-wea.R")
+
+#--make sure data is up-to-date
+source("01_create-features/code_preds-soil.R")
+source("01_create-features/code_preds-wea.R")
 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
-library(saapsim) #--has functios
-library(tidysawyer2) #--has data
-library(tidyverse)
-library(lubridate)
-
+#--note libraries are loaded in above scripts
 
 
 # data --------------------------------------------------------------------
 
-soi <- read_csv("data/tidy/td_pred-soil.csv")
-wea <- read_csv("data/tidy/td_pred-wea.csv") 
+soi <- read_csv("01_create-features/cf_pred-soil.csv")
+wea <- read_csv("01_create-features/cf_pred-wea.csv")
 
 
 # what else should we add? ------------------------------------------------
@@ -144,8 +141,11 @@ saw_tidysawyer %>%
            geom_point() + 
   geom_smooth(method = "lm")
 
+
+# save data ---------------------------------------------------------------
+
 dat %>% 
-  write_csv("data/tidy/td_preds.csv")
+  write_csv("01_create-features/cf_preds-all.csv")
 
 
 # summarize ---------------------------------------------------------------
@@ -183,12 +183,16 @@ dat_tab <-
                             "prep2wk_precip_mm_tot" = "Total Precip 2 wks before pl",
                             "pre2wkp2wk_tl_mean" = "Mean low temp 4 weeks around planting",
                             "wintcolddays_n" = "# of days < 4degF before Jan 1 - planting",
-                            "p2mo_gdd" = "GDDs 0-2mo after planting")
+                            "p2mo_gdd" = "GDDs 0-2mo after planting",
+                            "iacsr" = "Iowa Corn Suitability Rating",
+                            "bhzdepth_cm" = "Depth to B horizon")
                             ) %>% 
-  select(vars_nice, min, max, mean, vars) %>% 
+  select(vars, min, max, mean, vars_nice) %>% 
   gt() %>% 
   tab_header(
     title = "Variables Included In Models")
 
-gtsave(dat_tab, filename = "tble_all-dat.png", path = "tables/")
+dat_tab
+
+gtsave(dat_tab, filename = "tbl_preds-all.png", path = "01_create-features/")
 
