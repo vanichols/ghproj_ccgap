@@ -36,6 +36,7 @@ ccgap <-
   select(-p2mo_gdd) %>% 
   select(-pre2wkp2wk_tl_mean) %>% 
   select(-paw_150cm_mm) %>% 
+  select(-p2wk_precip_mm_tot) %>% 
   filter(!is.na(prev_ccyield))
 
 ccgap <- na.omit(ccgap)
@@ -105,9 +106,11 @@ ggsave("figs/stats_rf-pdpnd-pct.png")
 ice = 
   FeatureEffect$new(
     predictor = gap_pred,
-    feature = "p2mo_gdd",
+    feature = "heatstress_n",
     method = "ice")
 plot(ice)
+
+ggsave("02_fit-models/fig_pd-heatstress.png")
 
 # try just > 2005 years ---------------------------------------------------
 
