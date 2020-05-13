@@ -1,5 +1,6 @@
 # Created:      3/12/2020
 # last edited:   3/31/2020 (I was confused...)
+#               5/13/2020 (changed file structure, revisit)
 #
 # purpose: evaluate each factor individually and in combination using CALIBRATED APSIM sims using CC sim as base, tweaking from that
 #
@@ -41,7 +42,8 @@ apraw <-
          year < 2017) #--exp data stops in 2016 
 
 
-#NOTE: Need to evaluate combinations!!!!!
+apraw %>% write_csv("00_sims-explore/se_apsim-sims-raw.csv")
+
 
 # keep base files separate ------------------------------------------------
 
@@ -117,7 +119,7 @@ gaps <-
 
 #--for quality check (oat number)
 gaps %>% 
- # filter(category %in% c("4 factor")) %>% 
+  filter(!category %in% c("2 factor")) %>% 
   ggplot(aes(reorder(as_factor(oat_nu), gap_kgha), gap_kgha)) + 
   geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap"))) +
   geom_point() + 
@@ -150,5 +152,38 @@ gaps %>%
   labs(title = "ames") + 
   facet_grid(category~., scales = "free")
 
-ewgap
+#--it was the first year. remove it
+ewgap %>% filter(year == max(year))
 
+
+gaps %>% 
+  filter(!category %in% c("2 factor")) %>% 
+  filter(year > 2000) %>% 
+  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
+  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap"))) +
+  geom_point() + 
+  coord_flip() + 
+  guides(color = F) +
+  labs(title = "ames, 2001-2016") + 
+  facet_grid(category~., scales = "free")
+
+ggsave("00_sims-explore/fig_gaps-by-factors.png")
+
+
+
+library(ggridges)
+
+gaps %>% 
+  filter(year > 2000) %>% 
+  filter(!category %in% c("2 factor")) %>% 
+  ggplot(aes(x = gap_kgha, y = oat_what)) +
+  geom_density_ridges(alpha = 0.5, aes(fill = oat_what %in% c("exp gap", "current apsim gap"))) +
+  scale_fill_manual(values = c("orange3", "black")) +
+  guides(fill = FALSE) +
+  guides(color = FALSE) +
+  theme_bw() +
+  facet_grid(category~., scales = "free") + 
+  labs(title = "ames, 2001-2016",
+       x = "Contin. Corn Penalty (kg/ha)")
+
+ggsave("00_sims-explore/fig_gaps-by-factors-density.png")
