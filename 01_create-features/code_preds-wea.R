@@ -32,7 +32,8 @@ wea <- saw_wea %>% as_tibble()
 
 pwea <- wea %>% 
   left_join(saw_plant) %>% 
-  select(-plant_date, -crop) 
+  select(-plant_date, -crop) %>% 
+  filter(!is.na(plant_doy))
 
 #--check, all sites/years?
 pwea %>% 
@@ -301,3 +302,52 @@ ggsave("01_create-features/fig_wea-corrs.png")
 # write what i like -------------------------------------------------------
 
 wea_parms %>% write_csv("01_create-features/cf_pred-wea.csv")
+
+
+# when did heatstres occur ------------------------------------------------
+
+
+hs_sum <- 
+  pwea %>% 
+  filter(day < plant_doy + 120, day > plant_doy) %>%
+  filter(tmax_c > 30) %>% 
+  group_by(site, year) %>% 
+  summarise(heatstress_n = n())
+
+hs_sum %>% 
+  ggplot(aes(reorder(site, heatstress_n, mean), heatstress_n)) + 
+  geom_col(aes(fill = as.factor(year)), position = "dodge") + 
+  guides(fill = F)
+
+#--crawfordsville has seasons w/more than 60 days
+pwea %>% 
+  filter(site == "craw") %>% 
+  mutate(hs = ifelse(tmax_c > 30, "hot", "none")) %>%
+  ggplot(aes(day, tmax_c)) + 
+  geom_point(aes(color = hs)) +
+  geom_vline(aes(xintercept = plant_doy)) +
+  geom_vline(aes(xintercept = plant_doy + 120)) +
+  geom_label(data = filter(hs_sum, site == "craw"),
+             x = 200, y = 0, aes(label = heatstress_n)) +
+  facet_wrap(~year) + 
+  labs(title = "Crawfordsville days w/Tmax > 30degC",
+       subtitle = "Planting to 120 DAP")
+
+ggsave("01_create-features/fig_craw-heatstress-days.png")
+
+
+#--ames has less in general
+pwea %>% 
+  filter(site == "nash") %>% 
+  mutate(hs = ifelse(tmax_c > 30, "hot", "none")) %>%
+  ggplot(aes(day, tmax_c)) + 
+  geom_point(aes(color = hs)) +
+  geom_vline(aes(xintercept = plant_doy)) +
+  geom_vline(aes(xintercept = plant_doy + 120)) +
+  geom_label(data = filter(hs_sum, site == "nash"),
+             x = 200, y = 0, aes(label = heatstress_n)) +
+  facet_wrap(~year) + 
+  labs(title = "Nashua days w/Tmax > 30degC",
+       subtitle = "Planting to 120 DAP")
+
+ggsave("01_create-features/fig_nash-heatstress-days.png")
