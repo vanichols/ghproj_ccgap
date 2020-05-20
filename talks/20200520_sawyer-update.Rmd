@@ -19,14 +19,13 @@ knitr::include_graphics("../00_exp-explore/fig_yields-over-time.png")
 ## Yield Gaps
 
 ```{r gaps, out.width='100%'}
-knitr::include_graphics("../00_exp-explore/fig_yields-over-time.png")
 
 ```
 
 
 ## What variables did we look at in Iowa?
 
-```{r lasso, out.height='100%'}
+```{r vars, out.height='90%'}
 knitr::include_graphics("../01_create-features/tbl_preds-all.png")
 
 ```
@@ -38,10 +37,29 @@ knitr::include_graphics("../02_fit-models/fig_lasso-pctgap.png")
 
 ```
 
+## Does the penalty increase over time? Lit review
+
+
+```{r, out.width='100%'}
+knitr::include_graphics("../figs/lit_years-in-corn.png")
+```
+
+
 ## What are some possible targets in APSIM?
 
 
-```{r gaps, out.width='100%'}
+```{r apsim, out.width='100%'}
 knitr::include_graphics("../03_sims/fig_1-factor-gaps.png")
 
 ```
+
+## Summary and next steps
+*Summary:*
+
+- Cold wet springs and hot early growing seasons enhance rotation effect at high N rates
+- Penalty is only sensitive to previous year's crop (number of years in corn not important)
+
+*Next:*
+
+- Include IL data in random forest variable selection and LASSO regression
+- Implement select changes in APSIM, assess how model performs at other sites w/those changes
