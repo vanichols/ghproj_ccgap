@@ -16,34 +16,11 @@ library(tidyverse)
 library(janitor)
 
 
-# keeping track of oats ---------------------------------------------------
 
-oat_key <-
-  read_csv("../../../Box/Gina_APSIM_modeling/sims-ames-CCbase/data-raw/rd_oats-calibrated-v1CC.csv") %>%  
-  #read_csv("sims_Mitch-cal-factor-analysis/data-raw/rd_oats-calibrated-v1.csv") %>% 
-  separate_rows(category, sep = ",") %>% 
-  remove_empty("rows") %>% 
-  remove_empty("cols")
+# read in output from read-in-sim-res code --------------------------------
 
+apraw <- read_csv("03_sims/se_apsim-sims-raw.csv")
 
-# read in .out files ------------------------------------------------------
-
-my_dir <- "../../../Box/Gina_APSIM_modeling/sims-ames-CCbase/"
-
-apraw <-
-  saf_readapout(my_dir) %>%
-  select(file, year, corn_buac) %>%
-  mutate(yield_kgha = saf_buac_to_kgha_corn(corn_buac)) %>%
-  separate(file, into = c("rot", "Nrate", "apsim_oat")) %>%
-  # remove years during spin up
-  filter(!is.na(apsim_oat), 
-         year > 1998, #--exp data starts in 1999
-         year < 2017) #--exp data stops in 2016 
-
-
-#NOTE: Need to evaluate combinations!!!!!
-
-# keep base files separate ------------------------------------------------
 
 #--apsim cc yields
 base_contc <- 
@@ -109,49 +86,8 @@ gaps <-
   ewgap %>% 
   bind_rows(agap) %>% 
   bind_rows(agap_notweaks) %>% 
-  left_join(oat_key)
+  left_join(oat_key) 
 
-
-
-# look at gaps ------------------------------------------------------------
-
-#--for quality check (oat number)
-gaps %>% 
- # filter(category %in% c("4 factor")) %>% 
-  ggplot(aes(reorder(as_factor(oat_nu), gap_kgha), gap_kgha)) + 
-  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap"))) +
-  geom_point() + 
-  coord_flip() + 
-  guides(color = F) +
-  labs(title = "ames") + 
-  facet_wrap(~category, scales = "free")
-
-
-gaps %>% 
-  filter(!category %in% c("2 factor")) %>% 
-  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
-  geom_point(color = "gray80") + 
-  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap")), alpha = 0.5) +
-  coord_flip() + 
-  guides(color = F) +
-  labs(title = "ames") + 
-  facet_grid(category~., scales = "free") + 
-  theme_bw()
-
-ggsave("03_sims/fig_all-factor-gaps.png")
-
-gaps %>% 
-  filter(category %in% c("1 factor")) %>% 
-  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
-  geom_point(color = "gray80") + 
-  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap")), alpha = 0.5) +
-  coord_flip() + 
-  guides(color = F) +
-  labs(title = "ames") + 
-  facet_grid(category~., scales = "free") + 
-  theme_bw()
-
-ggsave("03_sims/fig_1-factor-gaps.png")
 
 #--what is that one year?
 
@@ -166,4 +102,52 @@ gaps %>%
   facet_grid(category~., scales = "free")
 
 ewgap
+
+
+
+gaps_filt <- 
+  gaps %>% 
+  #--2000 was the beginning year, sims are bad at first years
+  filter(year > 2000)
+  
+
+# look at gaps ------------------------------------------------------------
+
+#--for quality check (oat number)
+gaps_filt %>% 
+ # filter(category %in% c("4 factor")) %>% 
+  ggplot(aes(reorder(as_factor(oat_nu), gap_kgha), gap_kgha)) + 
+  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap"))) +
+  geom_point() + 
+  coord_flip() + 
+  guides(color = F) +
+  labs(title = "ames") + 
+  facet_wrap(~category, scales = "free")
+
+
+gaps_filt %>% 
+  filter(!category %in% c("2 factor")) %>% 
+  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
+  geom_point(color = "gray80") + 
+  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap")), alpha = 0.5) +
+  coord_flip() + 
+  guides(color = F) +
+  labs(title = "ames") + 
+  facet_grid(category~., scales = "free") + 
+  theme_bw()
+
+ggsave("03_sims/fig_all-factor-gaps.png")
+
+gaps_filt %>% 
+  filter(category %in% c("1 factor")) %>% 
+  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
+  geom_point(color = "gray80") + 
+  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap")), alpha = 0.5) +
+  coord_flip() + 
+  guides(color = F) +
+  labs(title = "ames") + 
+  facet_grid(category~., scales = "free") + 
+  theme_bw()
+
+ggsave("03_sims/fig_1-factor-gaps.png")
 
