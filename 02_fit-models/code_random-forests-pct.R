@@ -78,6 +78,22 @@ gap_imp =
 # importance values
 plot(gap_imp)
 
+ggsave("02_fit-models/fig_rf-partdep-imp.png")
+
+
+#--I can use these top 10ish features in the LASSOs/PLSs  
+gap_imp_dat <- 
+  gap_imp$results %>% 
+  as_tibble() %>% 
+  arrange(-importance) %>% 
+  filter(importance > 1.1) %>% 
+  select(feature, importance)
+
+gap_imp_dat %>% 
+  write_csv("02_fit-models/fm-rfpct-imp.csv")
+
+
+
 # look at it --------------------------------------------------------------
 
 # Create a "predictor" object that 
@@ -100,8 +116,7 @@ pdp$plot() +
     option = "D") + 
   labs(fill = "Prediction")
 
-ggsave("figs/stats_rf-pdpnd-pct.png")
-
+ggsave("02_fit-models/fig_rf-partdep-pct.png")
 
 ice = 
   FeatureEffect$new(
@@ -110,7 +125,7 @@ ice =
     method = "ice")
 plot(ice)
 
-ggsave("02_fit-models/fig_pd-heatstress.png")
+ggsave("02_fit-models/fig_rf-partdep-pct-heatstress.png")
 
 # try just > 2005 years ---------------------------------------------------
 

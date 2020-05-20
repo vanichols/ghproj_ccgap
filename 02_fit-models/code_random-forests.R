@@ -5,6 +5,9 @@
 # notes: 
 #
 # last edited: 4/20/2020 use new 'master' dataset
+#              5/20/2020 moved to new 02_fit-models folder
+#
+# notes: it's not working now. Grr. 
 
 
 rm(list = ls())
@@ -15,9 +18,11 @@ library(lubridate)
 
 
 # master data -------------------------------------------------------------
+# dat <- read_csv("01_create-features/cf_preds-all.csv") %>% 
+#   mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
 
-dat <- read_csv("data/tidy/td_preds.csv") %>% 
   mutate(year = paste0("Y", year)) #--to ensure it isn't numeric
+
 
 #--is iacsr and site-index related? yes
 dat %>% 
@@ -62,7 +67,8 @@ ccgap <- dat %>%
   select(-crop, -site, -year) %>%
   select(-avg_yield) %>% 
   select(-ndays_gdd140) %>% 
-  filter(!is.na(prev_ccyield))
+  filter(!is.na(prev_ccyield)) %>% 
+  select(-cgap_max_pct)
 
 ccgap <- na.omit(ccgap)
 
