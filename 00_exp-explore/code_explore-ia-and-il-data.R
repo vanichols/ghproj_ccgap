@@ -1,137 +1,67 @@
-# Created:       2/17/2020
-# last edited:   3/16/2020
-#                3/20/2020
+# Created:       5/20/2020
+# last edited:   
 # 
-# purpose: diagnose john sawyer's data
+# purpose: diagnose john sawyer and emmerson's data
 #
-# notes: sotiris wants a bunch of stuff...need to work on that
-#  are the gaps related to weather? ie disease? I tried the soil N thing, didn't work
-
+# notes: 
 
 rm(list = ls())
-#devtools::install_github("vanichols/tidysawyer2", force = T)
-library(tidysawyer2) #--saw_xx data
-library(lme4)
+library(tidysawyer2) #--saw_xx data, il_xx data
+library(tidyverse)
 
 
 
-# calc sawyer things ------------------------------------------------------
-
-#--lewis has a weired 2013 year
-#--normal gap at 0, no gap at mid, neg gap at high. 
-saw_tidysawyer %>% 
-  filter(site == "lewi") %>% 
-  ggplot(aes(nrate_kgha, yield_kgha)) + 
-  geom_point(aes(color = rotation)) + 
-  facet_wrap(~year)
-
-#--remove that year for now
-
-saw_filt <- 
-  saw_tidysawyer %>% 
-    filter(! (year == 2013 & site == "lewi"))
-
-d_max <- 
-  saw_cgap %>% 
-  filter(! (year == 2013 & site == "lewi"))
-
-# penalty at mid-N rate
-d_mid <-  
-  saw_filt %>% 
-  group_by(crop, site, rotation) %>% 
-  filter(nrate_kgha > 100,
-         nrate_kgha < 150) %>% 
-  select(crop, site, year, rotation, yield_kgha) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(cgap_mid = sc-cc) %>% 
-  filter(!is.na(cgap_mid)) %>% 
-  select(-cc, -sc)
-
-# gap at 0N
-d_0 <- 
-  saw_filt %>% 
-  group_by(crop, site, rotation) %>% 
-  mutate(nmin = min(nrate_kgha)) %>% 
-  filter(nrate_kgha == nmin) %>% 
-  select(crop, site, year, rotation, yield_kgha) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(cgap_0 = sc-cc) %>% 
-  filter(!is.na(cgap_0)) %>% 
-  select(-cc, -sc)
+# data --------------------------------------------------------------------
 
 
-d_gaps <- 
-  d_max %>% 
-  left_join(d_mid) %>% 
-  left_join(d_0)
+ia_gap <- saw_cgap %>% mutate(state = "IA") %>% filter(year > 2000, cgap_max > -1000)
+il_gap <- il_cgap %>% mutate(state = "IL")
+
+cgap <- bind_rows(ia_gap, il_gap)
 
 
+ia_ylds <- saw_tidysawyer %>% mutate(state = "IA") %>% select(-sd_kgha, -nreps) %>% filter(year > 2000)
+il_ylds <- il_yields %>% mutate(state = "IL")
 
-# how do yield gaps vary by loc? by year? ---------------------------------
+ylds <- bind_rows(ia_ylds, il_ylds)
 
-# note: there are 7 sites for 2006-2016 only
 
-figloc <- 
-  d_gaps %>% 
-  filter(year > 2005) %>% 
-  ggplot(aes(reorder(site, cgap_max, mean), cgap_max)) + 
-  geom_boxplot() + 
+# look at things ----------------------------------------------------------
+
+
+cgap %>% 
+  ggplot(aes(year, cgap_max)) + 
   geom_point() +
-  coord_flip() + 
-  labs(title = '2006-2016',
-       y = "yield gap")
-  
-figyr <- 
-  d_gaps %>% 
-  group_by(year) %>% 
-  mutate(n = n()) %>% 
-  filter(n == 7) %>% 
-  ggplot(aes(reorder(year, cgap_max, mean), cgap_max)) + 
-  geom_boxplot() + 
-  geom_point() +
-  coord_flip() + 
-  labs(title = "7 sites",
-       x = NULL,
-       y = "yield gap")
-  
-
-figyr
-
-library(patchwork)
-
-figloc / figyr
-
-ggsave("00_explore/fig_variation-yr-site.png")
+  geom_smooth(method = "lm", se = F) +
+  geom_hline(yintercept = 0) +
+  facet_grid(.~state, scales = "free")
 
 
-# how to quantify variation explained by year vs site? --------------------
+ylds %>% 
+  ggplot(aes(nrate_kgha, yield_kgha, color = site, linetype = rotation, 
+             group = interaction(year, site, rotation))) + 
+  geom_point() + 
+  geom_line() + 
+  facet_grid(state ~ .)
 
+ylds %>% 
+ 
+  ggplot(aes(year, yield_kgha, color = site, linetype = rotation, 
+             group = interaction(nrate_kgha, site, rotation))) + 
+  geom_point() + 
+  geom_line() + 
+  geom_smooth(method = "lm", se = F, color = "black", aes(group = state)) +
+  guides(color = F) +
+  facet_wrap(~state, ncol = 2, scales = "free")
 
-#--assign site as random effect, compare to residual variation (which is basically year?)
-library(lme4)
-library(broom)
+ylds %>%
+  filter(nrate_kgha != 67.38, nrate_kgha != 202.14) %>%
+  ggplot(aes(year, yield_kgha/1000, color = site, linetype = rotation, 
+             group = interaction(nrate_kgha, site, rotation))) + 
+  geom_point() + 
+  geom_line() + 
+  geom_smooth(method = "lm", se = F, color = "black", aes(group = state)) +
+  guides(color = F) +
+  facet_grid(rotation ~ state + nrate_kgha, scales = "free")
 
-d_stats <- 
-  d_gaps %>% 
-  unite(site, year, col = "site_yr", remove = F)
-
-m1 <- lmer(cgap_max ~ 1 + (1|site), data = d_stats)
-summary(m1)
-
-m2 <- lm(cgap_max ~ 1, data = d_stats)
-
-anova(m1, m2)
-
-#--nothing is even significant. 
-
-# are yield gpas at min and max N rates related? --------------------------
-
-#--no. put that in the 'draft'. It's contrary to Gentry et al. 
-d_gaps %>% 
-  ggplot(aes(cgap_0, cgap_max)) + 
-  geom_point(aes(color = site)) + 
-#  facet_grid(.~site) + 
-  geom_smooth(method = "lm", aes(color = site), se = F) + 
-  labs(x = "Yield gap at 0 Nrate (kg/ha)", 
-       y = "Yield gap at max Nrate (kg/ha)") + 
-  theme_bw()
+ggsave("00_exp-explore/fig_yields-over-time.png")
