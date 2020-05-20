@@ -5,6 +5,7 @@
 # notes: 
 #
 # last edited:   4/23/2020
+#                5/20/2020 moved to 02_fit-models folder
 
 rm(list = ls())
 library(tidyverse)
@@ -12,10 +13,10 @@ library(tidyverse)
 
 # data --------------------------------------------------------------------
 
-datraw <- read_csv("data/tidy/td_preds.csv") %>% 
-  select(-year)
+datraw <- read_csv("01_create-features/cf_preds-all.csv")
 
-imps <- read_csv("data/smy/sd_rf-feat-imp-pct.csv")
+
+imps <- read_csv("02_fit-models/fm-rfpct-imp.csv")
 
 
 # do percent gaps -------------------------------------------------------------
@@ -214,7 +215,7 @@ myres %>%
        title = "LASSO Regression,\nWhat Drives Contin Corn Penalty on a Percent Basis?")
 
 
-ggsave("figs/stats_lasso-pct.png")
+ggsave("02_fit-models/fig_lasso-pctgap.png")
 ggsave("../../../Box/Gina_APSIM_modeling/figs-from-repo/stats_lasso-pctgap.png")
 
 
