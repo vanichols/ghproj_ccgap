@@ -1,0 +1,19 @@
+---
+title: "Sawyer Update"
+author: "Gina Nichols"
+date: "5/20/2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Iowa and Illinois Yields Over Time
+
+```{r yields, out.width='100%'}
+knitr::include_graphics("../00_exp-explore/fig_yields-over-time.png")
+
+```
+
+## Yield Gaps
