@@ -19,6 +19,17 @@ library(janitor)
 
 # read in output from read-in-sim-res code --------------------------------
 
+
+# keeping track of oats ---------------------------------------------------
+
+oat_key <-
+  read_csv("../../../Box/Gina_APSIM_modeling/sims-ames-CCbase/data-raw/rd_oats-calibrated-v1CC.csv") %>%  
+  #read_csv("sims_Mitch-cal-factor-analysis/data-raw/rd_oats-calibrated-v1.csv") %>% 
+  separate_rows(category, sep = ",") %>% 
+  remove_empty("rows") %>% 
+  remove_empty("cols")
+
+
 apraw <- read_csv("03_sims/se_apsim-sims-raw.csv")
 
 
@@ -124,7 +135,7 @@ gaps_filt %>%
   labs(title = "ames") + 
   facet_wrap(~category, scales = "free")
 
-
+#--all factor combos
 gaps_filt %>% 
   filter(!category %in% c("2 factor")) %>% 
   ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
@@ -138,6 +149,7 @@ gaps_filt %>%
 
 ggsave("03_sims/fig_all-factor-gaps.png")
 
+#--just 1 factor
 gaps_filt %>% 
   filter(category %in% c("1 factor")) %>% 
   ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
@@ -151,3 +163,105 @@ gaps_filt %>%
 
 ggsave("03_sims/fig_1-factor-gaps.png")
 
+
+#--try windmill plots
+
+yrs_ord <- 
+  gaps_filt %>% 
+  filter(oat_what == "exp gap", category == "1 factor") %>% 
+  arrange(gap_kgha) %>% 
+  select(year) %>% 
+  pull()
+
+gaps_filt_wind <- 
+  gaps_filt %>%
+  mutate(year = factor(year, levels = yrs_ord),
+         oat_what = case_when(
+           grepl("exp gap", oat_what) ~ "1_exp gap",
+           grepl("current", oat_what) ~ "2_current apsim gap",
+           TRUE ~ oat_what))
+
+wind_theme <-   theme(strip.text.y = element_text(angle = 360),
+                      axis.text.y = element_blank(),
+                      axis.ticks.y = element_blank())
+
+
+fac1 <- 
+  gaps_filt_wind %>%
+  filter(category == "1 factor") %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_bar(aes(fill = oat_what),
+               #alpha = oat_what %in% c("1_exp gap")),
+           position = "dodge", stat = "identity", color = "black") + 
+  facet_grid(oat_what~category) + 
+  guides(fill = F, alpha = F) +
+  coord_flip() + 
+  labs(title = "Ames",
+       x = NULL) + 
+  wind_theme
+
+fac1
+ggsave("03_sims/fig_1-factor-gaps-windmill.png")
+
+
+fac2 <- 
+  gaps_filt_wind %>% 
+  filter(category == "3 factor") %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_bar(aes(fill = oat_what),
+               #alpha = oat_what %in% c("1_exp gap")),
+           position = "dodge", stat = "identity", color = "black") + 
+  facet_grid(oat_what ~ category) + 
+  guides(fill = F, alpha = F) +
+  coord_flip() + 
+  labs(title = "Ames",
+       x = NULL) + 
+  wind_theme
+
+fac2
+ggsave("03_sims/fig_3-factor-gaps-windmill.png", width = 3.5, height = 7.5)
+
+
+fac3 <- 
+  gaps_filt_wind %>%
+  filter(category == "4 factor") %>% 
+  mutate(year = factor(year, levels = yrs_ord)) %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_bar(aes(fill = oat_what),
+               #alpha = oat_what %in% c("1_exp gap")),
+           position = "dodge", stat = "identity", color = "black") + 
+  facet_grid(oat_what ~category) + 
+  guides(fill = F, alpha = F) +
+  coord_flip() + 
+  labs(title = "Ames",
+       x = NULL) + 
+  wind_theme
+
+fac3
+
+ggsave("03_sims/fig_4-factor-gaps-windmill.png")
+
+fac4 <- 
+  gaps_filt_wind %>%
+  filter(category == "5 factor") %>% 
+  mutate(year = factor(year, levels = yrs_ord)) %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_bar(aes(fill = oat_what),
+           #alpha = oat_what %in% c("1_exp gap")),
+           position = "dodge", stat = "identity", color = "black") + 
+  facet_grid(oat_what ~category) + 
+  guides(fill = F, alpha = F) +
+  coord_flip() + 
+  labs(title = "Ames",
+       x = NULL) + 
+  wind_theme
+
+fac4
+
+ggsave("03_sims/fig_5-factor-gaps-windmill.png")
+
+
+library(patchwork)
+fac1 + fac2 + fac3 
+
+ggsave("03_sims/fig_all-factor-gaps-windmill.png")

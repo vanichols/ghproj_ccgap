@@ -25,7 +25,7 @@ knitr::include_graphics("../00_exp-explore/fig_yields-over-time.png")
 
 ## What variables did we look at in Iowa?
 
-```{r vars, out.height='90%'}
+```{r vars, out.width='60%'}
 knitr::include_graphics("../01_create-features/tbl_preds-all.png")
 
 ```
@@ -45,11 +45,11 @@ knitr::include_graphics("../figs/lit_years-in-corn.png")
 ```
 
 
-## What are some possible targets in APSIM?
+## Possible targets in APSIM?
 
 
-```{r apsim, out.width='100%'}
-knitr::include_graphics("../03_sims/fig_1-factor-gaps.png")
+```{r apsim, out.width='100%', out.height='100%'}
+knitr::include_graphics("../03_sims/fig_all-factor-gaps-windmill.png")
 
 ```
 

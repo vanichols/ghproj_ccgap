@@ -18,16 +18,6 @@ library(tidyverse)
 library(janitor)
 
 
-# keeping track of oats ---------------------------------------------------
-
-oat_key <-
-  read_csv("../../../Box/Gina_APSIM_modeling/sims-ames-CCbase/data-raw/rd_oats-calibrated-v1CC.csv") %>%  
-  #read_csv("sims_Mitch-cal-factor-analysis/data-raw/rd_oats-calibrated-v1.csv") %>% 
-  separate_rows(category, sep = ",") %>% 
-  remove_empty("rows") %>% 
-  remove_empty("cols")
-
-
 # read in .out files ------------------------------------------------------
 
 my_dir <- "../../../Box/Gina_APSIM_modeling/sims-ames-CCbase/"
