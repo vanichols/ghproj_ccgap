@@ -120,12 +120,18 @@ i <- i + 1
 
 }
 
+#--site individually
+imp_dat %>%
+  filter(!grepl("Y", loo)) %>% 
+  group_by(loo, feature) %>% 
+  rename(imp = importance) %>% 
+  ggplot(aes(reorder(feature, imp), imp)) +
+  geom_point(size = 4) + 
+  geom_segment(y = 0, aes(xend = feature, yend = imp)) + 
+  coord_flip() + 
+  facet_wrap(~loo)
 
-imp_dat %>% 
-  ggplot(aes(x = reorder(feature, importance), y = importance)) + 
-  geom_col(aes(fill = loo), position = "dodge") + 
-  coord_flip() 
-
+ggsave("02_fit-models/fig_rf-loo-site.png")
 
 imp_dat %>%
   group_by(feature) %>% 
@@ -135,9 +141,6 @@ imp_dat %>%
   geom_segment(y = 0, aes(xend = feature, yend = imp)) + 
   coord_flip() + 
   labs(title = "Leave-one-out sum of imps")
-
-ggsave("02_fit-models/fig_rf-loo-site.png")
-
 
 
 # do it for years ---------------------------------------------------------
@@ -198,6 +201,7 @@ imp_dat %>%
   coord_flip() + 
   facet_wrap(~loo)
   
+ggsave("02_fit-models/fig_rf-loo-year.png")
 
 
 imp_dat %>%
@@ -212,7 +216,7 @@ imp_dat %>%
   labs(title = "Leave-one-out sum of imps") + 
   facet_wrap(.~loo_cat)
 
-ggsave("02_fit-models/fig_rf-loo-site.png")
+ggsave("02_fit-models/fig_rf-loo-summary.png")
 
 
 
