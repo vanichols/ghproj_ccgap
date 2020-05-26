@@ -2,7 +2,9 @@
 title: "Exploring and Modeling the Continuous Corn Yield Penalty"
 author: "Gina Nichols"
 date: "5/20/2020"
-output: ioslides_presentation
+output:
+  ioslides_presentation: default
+  beamer_presentation: default
 ---
 
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
@@ -36,7 +38,7 @@ dat_seg <-
                            "cc" = "Continuous Corn",
                            "sc" = "Soybean-Corn")) %>%
   dplyr::select(rotation, datatype, yield_kgha) %>% 
-  pivot_wider(names_from = datatype, values_from = yield_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
   mutate(nrate_kgha = 265)
 
 dat %>%
@@ -46,33 +48,123 @@ dat %>%
   ungroup() %>%
   mutate(rotation = recode(rotation,
                            "cc" = "Continuous Corn",
-                           "sc" = "Soybean-Corn")) %>%
+                           "sc" = "Soybean-Corn"),
+         datatype = factor(datatype, levels = c("experimental", "apsim"))) %>%
   filter(n > 20) %>%
   ggplot(aes(nrate_kgha, yield_kgha/1000)) +
-  geom_line(aes(color = datatype), size = 3) +
+  geom_line(aes(color = rotation), size = 3) +
   geom_segment(data = dat_seg, aes(x = nrate_kgha,
                                    xend = nrate_kgha,
-                                   yend = experimental/1000,
-                                   y = apsim/1000),
+                                   yend = `Continuous Corn`/1000,
+                                   y = `Soybean-Corn`/1000),
                arrow = arrow(length = unit(0.1, "inches")),
                size = 1.5,
                color = "red") +
-  scale_color_manual(values = c("apsim" = "darkred",
-                                "experimental" = "deepskyblue")) +
+  scale_color_manual(values = c("darkred", "deepskyblue")) +
   labs(x = "Nitrogen Rate (kg/ha)",
        y = "Yield (Mg/ha)",
        title = "Iowa Data",
-       color = "Data Type") +
+       color = "Rotation") +
   theme_bw() +
   theme(legend.position = c(1,0),
         legend.justification = c(1,0),
         legend.background = element_rect(color = "black"),
         strip.text = element_text(size = rel(1.4)),
         axis.title = element_text(size = rel(1.2))) +
-  facet_grid(. ~ rotation)
+  facet_grid(. ~ datatype)
 
 
 ```
+
+
+
+## Continuous Corn Yields Relative to Rotated Corn Yields
+
+```{r, out.width='100%'}
+
+
+mean_pct_sc <- 
+  saw_tidysawyer %>% 
+  select(site, year, rotation, nrate_kgha, yield_kgha) %>% 
+  mutate(state = "Iowa") %>% 
+  bind_rows(il_yields %>% select(site, year, rotation, nrate_kgha, yield_kgha) %>% mutate(state = "Illinois")) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(pct_sc = (cc) / sc) %>% 
+  group_by(state) %>% 
+  mutate(mxnrate_kgha = max(nrate_kgha)) %>% 
+  filter(nrate_kgha == mxnrate_kgha) %>% 
+  group_by(state, nrate_kgha) %>% 
+  summarise(mn_pct_sc = mean(pct_sc, na.rm = TRUE))
+
+
+saw_tidysawyer %>% 
+  select(site, year, rotation, nrate_kgha, yield_kgha) %>% 
+  mutate(state = "Iowa") %>% 
+  bind_rows(il_yields %>% select(site, year, rotation, nrate_kgha, yield_kgha) %>% mutate(state = "Illinois")) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(pct_sc = (cc) / sc) %>% 
+  filter(nrate_kgha != 67.38,
+         nrate_kgha != 202.14) %>% 
+  ggplot(aes(year, pct_sc)) + 
+  geom_point(size = 1, color = "gray70") +
+  geom_line(aes(group = site), size = 1, color = "gray70") + 
+  geom_smooth(method = "lm", se = F, size = 1.2, color = "black") +
+  geom_hline(yintercept = 1, lintype = "dashed") +
+  geom_hline(data = mean_pct_sc, aes(yintercept = mn_pct_sc), color = "red", size = 2) +
+  geom_text(data = mean_pct_sc, x = 2006, y = 1.2, aes(label = paste0(round(mn_pct_sc, 2) * 100, "%")), color = "red") +
+  guides(color = F) +
+  facet_grid(.~state + nrate_kgha, scales = "free") + 
+  scale_y_continuous(labels = scales::label_percent()) + 
+  labs(y = "Continuous Corn Yield\nRelative to Rotated Corn (%)",
+       x = "Year") +
+  theme_bw() + 
+  theme(axis.text.x = element_blank())
+  
+```
+
+
+## Gap at highest N-rate, absolute values
+
+```{r yield gap}
+
+saw_cgap %>% 
+  mutate(state = "Iowa") %>% 
+  filter(year > 2000) %>% 
+  bind_rows(il_cgap %>% mutate(state = "Illinois")) %>% 
+  group_by(state) %>% 
+  mutate(mean_cgap = mean(cgap_max, na.rm = TRUE)) %>% 
+  ggplot(aes(year, cgap_max/1000, group = site)) + 
+  geom_hline(yintercept = 0) +
+  geom_point(aes(color = state)) + 
+  geom_line(aes(color = state)) +
+  geom_hline(aes(yintercept = mean_cgap/1000), color = "red", size = 2) +
+  facet_grid(.~state, scales = "free") +
+  scale_color_manual(values = c("Illinois" = "purple",
+                                 "Iowa" = "orange")) +
+  guides(color = F) +
+  theme_bw() + 
+  labs(x = "Year",
+       y = "Yield (Mg/ha)",
+       title = "Experimental Continuous Corn Penalty At Highest N rate") +
+  theme_bw() +
+  theme(legend.position = c(1,0),
+        legend.justification = c(1,0),
+        legend.background = element_rect(color = "black"),
+        strip.text = element_text(size = rel(1.4)),
+        axis.title = element_text(size = rel(1.2)))
+
+```
+
+## Previous work
+
+Nothing has been done on a mid-level scale
+
+- Limited to one or two sites (5 studies), or uses satellite data (1 study)
+
+- Statistical models from one site (ex. Gentry et al. 2013) do not work in Iowa (we tried)
+
+- Explore limited explanatory variables
+
 
 ## Hypotheses and Objectives
 
@@ -119,7 +211,7 @@ dat_sum_tib <-
   mutate(vars = dat_vars) %>% 
   dplyr::select(vars, min, max, mean) %>% 
   filter(!is.infinite(min)) %>% 
-  mutate_if(is.numeric, round, 0)
+  mutate_if(is.numeric, round, 0) 
 
 #--make something explaining what each var is
 dat_tab <- 
@@ -150,18 +242,25 @@ dat_tab <-
 
 ssurgo_tab <- 
   dat_tab %>% 
-  filter(grepl("SSURGO", Variable))
+  filter(grepl("SSURGO", Variable)) %>% 
+  mutate(units = c("cm", "unitless", "cm", "%", "%", "mm")) %>% 
+  dplyr::select(Variable, units, mean, min, max) 
 
 
 wea_tab <- 
   dat_tab %>% 
-  filter(grepl("WEA", Variable))
+  filter(grepl("WEA", Variable)) %>% 
+  mutate(units = c("days", "days", "mm", "mm", "degC", "days",
+                   "10degC base, 30degC max")) %>% 
+  dplyr::select(Variable, units, mean, min, max) 
 
 
 mgmt_tab <- 
   dat_tab %>% 
   filter(!grepl("WEA", Variable),
-         !grepl("SSURGO", Variable))
+         !grepl("SSURGO", Variable)) %>% 
+  mutate(units = c("factor", "kg/ha", "%", "kg/ha", "kg/ha", "numeric integer"))  %>% 
+  dplyr::select(Variable, units, mean, min, max) 
 
 
 ```
@@ -245,14 +344,14 @@ rf_imps %>%
 
 ## LASSO regression results
 
-```{r lasso, out.width ='90%', out.height= '60%'}
+```{r lasso, out.width ='70%', out.height= '60%'}
 knitr::include_graphics("../02_fit-models/fig_lasso-pctgap.png")
 ```
 
 ## Does the penalty increase over time?
-Literature review, studies must not confound time in continuous corn with year
-```{r, out.width='100%'}
-knitr::include_graphics("../figs/lit_years-in-corn.png")
+
+```{r, out.width='70%', out.height='100%'}
+knitr::include_graphics("../00_exp-explore/fig_lit-penalty-over-time.png")
 ```
 
 
@@ -268,7 +367,7 @@ knitr::include_graphics("../figs/lit_years-in-corn.png")
 
 Don't worry about the acronyms, the point is the magnitude
 
-```{r apsim, out.width='100%', out.height='100%'}
+```{r apsim, out.width='70%', out.height='70%'}
 knitr::include_graphics("../03_sims/fig_all-factor-gaps-windmill.png")
 
 ```
@@ -281,46 +380,6 @@ knitr::include_graphics("../03_sims/fig_all-factor-gaps-windmill.png")
 - Creating an algorithm that adjusts these parameters based on soil/weather/management has the potential to capture the patterns
 
 
-## Iowa and Illinois Yields Over Time
-
-```{r yields, out.width='100%'}
-knitr::include_graphics("../00_exp-explore/fig_yields-over-time.png")
-
-```
-
-## Closer look at the continuous corn yield gap
-
-```{r yield gap}
-
-saw_cgap %>% 
-  mutate(state = "Iowa") %>% 
-  filter(year > 2000) %>% 
-  bind_rows(il_cgap %>% mutate(state = "Illinois")) %>% 
-  group_by(state) %>% 
-  mutate(mean_cgap = mean(cgap_max, na.rm = TRUE)) %>% 
-  ggplot(aes(year, cgap_max/1000, group = site)) + 
-  geom_hline(yintercept = 0) +
-  geom_point(aes(color = state)) + 
-  geom_line(aes(color = state)) +
-  geom_hline(aes(yintercept = mean_cgap/1000), color = "red", size = 2) +
-  facet_grid(.~state, scales = "free") +
-  scale_color_manual(values = c("Illinois" = "purple",
-                                 "Iowa" = "orange")) +
-  guides(color = F) +
-  theme_bw() + 
-  labs(x = "Year",
-       y = "Yield (Mg/ha)",
-       title = "Experimental Continuous Corn Penalty") +
-  theme_bw() +
-  theme(legend.position = c(1,0),
-        legend.justification = c(1,0),
-        legend.background = element_rect(color = "black"),
-        strip.text = element_text(size = rel(1.4)),
-        axis.title = element_text(size = rel(1.2)))
-
-```
-
-
 ## Next steps
 
 *Next:*
@@ -329,3 +388,11 @@ saw_cgap %>%
 - Re-evaluate implementation of APSIM adjustments
 - Implement select changes in APSIM, assess how model performs
 
+
+
+## Iowa and Illinois Yields Over Time
+
+```{r yields, out.width='100%'}
+knitr::include_graphics("../00_exp-explore/fig_yields-over-time.png")
+
+```
