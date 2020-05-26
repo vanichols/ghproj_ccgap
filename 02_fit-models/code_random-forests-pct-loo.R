@@ -219,4 +219,10 @@ imp_dat %>%
 ggsave("02_fit-models/fig_rf-loo-summary.png")
 
 
-
+imp_dat %>%
+  mutate(loo_cat = ifelse(grepl("Y", loo), "year", "site")) %>% 
+  group_by(loo_cat, feature) %>% 
+  summarise(imp = sum(importance)) %>%
+  arrange(-imp) %>% 
+  write_csv("02_fit-models/fm-rfpct-imp-loo.csv")
+  
