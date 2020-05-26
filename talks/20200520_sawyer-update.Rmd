@@ -39,7 +39,8 @@ dat_seg <-
                            "sc" = "Soybean-Corn")) %>%
   dplyr::select(rotation, datatype, yield_kgha) %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(nrate_kgha = 265)
+  mutate(nrate_kgha = 265) %>% 
+  filter(datatype != "apsim")
 
 dat %>%
   group_by(crop, nrate_kgha, rotation, datatype) %>%
@@ -52,7 +53,7 @@ dat %>%
          datatype = factor(datatype, levels = c("experimental", "apsim"))) %>%
   filter(n > 20) %>%
   ggplot(aes(nrate_kgha, yield_kgha/1000)) +
-  geom_line(aes(color = rotation), size = 3) +
+  geom_line(aes(color = rotation), size = 4) +
   geom_segment(data = dat_seg, aes(x = nrate_kgha,
                                    xend = nrate_kgha,
                                    yend = `Continuous Corn`/1000,
