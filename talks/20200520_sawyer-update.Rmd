@@ -84,9 +84,12 @@ dat %>%
 
 - Use results to incorporate cont. corn yield penalty into APSIM algorithms
 
+## Hypotheses and Objectives Cont.
+
 **Hypotheses:**
 
 $H_1$ The continuous corn penalty is not random and can be captured and described by a process-based model. 
+
 $H_0$ The penalty is related to biotic phenomena (disease) that cannot be captured by a process-based model that only captures abiotic processes. 
 
 ## Preliminary Approach, Iowa
@@ -257,7 +260,7 @@ knitr::include_graphics("../figs/lit_years-in-corn.png")
 
 *Summary:*
 
-- Cold wet springs and hot early growing seasons enhance rotation effect at high N rates
+- Cold wet springs and hot early growing seasons enhance cont. corn penalty at high N rates
 - Penalty is only sensitive to previous year's crop (number of years in corn not important)
 
 
