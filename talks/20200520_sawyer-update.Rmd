@@ -5,9 +5,76 @@ date: "5/20/2020"
 output: ioslides_presentation
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(tidysawyer2)
 ```
+
+## Motivation
+
+```{r motivation}
+
+dat <- saw_tidysawyer %>% 
+  select(crop, site, year, rotation, nrate_kgha, yield_kgha) %>% 
+  mutate(datatype = "experimental") %>% 
+  bind_rows(saw_tidyapsim %>% 
+              select(-rotation) %>% 
+              rename(rotation = rotation2) %>% 
+              mutate(datatype = "apsim"))
+
+
+dat_seg <- 
+  dat %>% 
+  group_by(crop, nrate_kgha, rotation, datatype) %>%
+  summarise(n = n(),
+            yield_kgha = mean(yield_kgha, na.rm = TRUE)) %>% 
+  group_by(crop, rotation, datatype) %>% 
+  mutate(mx_nrate_kgha = max(nrate_kgha)) %>%
+  ungroup() %>%
+  filter(nrate_kgha == mx_nrate_kgha) %>% 
+  mutate(rotation = recode(rotation,
+                           "cc" = "Continuous Corn",
+                           "sc" = "Soybean-Corn")) %>%
+  select(rotation, datatype, yield_kgha) %>% 
+  pivot_wider(names_from = datatype, values_from = yield_kgha) %>% 
+  mutate(nrate_kgha = 265)
+
+dat %>%
+  group_by(crop, nrate_kgha, rotation, datatype) %>%
+  summarise(n = n(),
+            yield_kgha = mean(yield_kgha, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(rotation = recode(rotation,
+                           "cc" = "Continuous Corn",
+                           "sc" = "Soybean-Corn")) %>%
+  filter(n > 20) %>%
+  ggplot(aes(nrate_kgha, yield_kgha/1000)) +
+  geom_line(aes(color = datatype), size = 3) +
+  geom_segment(data = dat_seg, aes(x = nrate_kgha,
+                                   xend = nrate_kgha,
+                                   yend = experimental/1000,
+                                   y = apsim/1000),
+               arrow = arrow(length = unit(0.1, "inches")),
+               size = 1.5,
+               color = "red") +
+  scale_color_manual(values = c("apsim" = "darkred",
+                                "experimental" = "deepskyblue")) +
+  labs(x = "Nitrogen Rate (kg/ha)",
+       y = "Yield (Mg/ha)",
+       title = "Iowa Data",
+       color = "Data Type") +
+  theme_bw() +
+  theme(legend.position = c(1,0),
+        legend.justification = c(1,0),
+        legend.background = element_rect(color = "black"),
+        strip.text = element_text(size = rel(1.4)),
+        axis.title = element_text(size = rel(1.2))) +
+  facet_grid(. ~ rotation)
+
+
+```
+
 
 ## Iowa and Illinois Yields Over Time
 
