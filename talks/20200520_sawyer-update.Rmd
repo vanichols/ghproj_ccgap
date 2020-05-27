@@ -345,8 +345,41 @@ rf_imps %>%
 
 ## LASSO regression results
 
-```{r lasso, out.width ='70%', out.height= '60%'}
-knitr::include_graphics("../02_fit-models/fig_lasso-pctgap.png")
+```{r lasso, out.width ='90%', out.height= '80%'}
+
+lass <- read_csv("../02_fit-models/fm-reg-coefs.csv")
+
+lass %>% 
+  filter(LSO_value != 0) %>% 
+  filter(abs(LSO_value) > 1) %>% 
+  mutate(pred = recode(pred,
+                       p2mo_tx_mean = "Mean Max T planting-V12",
+                       wintcolddays_n = "Number of Days less than 4 degF Before Planting",
+                       prep2wk_precip_mm_tot = "Amount of Rain 2 weeks Before Planting",
+                       gs_tavg = "April 1 - Sept 1 Average Temperature",
+                       bhzdepth_cm = "Depth to B Horizon",
+                       wtdepth_cm = "Depth to Water Table",
+                       p4wk_1inrain = "Days planting-1 mo with 1 inch of rain",
+                       soc_30cm_pct = "Soil Carbon in top 30 cm",
+                       ndays_gdd140 = "Number of DAP to reach 140GDD",
+                       heatstress_n = "Number of days w/Tmax > 30degC 0-120 DAP",
+                       iacsr = "Iowa Corn Suitability Rating",
+                       years_in_corn = "Years In Experiment",
+                       avg_ccyield = "Site Average Corn Yield")
+  ) %>% 
+  mutate(effect = ifelse(LSO_value < 0, "Decreases Penalty", "Increases Penalty")) %>% 
+  ggplot(aes(reorder(pred, LSO_value, mean), LSO_value)) + 
+  geom_col(aes(fill = effect)) + 
+  coord_flip() + 
+  scale_fill_manual(values = c("Decreases Penalty" = "blue",
+                               "Increases Penalty" = "red")) +
+  labs(y = "Effect on Penalty", 
+       fill = NULL,
+       x = NULL,
+       title = "Associations with Contin Corn Penalty\n(% basis)") +
+  theme(legend.position = "bottom",
+        axis.text.y = element_text(size = rel(1.3)))
+
 ```
 
 ## Does the penalty increase over time?
