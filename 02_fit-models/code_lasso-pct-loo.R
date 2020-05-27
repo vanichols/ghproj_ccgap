@@ -25,7 +25,7 @@ imps <- read_csv("02_fit-models/fm-rfpct-imp-loo.csv")
 imps_lst <- 
   imps %>%
   pivot_wider(names_from = loo_cat, values_from = imp) %>% 
-  filter(year > 8) %>% #--eliminate bottom 3
+  filter(site > 8) %>% #--eliminate bottom 3
   select(feature) %>% 
   pull()
 
@@ -103,7 +103,7 @@ pred_tmp <-
   ydat %>%
   select(-cgap_max_pct) %>%
   select_if(is.numeric) %>%
-  mutate_all(funs(scale))
+  mutate_all(list(~scale(.)))
 
 myr_tmp <- ydat %>%
   select(cgap_max_pct) 
@@ -189,6 +189,8 @@ myL_res <- myL_coef[-1, 1] %>%
 myres <- left_join(myRR_res, myL_res) %>%
     select(pred, RR_value, RR_absval, everything())
   
+myres %>% write_csv("02_fit-models/fm-reg-coefs.csv")
+
 myres %>% 
   filter(LSO_value != 0) %>% 
   filter(abs(LSO_value) > 1) %>% 
