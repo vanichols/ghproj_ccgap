@@ -40,4 +40,8 @@ il <-
 
 # see what is missing -----------------------------------------------------
 
-ia %>% bind_rows(il) %>% write_csv("01_create-features/cf_ssurgo-problems.csv")
+probs <- ia %>% bind_rows(il) 
+  
+probs
+  
+probs %>% write_csv("01_create-features/cf_ssurgo-problems.csv")
