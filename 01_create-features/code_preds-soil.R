@@ -18,9 +18,9 @@ library(readr)
 
 #--these things come from ssurgo
 sc <- 
-  saw_soilchar %>% #--from tidysawyer2 pkg
+  read_csv("01_create-features/raw_ssurgo-vals-ia.csv") %>% 
   as_tibble() %>% 
-  select(-cropprodindex_maj, -cropprodindex_wgt, -om_wgt)
+  select(-cropprodindex_maj, -cropprodindex_wgt)
 
 #--these from measurements
 sprof <- 
