@@ -1,7 +1,8 @@
 # Created:       2/17/2020
 # last edited:   3/16/2020
 #                3/20/2020
-# 
+#                6/3/2020
+#
 # purpose: diagnose john sawyer's data
 #
 # notes: sotiris wants a bunch of stuff...need to work on that
@@ -12,12 +13,13 @@ rm(list = ls())
 #devtools::install_github("vanichols/tidysawyer2", force = T)
 library(tidysawyer2) #--saw_xx data
 library(lme4)
+library(tidyverse)
 
 
 
 # calc sawyer things ------------------------------------------------------
 
-#--lewis has a weired 2013 year
+#--lewis has a weird 2013 year
 #--normal gap at 0, no gap at mid, neg gap at high. 
 saw_tidysawyer %>% 
   filter(site == "lewi") %>% 
@@ -33,7 +35,7 @@ saw_filt <-
 
 d_max <- 
   saw_cgap %>% 
-  filter(! (year == 2013 & site == "lewi"))
+  filter(!(year == 2013 & site == "lewi"))
 
 # penalty at mid-N rate
 d_mid <-  
@@ -94,6 +96,7 @@ figyr <-
        x = NULL,
        y = "yield gap")
   
+
 
 figyr
 

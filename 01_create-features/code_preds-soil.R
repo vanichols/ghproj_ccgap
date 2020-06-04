@@ -16,11 +16,11 @@ library(readr)
 
 # soil data, from package ----------------------------------------------
 
-#--these things come from ssurgo
+#--these things come from ssurgo (except WT depth)
 sc <- 
-  read_csv("01_create-features/raw_ssurgo-vals-ia.csv") %>% 
+  saw_soilchar %>% 
   as_tibble() %>% 
-  select(-cropprodindex_maj, -cropprodindex_wgt)
+  select(-cropprodindex_maj, -cropprodindex_wgt, -wtann_cm, -wtspring_cm)
 
 #--these from measurements
 sprof <- 
@@ -61,7 +61,8 @@ soil_dat <-
   left_join(sclay) %>% 
   left_join(ssoc) %>% 
   left_join(spaw) %>% 
-  select(site, wtdepth_cm,
+  select(site, 
+         wtdepth_cm, #--I don't know where I originally got wtdepth, it's not in SSURGO?
          iacsr_wgt,
          bhz_wt,
          om_maj,

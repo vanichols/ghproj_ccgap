@@ -5,6 +5,7 @@
 # notes: 
 # last edited:  4/20/2020 cleaning up code, separating data things from stats things
 #               4/30/2020 trying new folder structure
+#               6/4/2020 add drainage
 
 
 #--make sure data is up-to-date
@@ -111,6 +112,10 @@ cgap_pct <-
          cgap_max_pct = gap/sc*100) %>% 
   select(site, year, cgap_max_pct)
          
+#--tiled or not?
+drainage <- 
+  saw_siteinfo %>% 
+  select(site_name, site, drainage)
 
 # put it all together -----------------------------------------------------
 
@@ -123,6 +128,7 @@ dat <-
   left_join(yrs_corn) %>% 
   left_join(wea) %>% 
   left_join(soi) %>% 
+  left_join(drainage) %>% 
   mutate(yearF = paste0("Y", year)) #--to ensure it isn't numeric
 
 
