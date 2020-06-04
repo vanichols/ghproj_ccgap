@@ -117,6 +117,8 @@ drainage <-
   saw_siteinfo %>% 
   select(site_name, site, drainage)
 
+
+
 # put it all together -----------------------------------------------------
 
 dat <-  
@@ -131,6 +133,8 @@ dat <-
   left_join(drainage) %>% 
   mutate(yearF = paste0("Y", year)) #--to ensure it isn't numeric
 
+
+#
 
 #--does pct gap dec over years? yes.
 dat %>% 
