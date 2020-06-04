@@ -31,7 +31,7 @@ library(tidyr)
 wea <- saw_wea %>% as_tibble() 
 
 pwea <- wea %>% 
-  left_join(saw_plant) %>% 
+  left_join(saw_planting) %>% 
   select(-plant_date, -crop) %>% 
   filter(!is.na(plant_doy))
 
