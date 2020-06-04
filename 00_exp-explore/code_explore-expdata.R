@@ -10,12 +10,55 @@
 
 
 rm(list = ls())
-#devtools::install_github("vanichols/tidysawyer2", force = T)
+#devtools::install_github("vanichols/tidysawyer2")
 library(tidysawyer2) #--saw_xx data
 library(lme4)
 library(tidyverse)
 
 
+
+# recreate John's fig -----------------------------------------------------
+
+saw_tidysawyer %>%
+  group_by(site) %>% 
+  mutate(nmax = max(nrate_kgha)) %>% 
+  filter(nrate_kgha == nmax) %>% 
+  group_by(site, year) %>% 
+  mutate(siteyear_mean = mean(yield_kgha)) %>% 
+  ggplot(aes(siteyear_mean, yield_kgha, color = rotation)) + 
+  geom_point() + 
+  geom_label(aes(label = site)) +
+  geom_smooth(method = "lm")
+
+dat <- 
+  saw_tidysawyer %>%
+  group_by(site) %>% 
+  mutate(nmax = max(nrate_kgha)) %>% 
+  filter(nrate_kgha == nmax) %>% 
+  group_by(site, year) %>% 
+  mutate(siteyear_mean = mean(yield_kgha)) 
+
+m1 <- lm(yield_kgha/1000 ~ siteyear_mean*rotation, data = dat)
+
+anova(m1)  
+summary(m1)
+
+m2 <- lm(yield_kgha/1000 ~ siteyear_mean + rotation, data = dat)
+m3 <- lm(yield_kgha/1000 ~ siteyear_mean, data = dat)
+anova(m3, m2)
+anova(m2, m1)
+
+# look at data w/error bars -----------------------------------------------
+
+saw_tidysawyer %>% 
+  filter(nrate_kgha > 250) %>% 
+  filter(site == "ames") %>% 
+  mutate(se_kgha = sd_kgha/sqrt(4)) %>% 
+  ggplot(aes(year, yield_kgha)) + 
+  geom_col(aes(fill = rotation), position = position_dodge2(width = 0.9)) + 
+  geom_errorbar(aes(x = year, ymin = yield_kgha - se_kgha, ymax = yield_kgha + se_kgha),
+                 color = "black", position = position_dodge2(width = 0.9), size = 1) +
+  facet_wrap(.~site, scales = "free")
 
 # calc sawyer things ------------------------------------------------------
 

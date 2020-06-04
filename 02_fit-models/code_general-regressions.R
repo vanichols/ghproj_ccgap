@@ -15,12 +15,10 @@ library(tidyverse)
 
 datraw <- read_csv("01_create-features/cf_preds-all.csv")
 
-pctgap <- datraw %>% 
-  dplyr::select(-crop, -site, -site_name, -year, -cgap_max, -iacsr) %>% 
-  filter(years_in_corn > 1)
 
-rawgap <- datraw %>% 
-  dplyr::select(-crop, -site, -site_name, -year, -cgap_max_pct, -iacsr) %>% 
+
+mdat <- datraw %>% 
+  dplyr::select(-crop, -site, -site_name, -year, -yearF, -iacsr) %>% 
   filter(years_in_corn > 1)
 
 
@@ -29,20 +27,56 @@ rawgap <- datraw %>%
 #--no interactions
 
 #--with %cgap as response
-m1 <- lm(cgap_max_pct ~ ., data = pctgap)
-sm1 <- step(m1) #--gives me an error about number of rows? there aren't any NAs...
+m1 <- lm(cgap_max_pct ~ ., 
+         data = mdat %>% select(-cgap_max))
+sm1 <- step(m1, ,
+            k = log(nrow(pctgap))) #--gives BIC instead of AIC, this seriously limits what gets in
+
+m1vars <- sm1$coefficients %>% enframe() %>% filter(name != "(Intercept)")
+
 summary(sm1)
+anova(sm1)
 
 #--with rawgap as response
 m2 <- lm(cgap_max ~ ., data = rawgap %>% dplyr::select(-yearF))
-sm2 <- stepAIC(m1) #--gives me an error about number of rows? there aren't any NAs...
-summary(sm1)
+sm2 <- step(m2)
+summary(sm2)
+
+#resid(sm2)
+library(broom)
+library(ggResidpanel)
+resid_panel(sm2)
+
+#--what about weighting??
+
+#--let's try with interactions, only including things from m1a
+
+#--on percentage
+m1a <- lm(cgap_max_pct ~ .*., 
+         data = pctgap %>% select_at(vars(m1vars$name, cgap_max_pct)))
+sm1a <- step(m1a)
+sm1a
+summary(sm1a) %>% 
+  tidy() %>% 
+  arrange(p.value)
 
 
-# no interactions
-m1 <- lm(cgap_max_pct ~ ., data = pctgap %>% dplyr::select(-yearF))
-sm1 <- stepAIC(m1) #--gives me an error about number of rows? there aren't any NAs...
-summary(sm1)
+#--on raw diff
+m1a <- lm(cgap_max ~ .*., 
+          data = pctgap %>% select_at(vars(m1vars$name, cgap_max_pct)))
+sm1a <- step(m1a)
+sm1a
+summary(sm1a) %>% 
+  tidy() %>% 
+  arrange(p.value)
 
-m2 <- lm(cgap_max_pct ~ .*., data = pctgap %>% select(-yearF))
-step(m2)
+
+# extract parms
+m1avars <- 
+  sm1a$coefficients %>% 
+  enframe() %>% 
+  filter(name != "(Intercept)")
+
+pctgap %>% 
+  ggplot(aes(wintcolddays_n, cgap_max_pct)) + 
+  geom_point()
