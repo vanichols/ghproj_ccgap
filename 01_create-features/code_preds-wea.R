@@ -48,27 +48,27 @@ pwea %>%
   geom_point()
 
 # do a pca? ---------------------------------------------------------------
-
-library("factoextra")
-data(decathlon2)
-decathlon2.active <- decathlon2[1:23, 1:10]
-head(decathlon2.active[, 1:6])
-res.pca <- prcomp(decathlon2.active, scale = TRUE)
-fviz_eig(res.pca)
-fviz_pca_ind(res.pca,
-             col.ind = "cos2", # Color by the quality of representation
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE     # Avoid text overlapping
-)
-fviz_pca_var(res.pca,
-             col.var = "contrib", # Color by contributions to the PC
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE     # Avoid text overlapping
-)
-fviz_pca_biplot(res.pca, repel = TRUE,
-                col.var = "#2E9FDF", # Variables color
-                col.ind = "#696969"  # Individuals color
-)
+# 
+# library("factoextra")
+# data(decathlon2)
+# decathlon2.active <- decathlon2[1:23, 1:10]
+# head(decathlon2.active[, 1:6])
+# res.pca <- prcomp(decathlon2.active, scale = TRUE)
+# fviz_eig(res.pca)
+# fviz_pca_ind(res.pca,
+#              col.ind = "cos2", # Color by the quality of representation
+#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+#              repel = TRUE     # Avoid text overlapping
+# )
+# fviz_pca_var(res.pca,
+#              col.var = "contrib", # Color by contributions to the PC
+#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+#              repel = TRUE     # Avoid text overlapping
+# )
+# fviz_pca_biplot(res.pca, repel = TRUE,
+#                 col.var = "#2E9FDF", # Variables color
+#                 col.ind = "#696969"  # Individuals color
+# )
 
 # #-bahhhhhh
 # pwea %>% 
@@ -161,6 +161,7 @@ wea5 <-
          day < plant_doy + 14) %>% 
   summarise(p2wk_precip_mm_tot = sum(precip_mm))
 
+#--3 weeks
 wea6 <- 
   pwea %>% 
   group_by(site, year) %>% 
@@ -168,6 +169,7 @@ wea6 <-
          day < plant_doy + 21) %>% 
   summarise(p3wk_precip_mm_tot = sum(precip_mm))
 
+#--4 weeks
 wea7 <- 
   pwea %>% 
   group_by(site, year) %>% 
@@ -187,7 +189,7 @@ wea8 %>%
   ggplot(aes(prep2wk_precip_mm_tot)) + 
   geom_histogram()
 
-
+#--3 weeks
 wea9 <- 
   pwea %>% 
   group_by(site, year) %>% 
@@ -195,6 +197,7 @@ wea9 <-
          day > plant_doy - 21) %>% 
   summarise(prep3wk_precip_mm_tot = sum(precip_mm))
 
+#--4 weeks
 wea10 <- 
   pwea %>% 
   group_by(site, year) %>% 
@@ -248,7 +251,7 @@ wea14 %>%
   geom_histogram()
 
 
-
+#--heat stress yes/no days
 wea_hs <- 
   pwea %>% 
   filter(day < plant_doy + 120, day > plant_doy) %>%
@@ -259,6 +262,21 @@ wea_hs <-
 wea_hs %>% 
   ggplot(aes(heatstress_n)) + 
   geom_histogram()
+
+
+#--heat stress gradient
+wea_hs2 <- 
+  pwea %>% 
+  filter(day < plant_doy + 120, day > plant_doy) %>%
+  filter(tmax_c > 30) %>%
+  mutate(tstress = tmax_c - 30) %>% 
+  group_by(site, year) %>% 
+  summarise(heatstress_cum = sum(tstress))
+
+wea_hs2 %>% 
+  ggplot(aes(heatstress_cum)) + 
+  geom_histogram()
+
 
 
 # weather metrics ---------------------------------------------------------
@@ -331,6 +349,8 @@ wea_parms <-
   left_join(wea12) %>% 
   left_join(wea13) %>% 
   left_join(wea14) %>% 
+  #left_join(wea_hs) %>% 
+  left_join(wea_hs2) %>% 
   #left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
   #left_join(wea_may) %>% 
   #left_join(wea_apr) %>% 
@@ -352,7 +372,11 @@ corrplot::corrplot(corres)
 
 ggsave("01_create-features/fig_wea-corrs.png")
 
-# i like heatstress more than gs_tavg I think, comment out line 272
+# i like heatstress_cum more than gs_tavg and heatstress_n I think
+
+wea_cor %>% 
+  ggplot(aes(heatstress_n, heatstress_cum)) + 
+  geom_point()
 
 wea_pca <- 
   wea_parms %>% 
