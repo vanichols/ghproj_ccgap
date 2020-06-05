@@ -41,6 +41,11 @@ pwea %>%
   select(site, year) %>% 
   distinct() 
 
+pwea %>% 
+  group_by(year, site) %>% 
+  summarise(precip_mm = sum(precip_mm, na.rm = T)) %>% 
+  ggplot(aes(year, precip_mm)) + 
+  geom_point()
 
 # do a pca? ---------------------------------------------------------------
 
@@ -100,6 +105,24 @@ fviz_pca_biplot(res.pca, repel = TRUE,
 #   filter(tav < 10) %>% 
 #   summarise(wintcolddays_n = n())
 
+#--water year precip (prev Oct to July?)
+library(saapsim)
+saf_date_to_doy("2001-10-01")
+
+wea2 <- 
+  pwea %>% 
+  mutate(newyeargroup = ifelse( (day > 182 & day < 274), NA,
+                                ifelse(
+                                  day > 182, year - 1, year))) %>% 
+  group_by(newyeargroup, site) %>% 
+  mutate(wyprecip_mm = sum(precip_mm, na.rm = T)) %>% 
+  ungroup() %>% 
+  select(-newyeargroup)
+
+wea2 %>% 
+  ggplot(aes(wyprecip_mm)) + 
+  geom_histogram()
+
 #--precip_mmy days >1" from planting to 60 DAP
 wea3 <- 
   pwea %>% 
@@ -107,7 +130,7 @@ wea3 <-
   filter(day > plant_doy, 
          day < plant_doy + 30) %>%
   filter(precip_mm >= 25.4) %>% #--precip_mm more than an inch
-  summarise(p4wk_1inprecip_mm = n())
+  summarise(p4wk_1inprecip_mm = n()) 
 
 wea3 %>% 
   ggplot(aes(p4wk_1inprecip_mm)) + 
@@ -295,7 +318,7 @@ wea_gs <-
 wea_parms <- 
   wea_hs %>% 
   #left_join(wea1) %>% 
-  #left_join(wea2) %>% #--not a lot of variation
+  left_join(wea2) %>% 
   #left_join(wea3) %>% #--not much variation
   left_join(wea4) %>% 
   left_join(wea5) %>% 
