@@ -115,9 +115,9 @@ wea2 <-
                                 ifelse(
                                   day > 182, year - 1, year))) %>% 
   group_by(newyeargroup, site) %>% 
-  mutate(wyprecip_mm = sum(precip_mm, na.rm = T)) %>% 
-  ungroup() %>% 
-  select(-newyeargroup)
+  summarise(wyprecip_mm = sum(precip_mm, na.rm = T)) %>% 
+  ungroup() %>%
+  rename(year = newyeargroup)
 
 wea2 %>% 
   ggplot(aes(wyprecip_mm)) + 
@@ -359,23 +359,23 @@ wea_pca <-
   unite(site, year, col = "site_year") %>% 
   column_to_rownames("site_year")
 
-res_pca <- prcomp(wea_pca, scale = TRUE)
-fviz_eig(res_pca)
-fviz_pca_ind(res_pca,
-             col.ind = "cos2", # Color by the quality of representation
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE     # Avoid text overlapping
-)
-fviz_pca_var(res_pca,
-             col.var = "contrib", # Color by contributions to the PC
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE     # Avoid text overlapping
-)
-fviz_pca_biplot(res_pca, repel = TRUE,
-                col.var = "#2E9FDF", # Variables color
-                col.ind = "#696969"  # Individuals color
-)
-
+# res_pca <- prcomp(wea_pca, scale = TRUE)
+# fviz_eig(res_pca)
+# fviz_pca_ind(res_pca,
+#              col.ind = "cos2", # Color by the quality of representation
+#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+#              repel = TRUE     # Avoid text overlapping
+# )
+# fviz_pca_var(res_pca,
+#              col.var = "contrib", # Color by contributions to the PC
+#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+#              repel = TRUE     # Avoid text overlapping
+# )
+# fviz_pca_biplot(res_pca, repel = TRUE,
+#                 col.var = "#2E9FDF", # Variables color
+#                 col.ind = "#696969"  # Individuals color
+# )
+# 
 
 
 # write what i like -------------------------------------------------------
