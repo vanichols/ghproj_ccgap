@@ -12,118 +12,124 @@ library(ggdag)
 coords1 <- list(
   x = c(PRVCP = 0,
         
-        RES_AMT = 2,
-        RES_TYPE = 2,
+        RES_A = 2,
+        RES_T = 2,
         RES_CN = 2,
-        SDPRESS = 2,
+        SOILD = 2,
         RT_CHN = 2,
         AMF = 2,
         
+        WEA = 6,
         ROOTS = 9,
         SOILN = 4,
-        FDPRESS = 4,
+        FOLD = 4,
         
         SOILT = 2.5, SOILM = 4,
         PHYS = 4.5, 
         EROS = 5.5, RAIN = 6, SPDGRM = 4, 
-        SDLGSURV = 6, 
-        POP = 7,
+        SSURV = 6, 
+        POP = 7.5,
         YLD = 9),
   y = c(
     PRVCP = 0,
     
-    RES_AMT = 0,
-    RES_TYPE = 2,
+    RES_A = 0,
+    RES_T = 2,
     RES_CN = 4,
+    
+    WEA = 6,
     
     ROOTS = -8,
     SOILN = 4,
-    FDPRESS = 2,
-    SDPRESS = -6,
+    FOLD = 2,
+    SOILD = -6,
     RT_CHN = -8,
     AMF = -10,
     
-    SOILT = -2, SOILM = -2,
+    SOILT = -2.5, SOILM = -2,
     PHYS = 0, 
     EROS = -2, RAIN = 0, SPDGRM = -5, 
-    SDLGSURV = -6, 
-    POP = -4,
+    SSURV = -6, 
+    POP = -3.5,
     YLD = 0)
   )
 
 dag1 <- dagify(
   #-prev crop
-  RES_AMT ~ PRVCP,
-  RES_TYPE ~ PRVCP,
-  SDPRESS ~ PRVCP,
+  RES_A ~ PRVCP,
+  RES_T ~ PRVCP,
+  SOILD ~ PRVCP,
   RES_CN ~ PRVCP,
   RT_CHN ~ PRVCP,
   AMF ~ PRVCP,
   
   #-res type
-  FDPRESS ~ RES_AMT,
-  FDPRESS ~ RES_TYPE,
+  FOLD ~ RES_A,
+  FOLD ~ RES_T,
   
   #-res amt
-  PHYS ~ RES_AMT,
-  SOILT ~ RES_AMT,
-  SOILM ~ RES_AMT,
+  PHYS ~ RES_A,
+  SOILT ~ RES_A,
+  SOILM ~ RES_A,
   
   SOILN ~ RES_CN,
-  SOILN ~ RES_AMT,
+  SOILN ~ RES_A,
   
     #--phys
   EROS ~ PHYS,
   RAIN ~ PHYS,
-  SDLGSURV ~ PHYS,
-  SDLGSURV ~ EROS,
-  SDLGSURV ~ RAIN,
+  SSURV ~ PHYS,
+  SSURV ~ EROS,
+  SSURV ~ RAIN,
   EROS ~ PHYS,
+  
+  FOLD ~ WEA,
+  SOILM ~ WEA,
+  SOILT ~ WEA,
+  RAIN ~ WEA,
 
     #--soil disease
   SPDGRM ~ SOILT,
-  SDPRESS ~ SOILT,
-  SDLGSURV ~ SOILT,
+  SOILD ~ SOILT,
+  SSURV ~ SOILT,
   SOILM ~ SOILT,
-  SDPRESS ~ SOILM,
-  SDLGSURV ~ SOILM,
-  SDPRESS ~ SPDGRM,
-  POP ~ SDLGSURV,
-  SDLGSURV ~ SDPRESS,
-  ROOTS ~ SDPRESS,
+  SOILD ~ SOILM,
+  SSURV ~ SOILM,
+  SOILD ~ SPDGRM,
+  POP ~ SSURV,
+  SSURV ~ SOILD,
+  ROOTS ~ SOILD,
   ROOTS ~ RT_CHN,
   ROOTS ~ AMF,
   
   YLD ~ SOILN,
   YLD ~ ROOTS,
   YLD ~ POP,
-  YLD ~ FDPRESS,
+  YLD ~ FOLD,
   
   exposure = "PRVCP",
   outcome = "YLD", 
-  latent = c("RES_CN", "RES_TYPE", "SDPRESS"), #--what is a latent variable?
+  #latent = c("RES_CN", "RES_T", "SOILD"), #--what is a latent variable?
   coords = coords1
   )
 
 #--original
 tidy_dagitty(dag1) %>% 
-  ggdag(., node_size = 12, text_size = 1.5) + 
+  ggdag(., node_size = 5, text_size = 1.5) + 
   geom_dag_node(color = "brown", internal_color = "orange") + 
   geom_dag_text(color = "white") + 
   ggtitle("Short Term\nPrevious Crop (PRVCP), Yield (YLD)") + 
   theme_dag_blank() + 
   theme(panel.background = element_rect(color = "black", fill = "gray70"))
 
-
-
-#--playing
+#--playing with simplifying graph
 tidy_dagitty(dag1) %>% 
   mutate(clr = ifelse((name == "SOILN" & to == "YLD")|
-                         (name == "PHYS" & to == "SDLGSURV")|
-                      (name == "EROS" & to == "SDLGSURV")|
-                        (name == "RAIN" & to == "SDLGSURV"),
+                         (name == "PHYS" & to == "SSURV")|
+                      (name == "EROS" & to == "SSURV")|
+                        (name == "RAIN" & to == "SSURV"),
                       "A", "B")) %>% 
-  ggdag(., node_size = 12, text_size = 1.5) + 
+  ggdag(., node_size = 5, text_size = 1.5) + 
   geom_dag_node(aes(color = clr), internal_color = "orange") + 
   geom_dag_text(color = "white") +
   guides(color = F) +
@@ -132,6 +138,209 @@ tidy_dagitty(dag1) %>%
   theme(panel.background = element_rect(color = "black", fill = "gray70"))
 
 ggsave("00_dags/dag_prevcrop-yld-v2.png")
+
+
+
+#--disconnect soiln, phys things
+
+
+
+coords2 <- list(
+  x = c(PRVCP = 0,
+        AMF = 2,
+        FOLD = 4,
+        
+        RES_A = 2,
+        RES_T = 2,
+        RES_CN = 2,
+        ROOTS = 9,
+        
+        RT_CHN = 2,
+        
+        SOILD = 4.5,
+        
+        SOILN = 4,
+        SOILT = 2.5, 
+        SOILM = 4,
+        
+        PHYS = 5, 
+        SPDGRM = 3, 
+        SSURV = 6, 
+        POP = 7.5,
+        
+        #WEA = 6,
+        
+        YLD = 9),
+  y = c(
+    PRVCP = 0,
+    AMF = -15,
+    FOLD = 3,
+    PHYS = 0, 
+    
+    RES_A = 0,
+    RES_T = 3,
+    RES_CN = 6,
+    ROOTS = -12,
+    RT_CHN = -12,
+    
+    WEA = 6,
+    
+    SOILD = -10,
+    SOILN = 6,
+    SOILT = -6, 
+    SOILM = -2,
+    
+    SPDGRM = -10, 
+    SSURV = -6, 
+    POP = -3.5,
+    YLD = 0)
+)
+
+dag2 <- dagify(
+  #-prev crop
+  RES_A ~ PRVCP,
+  RES_T ~ PRVCP,
+  #SOILD ~ PRVCP,
+  RES_CN ~ PRVCP,
+  RT_CHN ~ PRVCP,
+  AMF ~ PRVCP,
+  
+  #-res type
+  FOLD ~ RES_A,
+  FOLD ~ RES_T,
+  
+  #-res amt
+  PHYS ~ RES_A,
+  SOILT ~ RES_A,
+  SOILM ~ RES_A,
+  
+  SOILN ~ RES_CN,
+  SOILN ~ RES_A,
+  
+  #--phys
+  #EROS ~ PHYS,
+  #RAIN ~ PHYS,
+ # SSURV ~ PHYS,
+#  SSURV ~ EROS,
+ # SSURV ~ RAIN,
+  
+  #FOLD ~ WEA,
+  #SOILM ~ WEA,
+  #RAIN ~ WEA,
+  
+  #--soil disease
+  SPDGRM ~ SOILT,
+  SOILD ~ SOILT,
+  SSURV ~ SOILT,
+  SOILM ~ SOILT,
+  SOILD ~ SOILM,
+  SSURV ~ SOILM,
+  SOILD ~ SPDGRM,
+  POP ~ SSURV,
+  SSURV ~ SOILD,
+  ROOTS ~ SOILD,
+  ROOTS ~ RT_CHN,
+  ROOTS ~ AMF,
+  
+  #YLD ~ SOILN,
+  YLD ~ ROOTS,
+  YLD ~ POP,
+  YLD ~ FOLD,
+  
+  exposure = "PRVCP",
+  outcome = "YLD", 
+  #latent = c("RES_CN", "RES_T", "SOILD"), #--what is a latent variable?
+  coords = coords2
+)
+
+
+tidy_dagitty(dag2) %>% 
+  mutate(clr = ifelse((name == "SOILN" & to == "YLD")|
+                        (name == "PHYS" & to == "RES_A")|
+                        (name == "EROS" & to == "SSURV")|
+                        (name == "RAIN" & to == "SSURV"),
+                      "A", "B")) %>% 
+  ggdag(., node_size = 5, text_size = 1.5) + 
+  geom_dag_node(aes(color = clr), internal_color = "orange") + 
+  geom_dag_text(color = "white") +
+  guides(color = F) +
+  ggtitle("Short term, high N rates, \nPrevious Crop (PRVCP), Yield (YLD)") + 
+  theme_dag_blank() + 
+  theme(panel.background = element_rect(color = "black", fill = "gray70"))
+
+ggsave("00_dags/dag_prevcrop-yld-v3.png")
+
+impliedConditionalIndependencies(dag2)
+
+
+PRVC _||_ YLD | FDPR, POP, ROOT
+
+
+#--tilled system, simplified
+
+dag2 <- dagify(
+  #-prev crop
+  RES_A ~ PRVCP,
+  RES_T ~ PRVCP,
+  SOILD ~ PRVCP,
+  RES_CN ~ PRVCP,
+  RT_CHN ~ PRVCP,
+  AMF ~ PRVCP,
+  
+  #-res type
+  FOLD ~ RES_A,
+  FOLD ~ RES_T,
+  
+  #-res amt
+  PHYS ~ RES_A,
+  SOILT ~ RES_A,
+  SOILM ~ RES_A,
+  
+  SOILN ~ RES_CN,
+  SOILN ~ RES_A,
+  
+  #--phys
+  EROS ~ PHYS,
+  RAIN ~ PHYS,
+  # SSURV ~ PHYS,
+  #  SSURV ~ EROS,
+  # SSURV ~ RAIN,
+  EROS ~ PHYS,
+  
+  FOLD ~ WEA,
+  SOILM ~ WEA,
+  RAIN ~ WEA,
+  
+  #--soil disease
+  SPDGRM ~ SOILT,
+  SOILD ~ SOILT,
+  SSURV ~ SOILT,
+  SOILM ~ SOILT,
+  SOILD ~ SOILM,
+  SSURV ~ SOILM,
+  SOILD ~ SPDGRM,
+  POP ~ SSURV,
+  SSURV ~ SOILD,
+  ROOTS ~ SOILD,
+  ROOTS ~ RT_CHN,
+  ROOTS ~ AMF,
+  
+  #YLD ~ SOILN,
+  YLD ~ ROOTS,
+  YLD ~ POP,
+  YLD ~ FOLD,
+  
+  exposure = "PRVCP",
+  outcome = "YLD", 
+  #latent = c("RES_CN", "RES_T", "SOILD"), #--what is a latent variable?
+  coords = coords1
+)
+
+
+
+
+
+# playing -----------------------------------------------------------------
 
 
 #--latent vars?
