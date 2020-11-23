@@ -8,7 +8,7 @@
 #
 # notes: keep apsim sims in box, all r code in github
 # last edited:   3/31/2020 (I was confused...)
-#                11/23/2020 cleaning, making sense. NEED TO ADD 50% red in RFV
+#                11/23/2020 cleaning, added rfv50% (oat22)
 
 rm(list = ls())
 library(saapsim) #--has some functions
@@ -19,17 +19,15 @@ library(janitor)
 
 # read in output from read-in-sim-res code --------------------------------
 
-#--note oat 22 hasn't been run, getting soybean oxdef error 11/23
+#--oats
 oat_key <- 
   read_csv("01_sims-oat-by-hand/rd_oats-calibrated-v1CC.csv") %>%  
   separate_rows(category, sep = ",") %>% 
   remove_empty("rows") %>% 
-  remove_empty("cols") %>% 
-  filter(oat_nu != 22)
+  remove_empty("cols") 
 
-#--where did this come from? Read in sim-res...
-apraw <- read_csv("01_sims-oat-by-hand//se_apsim-sims-raw.csv")
-
+#--comes from 01_read-in-sim-res
+apraw <- read_csv("01_sims-oat-by-hand/sims_apsim-hand-oat-raw.csv")
 
 #--apsim cc yields
 base_contc <- 
@@ -98,7 +96,7 @@ gaps <-
   left_join(oat_key) 
 
 
-#--what is that one year?
+#--what is that one year? 2000. Huh. 
 
 gaps %>% 
   filter(!category %in% c("2 factor")) %>% 
@@ -145,7 +143,7 @@ gaps_filt %>%
   facet_grid(category~., scales = "free") + 
   theme_bw()
 
-ggsave("01_sims-oat-by-hand//fig_gaps-boxplot.png")
+ggsave("01_sims-oat-by-hand/fig_gaps-boxplot.png")
 
 #--just 1 factor
 gaps_filt %>% 
@@ -179,9 +177,10 @@ gaps_filt_wind <-
   group_by(dtype, oat_what, category) %>% 
   mutate(mngap = mean(gap_kgha, na.rm = T))
 
-wind_theme <-   theme(strip.text.y = element_text(angle = 360),
+wind_theme <-    theme_bw() +
+  theme(strip.text.y = element_text(angle = 0),
                       axis.text.y = element_blank(),
-                      axis.ticks.y = element_blank()) + theme_bw()
+                      axis.ticks.y = element_blank())
 
 
 fac1 <- 
@@ -200,7 +199,7 @@ fac1 <-
   wind_theme
 
 fac1
-ggsave("01_sims-oat-by-hand//fig_gaps-1fac-windmill.png")
+ggsave("01_sims-oat-by-hand/fig_gaps-1fac-windmill.png")
 
 
 fac2 <- 
@@ -219,7 +218,7 @@ fac2 <-
   wind_theme
 
 fac2
-ggsave("01_sims-oat-by-hand//fig_gaps-3fac-windmill.png", width = 3.5, height = 7.5)
+ggsave("01_sims-oat-by-hand/fig_gaps-3fac-windmill.png", width = 3.5, height = 7.5)
 
 
 fac3 <- 

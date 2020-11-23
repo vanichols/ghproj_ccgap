@@ -46,7 +46,7 @@ coords1 <- list(
     
     EROS = -2, 
     EMDOY = -18,
-    FOLD = 3,
+    FOLD = 6,
     
     PHYS = 0, 
     POP = -3.5,
@@ -141,29 +141,21 @@ tidy_dagitty(dag1) %>%
   theme_dag_blank() + 
   theme(panel.background = element_rect(color = "black", fill = "gray70"))
 
+
 #--highlight things tried in apsim
 tidy_dagitty(dag1) %>% 
-  ggdag(., node_size = 5, text_size = 1.5) + 
-  geom_dag_node(color = "brown", internal_color = "orange") + 
-  geom_dag_text(color = "white") + 
-  ggtitle("Short Term\nPrevious Crop (PRVCP), Yield (YLD)") + 
-  theme_dag_blank() + 
-  theme(panel.background = element_rect(color = "black", fill = "gray70"))
-
-
-
-#--playing with simplifying graph
-tidy_dagitty(dag1) %>% 
   mutate(clr = ifelse((name == "SOILN" & to == "YLD")|
-                         (name == "PHYS" & to == "SSURV")|
-                      (name == "EROS" & to == "SSURV")|
-                        (name == "RAIN" & to == "SSURV"),
+                        (name == "FOLD" & to == "YLD")|
+                        (name == "POP" & to == "YLD")|
+                        (name == "EMDOY" & to == "YLD")|
+                        (name == "ROOTS" & to == "YLD"),
                       "A", "B")) %>% 
   ggdag(., node_size = 5, text_size = 1.5) + 
   geom_dag_node(aes(color = clr), internal_color = "orange") + 
   geom_dag_text(color = "white") +
   guides(color = F) +
   ggtitle("Short Term\nPrevious Crop (PRVCP), Yield (YLD)") + 
+  scale_color_manual(values = c("darkblue", "gold4")) +
   theme_dag_blank() + 
   theme(panel.background = element_rect(color = "black", fill = "gray70"))
 

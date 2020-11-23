@@ -6,21 +6,20 @@
 #
 # last edited:   3/31/2020 (I was confused...)
 #                5/20/2020 separating reading in sims and looking at them (reading in takes too long)
+#                11/23/2020 created oat22 for rfv50%, updated file structure
 #
 # notes: keep apsim sims in box, all r code in github
 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--has some functions
-library(tidysawyer2) #--has sawyer data
 library(tidyverse)
 library(janitor)
 
 
 # read in .out files ------------------------------------------------------
 
-my_dir <- "../../../Box/Gina_APSIM_modeling/sims-ames-CCbase/"
+my_dir <- "../../../Box/Gina_APSIM_modeling/sims-explore-by-hand/sims-ames-CCbase/"
 
 apraw <-
   saf_readapout(my_dir) %>%
@@ -34,4 +33,4 @@ apraw <-
 
 
 apraw %>% 
-  write_csv("03_sims/se_apsim-sims-raw.csv")
+  write_csv("01_sims-oat-by-hand/sims_apsim-hand-oat-raw.csv")
