@@ -1,24 +1,26 @@
 # Created:      3/12/2020
-# last edited:   3/31/2020 (I was confused...)
 #
-# purpose: evaluate each factor individually and in combination using CALIBRATED APSIM sims using CC sim as base, tweaking from that
+# purpose: evaluate each factor individually and in combination using CALIBRATED APSIM sims 
+#          use CC sim as base, tweaking from that
+#          changed apsim files by hand (ames only)
 #
 # author: gina vnichols@iastate.edu
 #
 # notes: keep apsim sims in box, all r code in github
-
+# last edited:   3/31/2020 (I was confused...)
+#                11/23/2020 cleaning, making sense 
 
 rm(list = ls())
-#devtools::install_github("vanichols/saapsim", force = T)
 library(saapsim) #--has some functions
 library(tidysawyer2) #--has sawyer data
 library(tidyverse)
 library(janitor)
 
 
-
 # read in output from read-in-sim-res code --------------------------------
 
+oat_key <- 
+  read_csv("03_oat-by-hand-sims/
 
 # keeping track of oats ---------------------------------------------------
 
