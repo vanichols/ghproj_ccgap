@@ -12,96 +12,115 @@ library(ggdag)
 coords1 <- list(
   x = c(PRVCP = 0,
         
+        AMF = 2,
+        
+        EMDOY = 5,
+        EROS = 5.5, 
+        FOLD = 4,
+        
+        PHYS = 4.5,
+        POP = 7.5,
+        
+        RAIN = 6, 
         RES_A = 2,
         RES_T = 2,
         RES_CN = 2,
-        SOILD = 2,
+        ROOTS = 9,
         RT_CHN = 2,
-        AMF = 2,
+        
+        SOILD = 4,
+        SOILM = 4,
+        SOILN = 4,
+        SOILT = 2.5, 
+        SPDGRM = 2.5, 
+        SSURV = 6, 
         
         WEA = 6,
-        ROOTS = 9,
-        SOILN = 4,
-        FOLD = 4,
         
-        SOILT = 2.5, SOILM = 4,
-        PHYS = 4.5, 
-        EROS = 5.5, RAIN = 6, SPDGRM = 4, 
-        SSURV = 6, 
-        POP = 7.5,
         YLD = 9),
   y = c(
     PRVCP = 0,
     
-    RES_A = 0,
-    RES_T = 2,
-    RES_CN = 4,
+    AMF = -15,
     
-    WEA = 6,
     
-    ROOTS = -8,
-    SOILN = 4,
-    FOLD = 2,
-    SOILD = -6,
-    RT_CHN = -8,
-    AMF = -10,
+    EROS = -2, 
+    EMDOY = -18,
+    FOLD = 3,
     
-    SOILT = -2.5, SOILM = -2,
     PHYS = 0, 
-    EROS = -2, RAIN = 0, SPDGRM = -5, 
-    SSURV = -6, 
     POP = -3.5,
-    YLD = 0)
+    
+    RAIN = 0,
+    RES_A = 0,
+    RES_T = 3,
+    RES_CN = 6,
+    ROOTS = -12,
+    RT_CHN = -12,
+    
+    
+    SOILD = -9,
+    SOILM = -3,
+    SOILN = 9,
+    SOILT = -3, 
+    SPDGRM = -9, 
+    SSURV = -6, 
+    
+    YLD = 0,
+    WEA = 12)
   )
 
 dag1 <- dagify(
-  #-prev crop
-  RES_A ~ PRVCP,
-  RES_T ~ PRVCP,
-  SOILD ~ PRVCP,
-  RES_CN ~ PRVCP,
-  RT_CHN ~ PRVCP,
   AMF ~ PRVCP,
   
-  #-res type
+  EMDOY ~ SPDGRM,
+  EROS ~ PHYS,
+  
   FOLD ~ RES_A,
   FOLD ~ RES_T,
-  
-  #-res amt
-  PHYS ~ RES_A,
-  SOILT ~ RES_A,
-  SOILM ~ RES_A,
-  
-  SOILN ~ RES_CN,
-  SOILN ~ RES_A,
-  
-    #--phys
-  EROS ~ PHYS,
-  RAIN ~ PHYS,
-  SSURV ~ PHYS,
-  SSURV ~ EROS,
-  SSURV ~ RAIN,
-  EROS ~ PHYS,
-  
   FOLD ~ WEA,
-  SOILM ~ WEA,
-  SOILT ~ WEA,
-  RAIN ~ WEA,
-
-    #--soil disease
-  SPDGRM ~ SOILT,
-  SOILD ~ SOILT,
-  SSURV ~ SOILT,
-  SOILM ~ SOILT,
-  SOILD ~ SOILM,
-  SSURV ~ SOILM,
-  SOILD ~ SPDGRM,
+  
+  PHYS ~ RES_A,
   POP ~ SSURV,
-  SSURV ~ SOILD,
+  
+  RAIN ~ PHYS,
+  RAIN ~ WEA,
+  
+  RES_A ~ PRVCP,
+  RES_T ~ PRVCP,
+  RES_CN ~ PRVCP,
+  
   ROOTS ~ SOILD,
   ROOTS ~ RT_CHN,
   ROOTS ~ AMF,
+  RT_CHN ~ PRVCP,
   
+  #SOILD ~ PRVCP,
+  SOILD ~ SOILT,
+  SOILD ~ SOILM,
+  SOILD ~ SPDGRM,
+  
+  SOILT ~ RES_A,
+  SOILM ~ RES_A,
+  SOILM ~ WEA,
+  SOILM ~ SOILT,
+  
+  SOILN ~ RES_CN,
+  SOILN ~ RES_A,
+  SOILN ~ WEA,
+  
+  SOILT ~ WEA,
+  
+  
+  SPDGRM ~ SOILT,
+  
+  SSURV ~ PHYS,
+  SSURV ~ EROS,
+  SSURV ~ RAIN,
+  SSURV ~ SOILT,
+  SSURV ~ SOILM,
+  SSURV ~ SOILD,
+  YLD ~ EMDOY,
   YLD ~ SOILN,
   YLD ~ ROOTS,
   YLD ~ POP,
@@ -121,6 +140,17 @@ tidy_dagitty(dag1) %>%
   ggtitle("Short Term\nPrevious Crop (PRVCP), Yield (YLD)") + 
   theme_dag_blank() + 
   theme(panel.background = element_rect(color = "black", fill = "gray70"))
+
+#--highlight things tried in apsim
+tidy_dagitty(dag1) %>% 
+  ggdag(., node_size = 5, text_size = 1.5) + 
+  geom_dag_node(color = "brown", internal_color = "orange") + 
+  geom_dag_text(color = "white") + 
+  ggtitle("Short Term\nPrevious Crop (PRVCP), Yield (YLD)") + 
+  theme_dag_blank() + 
+  theme(panel.background = element_rect(color = "black", fill = "gray70"))
+
+
 
 #--playing with simplifying graph
 tidy_dagitty(dag1) %>% 
