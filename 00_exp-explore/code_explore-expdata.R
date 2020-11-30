@@ -17,6 +17,27 @@ library(tidyverse)
 
 
 
+# what is range in ccpen? -------------------------------------------------
+
+
+gaps <- 
+  ilia_yields %>% 
+  filter(nrate_kgha > 100) %>% 
+  mutate(rotation = ifelse(rotation == "cs", "sc", rotation)) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(pct = (sc - cc)/sc * 100)
+
+gaps %>% 
+  ggplot(aes(year, pct)) + 
+  geom_point() + 
+  facet_wrap(~site, scales = "free_x")
+
+gaps %>% 
+  group_by(state, site) %>% 
+  summarise(mn = min(pct, na.rm = T),
+            mx = max(pct, na.rm = T))
+
+
 # recreate John's fig -----------------------------------------------------
 
 saw_tidysawyer %>%

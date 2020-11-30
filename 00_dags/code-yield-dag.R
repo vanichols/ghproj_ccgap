@@ -6,6 +6,12 @@ library(dplyr)
 library(dagitty)
 library(ggdag)
 
+wrapper <- function(x, ...) 
+{
+  paste(strwrap(x, ...), collapse = "\n")
+}
+
+
 
 # full, short term --------------------------------------------------------------
 
@@ -142,6 +148,11 @@ tidy_dagitty(dag1) %>%
   theme(panel.background = element_rect(color = "black", fill = "gray70"))
 
 
+mykey <- "AMF = Arbuscular microrhizal fungi population EMDOY = Day of emergence EROS = Soil erosion FOLD = Foliar disease PHYS = Physical protection of soil POP = Plant population RAIN = Rain impact RES_CN = Residue CN ratio RES_T = Residue type RES_A = Residue amount ROOTS = Root growth/function RT_CHN = Root channels SOILD = Soil-borne disease SOILM = Soil moisture SOILN = Soil nitrogen SOILT = Soil temperature SPDGRM = Speed of germination SSURV = Seedling survival WEA = Weather"
+
+mykeyonecol <- "AMF = Arbuscular microrhizal fungi population\nEMDOY = Day of emergence\nEROS = Soil erosion\nFOLD = Foliar disease\nPHYS = Physical protection of soil\nPOP = Plant population\nRAIN = Rain impact\nRES_CN = Residue CN ratio\nRES_T = Residue type\nRES_A = Residue amount\nROOTS = Root growth/function\nRT_CHN = Root channels\nSOILD = Soil-borne disease\nSOILM = Soil moisture\nSOILN = Soil nitrogen\nSOILT = Soil temperature\nSPDGRM = Speed of germination\nSSURV = Seedling survival\nWEA = Weather"
+  
+
 #--highlight things tried in apsim
 tidy_dagitty(dag1) %>% 
   mutate(clr = ifelse((name == "SOILN" & to == "YLD")|
@@ -157,9 +168,13 @@ tidy_dagitty(dag1) %>%
   ggtitle("Short Term\nPrevious Crop (PRVCP), Yield (YLD)") + 
   scale_color_manual(values = c("darkblue", "gold4")) +
   theme_dag_blank() + 
-  theme(panel.background = element_rect(color = "black", fill = "gray70"))
+  theme(panel.background = element_rect(color = "black", fill = "gray70")) +
+  labs(caption = wrapper(mykey, width = 130)) + 
+  theme(panel.background = element_rect(color = "black", fill = "gray70"),
+        plot.caption = element_text(hjust = 0)) 
 
-ggsave("00_dags/dag_prevcrop-yld-v2.png")
+
+ggsave("00_dags/dag_prevcrop-yld-v2.png", height = 8, width = 8)
 
 
 
