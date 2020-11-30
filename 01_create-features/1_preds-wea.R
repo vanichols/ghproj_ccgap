@@ -383,7 +383,7 @@ wea_pca <-
 
 # write what i like -------------------------------------------------------
 
-wea_parms_all %>% write_csv("01_create-features/cf_pred-wea.csv")
+wea_parms_all %>% write_csv("01_create-features/1_preds-wea.csv")
 
 
 # when did heatstres occur ------------------------------------------------
@@ -415,7 +415,7 @@ wea %>%
   labs(title = "Crawfordsville days w/Tmax > 30degC",
        subtitle = "Planting to 120 DAP")
 
-ggsave("01_create-features/fig_ex-craw-heatstress-days.png")
+ggsave("01_create-features/1_fig_ex-craw-heatstress-days.png")
 
 
 #--ames has less in general
@@ -432,7 +432,7 @@ wea %>%
   labs(title = "Nashua days w/Tmax > 30degC",
        subtitle = "Planting to 120 DAP")
 
-ggsave("01_create-features/fig_ex-nash-heatstress-days.png")
+ggsave("01_create-features/1_fig_ex-nash-heatstress-days.png")
 
 
 # final decisions w/ just iowa, for reference ---------------------------------------------------------
