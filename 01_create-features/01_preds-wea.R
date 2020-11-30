@@ -4,6 +4,7 @@
 #                3/30/2020 (added planting-date-referenced weather)
 #                4/8/2020 (add Alison suggestions, play w/machine learning)
 #                4/30/2020 (update file structure)
+#                11/30/2020 (revisting. added illinois)
 # 
 # purpose: Create pred tibble for weather variables
 #
@@ -17,7 +18,7 @@
 
 rm(list = ls())
 #devtools::install_github("vanichols/tidysawyer2", force = T)
-library(tidysawyer2) #--has saw_xx data
+library(tidysawyer2) #--has wea data
 library(lubridate)
 library(dplyr)
 library(tibble)
@@ -25,92 +26,40 @@ library(ggplot2)
 library(readr)
 library(tidyr)
 
+data("ilia_wea")
 
-# weather data, from tidysawyer2 package ----------------------------------------------
+# ia_weather data, from tidysawyer2 package ----------------------------------------------
+library(saapsim)
+saf_date_to_doy("2001-10-01")
 
-wea <- saw_wea %>% as_tibble() 
+plantdat <- bind_rows(ia_planting, il_planting)
 
-pwea <- 
-  wea %>% 
-  left_join(saw_planting) %>% 
+wea <- 
+  ilia_wea %>% 
+  left_join(plantdat) %>% #--note the weather files start in 1980
   select(-plant_date, -crop) %>% 
   filter(!is.na(plant_doy))
 
 #--check, all sites/years?
-pwea %>% 
+wea %>% 
   select(site, year) %>% 
   distinct() 
 
-pwea %>% 
-  group_by(year, site) %>% 
+wea %>% 
+  group_by(state, year, site) %>% 
   summarise(precip_mm = sum(precip_mm, na.rm = T)) %>% 
-  ggplot(aes(year, precip_mm)) + 
+  ggplot(aes(year, precip_mm, color = state)) + 
   geom_point()
 
-# do a pca? ---------------------------------------------------------------
-# 
-# library("factoextra")
-# data(decathlon2)
-# decathlon2.active <- decathlon2[1:23, 1:10]
-# head(decathlon2.active[, 1:6])
-# res.pca <- prcomp(decathlon2.active, scale = TRUE)
-# fviz_eig(res.pca)
-# fviz_pca_ind(res.pca,
-#              col.ind = "cos2", # Color by the quality of representation
-#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-#              repel = TRUE     # Avoid text overlapping
-# )
-# fviz_pca_var(res.pca,
-#              col.var = "contrib", # Color by contributions to the PC
-#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-#              repel = TRUE     # Avoid text overlapping
-# )
-# fviz_pca_biplot(res.pca, repel = TRUE,
-#                 col.var = "#2E9FDF", # Variables color
-#                 col.ind = "#696969"  # Individuals color
-# )
+wea1 <- 
+  wea %>% 
+  select(state, site, year) %>% 
+  distinct() 
 
-# #-bahhhhhh
-# pwea %>% 
-#   unite(site, year, col = "site_year") %>%
-#   
-#   column_to_rownames("site_year_day")
-# 
-# w.pca <- prcomp(pwea, scale = TRUE)
-
-# weather in reference to planting ----------------------------------------
-
-#--days w/max temp < 50 up to 30 days after planting
-# wea1 <- 
-#   pwea %>% 
-#   group_by(site, year) %>% 
-#   filter(day > plant_doy, 
-#          day < plant_doy + 28) %>%
-#   filter(tmax_c <= 10) %>% #--temp is in C
-#   summarise(p4wk_less50_tmax_c = n())
-
-# wea1 %>% 
-#   ggplot(aes(p4wk_less50_tmax_c)) + 
-#   geom_histogram()
-
-#--I don't like this one, bad distribution
-
-#--days w/avg temp < 50 up to 30 dap
-# wea2 <- 
-#   pwea %>% 
-#   group_by(site, year) %>% 
-#   filter(day > plant_doy,
-#          day < plant_doy + 30) %>% 
-#   mutate(tav = (tmax_c + tmin_c)/2) %>% 
-#   filter(tav < 10) %>% 
-#   summarise(wintcolddays_n = n())
 
 #--water year precip (prev Oct to July?)
-library(saapsim)
-saf_date_to_doy("2001-10-01")
-
 wea2 <- 
-  pwea %>% 
+  wea %>% 
   mutate(newyeargroup = ifelse( (day > 182 & day < 274), NA,
                                 ifelse(
                                   day > 182, year - 1, year))) %>% 
@@ -125,7 +74,7 @@ wea2 %>%
 
 #--precip_mmy days >1" from planting to 60 DAP
 wea3 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 30) %>%
@@ -140,7 +89,7 @@ wea3 %>%
 
 #--days to reach 140 (or 120?)
 wea4 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy) %>% 
   mutate(gdd = (tmax_c + tmin_c)/2 - 10,
@@ -155,7 +104,7 @@ wea4 %>%
 
 #--precip_mm tot 2 weeks after planting
 wea5 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 14) %>% 
@@ -163,7 +112,7 @@ wea5 <-
 
 #--3 weeks
 wea6 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 21) %>% 
@@ -171,7 +120,7 @@ wea6 <-
 
 #--4 weeks
 wea7 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy, 
          day < plant_doy + 28) %>% 
@@ -179,7 +128,7 @@ wea7 <-
 
 #--2 weeks before planting
 wea8 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 14) %>% 
@@ -191,7 +140,7 @@ wea8 %>%
 
 #--3 weeks
 wea9 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 21) %>% 
@@ -199,7 +148,7 @@ wea9 <-
 
 #--4 weeks
 wea10 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy, 
          day > plant_doy - 28) %>% 
@@ -207,7 +156,7 @@ wea10 <-
 
 #--avg high temp in the month 2 months after planting
 wea11 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy + 56, 
          day < plant_doy + 56 + 28) %>% 
@@ -216,7 +165,7 @@ wea11 <-
 
 #--avg low temp in the month surrounding planting
 wea12 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy - 14, 
          day < plant_doy + 14) %>% 
@@ -224,7 +173,7 @@ wea12 <-
 
 #--number of days < 4degF (-15C) before planting. Why 4 deg? Anna? Don't remember...
 wea13 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day < plant_doy) %>% 
   filter(tmin_c < -15) %>% 
@@ -237,7 +186,7 @@ wea13 %>%
 
 #--gdd in 2 months after planting
 wea14 <- 
-  pwea %>% 
+  wea %>% 
   group_by(site, year) %>% 
   filter(day > plant_doy,
          day < plant_doy + 60) %>%
@@ -253,7 +202,7 @@ wea14 %>%
 
 #--heat stress yes/no days
 wea_hs <- 
-  pwea %>% 
+  wea %>% 
   filter(day < plant_doy + 120, day > plant_doy) %>%
   filter(tmax_c > 30) %>% 
   group_by(site, year) %>% 
@@ -266,7 +215,7 @@ wea_hs %>%
 
 #--heat stress gradient
 wea_hs2 <- 
-  pwea %>% 
+  wea %>% 
   filter(day < plant_doy + 120, day > plant_doy) %>%
   filter(tmax_c > 30) %>%
   mutate(tstress = tmax_c - 30) %>% 
@@ -321,16 +270,172 @@ wea_aprmay <-
             aprmay_precip_mm_tot = sum(precip_mm))
 
 
-wea_gs <- 
+wea_gsT <- 
   wea %>% 
   filter(day < 244, day > 91) %>% 
   group_by(site, year) %>% 
-  summarise(gs_precip_mm_tot = sum(precip_mm),
-            gs_tavg = mean((tmax_c + tmin_c)/2))
+  summarise(gs_tavg = mean((tmax_c + tmin_c)/2))
 
+wea_gsP <- 
+  wea %>% 
+  filter(day < 244, day > 91) %>% 
+  group_by(site, year) %>% 
+  summarise(gs_precip_mm_tot = sum(precip_mm))
 
 
 # combine wea metrics -------------------------------------------
+
+
+wea_parms_all <- 
+  wea1 %>% 
+  left_join(wea2) %>% #--water year precip
+  #left_join(wea3) %>% #--precip_mmy days >1" from planting to 60 DAP, not much variation
+  #left_join(wea4) %>% #--days to reach 140 (or 120?)
+  left_join(wea5) %>% #--precip_mm tot 2 weeks after planting
+  #left_join(wea6) %>% #--3 wks
+  #left_join(wea7) %>% #--4 wks
+  left_join(wea8) %>% #--2 wks before
+  #left_join(wea9) %>% #--3 wks
+  #left_join(wea10) %>% #--4wks
+  #left_join(wea11) %>% #--mo avg tmax 2 mo ap, corr w/days to gdd140 for some reason
+  left_join(wea12) %>% #--avg tmin in the month surrounding planting
+  left_join(wea13) %>% #--# days < 4degF (-15C) before planting. Why 4 deg? Anna? Don't remember...
+  #left_join(wea14) %>% #--gdd in 2 months after planting
+  #left_join(wea_hs) %>% #-heat stress yes/no days
+  left_join(wea_hs2) %>% #--heat stress gradient
+  #left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
+  #left_join(wea_may) %>% 
+  #left_join(wea_apr) %>% 
+  #left_join(wea_aprmay) %>%
+  #left_join(wea_gsT) %>% #--gs_tavg
+  left_join(wea_gsP) %>% #--gs_precip_mm_tot
+  ungroup() %>% 
+  mutate_if(is.numeric, list(~replace_na(., 0)))
+
+# what is correlated? -----------------------------------------------------
+library(corrplot)
+
+wea_cor <- 
+  wea_parms_all %>%
+  ungroup() %>% 
+  select_if(is.numeric) 
+corres <- cor(wea_cor, use="complete.obs")
+corrplot::corrplot.mixed(corres)
+corrplot::corrplot(corres)
+
+ggsave("01_create-features/fig_wea-corrs.png")
+
+#---this is just for deciding
+#--which have lots of correlations
+corres %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  pivot_longer(2:ncol(.)) %>% 
+  filter(abs(value) > 0.6, value != 1) %>% 
+  group_by(rowname) %>% 
+  summarise(n = n()) %>% 
+  arrange(-n)
+
+corres %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  pivot_longer(2:ncol(.)) %>% 
+  filter(abs(value) > 0.6, value != 1) 
+
+
+corres %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  pivot_longer(year:gs_tavg) %>% 
+  filter(abs(value) > 0.6, value != 1) %>% 
+  group_by(rowname) %>% 
+  mutate(n = n())
+
+
+# do a pca? ---------------------------------------------------------------
+
+wea_pca <- 
+  wea_parms_all %>% 
+  unite(site, year, col = "site_year") %>% 
+  column_to_rownames("site_year")
+
+# res_pca <- prcomp(wea_pca, scale = TRUE)
+# fviz_eig(res_pca)
+# fviz_pca_ind(res_pca,
+#              col.ind = "cos2", # Color by the quality of representation
+#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+#              repel = TRUE     # Avoid text overlapping
+# )
+# fviz_pca_var(res_pca,
+#              col.var = "contrib", # Color by contributions to the PC
+#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+#              repel = TRUE     # Avoid text overlapping
+# )
+# fviz_pca_biplot(res_pca, repel = TRUE,
+#                 col.var = "#2E9FDF", # Variables color
+#                 col.ind = "#696969"  # Individuals color
+# )
+# 
+
+
+# write what i like -------------------------------------------------------
+
+wea_parms_all %>% write_csv("01_create-features/cf_pred-wea.csv")
+
+
+# when did heatstres occur ------------------------------------------------
+
+
+hs_sum <- 
+  wea %>% 
+  filter(day < plant_doy + 120, day > plant_doy) %>%
+  filter(tmax_c > 30) %>% 
+  group_by(site, year) %>% 
+  summarise(heatstress_n = n())
+
+hs_sum %>% 
+  ggplot(aes(reorder(site, heatstress_n, mean), heatstress_n)) + 
+  geom_col(aes(fill = as.factor(year)), position = "dodge") + 
+  guides(fill = F)
+
+#--crawfordsville, brow, and dsup are the worst, has seasons w/more than 60 days
+wea %>% 
+  filter(site == "craw") %>% 
+  mutate(hs = ifelse(tmax_c > 30, "hot", "none")) %>%
+  ggplot(aes(day, tmax_c)) + 
+  geom_point(aes(color = hs)) +
+  geom_vline(aes(xintercept = plant_doy)) +
+  geom_vline(aes(xintercept = plant_doy + 120)) +
+  geom_label(data = filter(hs_sum, site == "craw"),
+             x = 200, y = 0, aes(label = heatstress_n)) +
+  facet_wrap(~year) + 
+  labs(title = "Crawfordsville days w/Tmax > 30degC",
+       subtitle = "Planting to 120 DAP")
+
+ggsave("01_create-features/fig_ex-craw-heatstress-days.png")
+
+
+#--ames has less in general
+wea %>% 
+  filter(site == "nash") %>% 
+  mutate(hs = ifelse(tmax_c > 30, "hot", "none")) %>%
+  ggplot(aes(day, tmax_c)) + 
+  geom_point(aes(color = hs)) +
+  geom_vline(aes(xintercept = plant_doy)) +
+  geom_vline(aes(xintercept = plant_doy + 120)) +
+  geom_label(data = filter(hs_sum, site == "nash"),
+             x = 200, y = 0, aes(label = heatstress_n)) +
+  facet_wrap(~year) + 
+  labs(title = "Nashua days w/Tmax > 30degC",
+       subtitle = "Planting to 120 DAP")
+
+ggsave("01_create-features/fig_ex-nash-heatstress-days.png")
+
+
+# final decisions w/ just iowa, for reference ---------------------------------------------------------
 
 
 wea_parms <- 
@@ -359,98 +464,3 @@ wea_parms <-
   ungroup() %>% 
   mutate_if(is.numeric, list(~replace_na(., 0)))
 
-# what is correlated? -----------------------------------------------------
-library(corrplot)
-
-wea_cor <- 
-  wea_parms %>%
-  ungroup() %>% 
-  select_if(is.numeric) 
-corres <- cor(wea_cor, use="complete.obs")
-corrplot::corrplot.mixed(corres)
-corrplot::corrplot(corres)
-
-ggsave("01_create-features/fig_wea-corrs.png")
-
-# i like heatstress_cum more than gs_tavg and heatstress_n I think
-
-wea_cor %>% 
-  ggplot(aes(heatstress_n, heatstress_cum)) + 
-  geom_point()
-
-wea_pca <- 
-  wea_parms %>% 
-  unite(site, year, col = "site_year") %>% 
-  column_to_rownames("site_year")
-
-# res_pca <- prcomp(wea_pca, scale = TRUE)
-# fviz_eig(res_pca)
-# fviz_pca_ind(res_pca,
-#              col.ind = "cos2", # Color by the quality of representation
-#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-#              repel = TRUE     # Avoid text overlapping
-# )
-# fviz_pca_var(res_pca,
-#              col.var = "contrib", # Color by contributions to the PC
-#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-#              repel = TRUE     # Avoid text overlapping
-# )
-# fviz_pca_biplot(res_pca, repel = TRUE,
-#                 col.var = "#2E9FDF", # Variables color
-#                 col.ind = "#696969"  # Individuals color
-# )
-# 
-
-
-# write what i like -------------------------------------------------------
-
-wea_parms %>% write_csv("01_create-features/cf_pred-wea.csv")
-
-
-# when did heatstres occur ------------------------------------------------
-
-
-hs_sum <- 
-  pwea %>% 
-  filter(day < plant_doy + 120, day > plant_doy) %>%
-  filter(tmax_c > 30) %>% 
-  group_by(site, year) %>% 
-  summarise(heatstress_n = n())
-
-hs_sum %>% 
-  ggplot(aes(reorder(site, heatstress_n, mean), heatstress_n)) + 
-  geom_col(aes(fill = as.factor(year)), position = "dodge") + 
-  guides(fill = F)
-
-#--crawfordsville has seasons w/more than 60 days
-pwea %>% 
-  filter(site == "craw") %>% 
-  mutate(hs = ifelse(tmax_c > 30, "hot", "none")) %>%
-  ggplot(aes(day, tmax_c)) + 
-  geom_point(aes(color = hs)) +
-  geom_vline(aes(xintercept = plant_doy)) +
-  geom_vline(aes(xintercept = plant_doy + 120)) +
-  geom_label(data = filter(hs_sum, site == "craw"),
-             x = 200, y = 0, aes(label = heatstress_n)) +
-  facet_wrap(~year) + 
-  labs(title = "Crawfordsville days w/Tmax > 30degC",
-       subtitle = "Planting to 120 DAP")
-
-ggsave("01_create-features/fig_craw-heatstress-days.png")
-
-
-#--ames has less in general
-pwea %>% 
-  filter(site == "nash") %>% 
-  mutate(hs = ifelse(tmax_c > 30, "hot", "none")) %>%
-  ggplot(aes(day, tmax_c)) + 
-  geom_point(aes(color = hs)) +
-  geom_vline(aes(xintercept = plant_doy)) +
-  geom_vline(aes(xintercept = plant_doy + 120)) +
-  geom_label(data = filter(hs_sum, site == "nash"),
-             x = 200, y = 0, aes(label = heatstress_n)) +
-  facet_wrap(~year) + 
-  labs(title = "Nashua days w/Tmax > 30degC",
-       subtitle = "Planting to 120 DAP")
-
-ggsave("01_create-features/fig_nash-heatstress-days.png")
