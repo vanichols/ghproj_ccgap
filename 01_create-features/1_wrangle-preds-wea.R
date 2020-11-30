@@ -323,7 +323,7 @@ corres <- cor(wea_cor, use="complete.obs")
 corrplot::corrplot.mixed(corres)
 corrplot::corrplot(corres)
 
-ggsave("01_create-features/fig_wea-corrs.png")
+ggsave("01_create-features/1_fig_wea-corrs.png")
 
 #---this is just for deciding
 #--which have lots of correlations
