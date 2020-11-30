@@ -185,7 +185,7 @@ wind_theme <-    theme_bw() +
 
 fac1 <- 
   gaps_filt_wind %>%
-  filter(category == "1 factor") %>% 
+  filter(category == "1 factor", oat_what != "dec RFV10%") %>% 
   ggplot(aes(year, gap_kgha)) + 
   geom_bar(aes(fill = oat_what),
                #alpha = oat_what %in% c("1_exp gap")),
@@ -199,8 +199,26 @@ fac1 <-
   wind_theme
 
 fac1
-ggsave("01_sims-oat-by-hand/fig_gaps-1fac-windmill.png")
+ggsave("01_sims-oat-by-hand/fig_gaps-1fac-windmill.png", width = 3.5, height = 7.5)
 
+#--try horizontal
+fac1alt <- 
+  gaps_filt_wind %>%
+  filter(category == "1 factor", oat_what != "dec RFV10%") %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_bar(aes(fill = oat_what),
+           #alpha = oat_what %in% c("1_exp gap")),
+           position = "dodge", stat = "identity", color = "black") + 
+  facet_grid(. ~ oat_what) + 
+  guides(fill = F, alpha = F) +
+  labs(title = "Ames",
+       x = NULL) +
+  geom_hline(aes(yintercept = mngap), linetype = "dotted", size = 1.2) +
+  wind_theme + 
+  theme(axis.text.x = element_blank())
+
+fac1alt
+ggsave("01_sims-oat-by-hand/fig_gaps-1fac-windmill.png", width = 7.5, height = 3.5)
 
 fac2 <- 
   gaps_filt_wind %>% 
@@ -265,3 +283,5 @@ library(patchwork)
 fac1 + fac2 #+ fac3 
 
 ggsave("01_sims-oat-by-hand/fig_gaps-windmill.png")
+
+
