@@ -71,7 +71,13 @@ dat %>%
 library(gt)
 library(psych)
 
-dat_sum <- psych::describe(dat %>% select(-year, -yearF))
+dat_4table <-
+  dat %>% 
+  select(cc_kgha, sc_kgha, pen_kgha, pen_pct, yearsincorn, everything()) %>% 
+  select(-year, -yearF)
+  
+
+dat_sum <- psych::describe(dat_4table)
 
 dat_vars <- rownames(dat_sum)
 
@@ -97,10 +103,10 @@ dat_nice <-
                             "paw30_mm" = "Plant-available-water in top 30 cm",
                             "prevyrccyield_kgha" = "Preceeding year CC yield",
                             "aveyield_kgha" = "Average site-year yield",
-                            "cc_kgha" = "CC yield",
-                            "sc_kgha" = "SC yield",
-                            "pen_kgha" = "CC/SC gap at max N rate",
-                            "pen_pct" = "CC/SC gap at max N rate as % of SC yield",
+                            "cc_kgha" = "CC yield*",
+                            "sc_kgha" = "SC yield*",
+                            "pen_kgha" = "CC/SC gap at max N rate*",
+                            "pen_pct" = "CC/SC gap at max N rate as % of SC yield*",
                             "prev_ccyield" = "Prev year CC yield at max N rate\n (indicative of residue amount)",
                             "avg_yield" = "Avg yield at max N at that site",
                             "years_in_corn" = "Number of Years in Cont Corn",
@@ -131,8 +137,13 @@ dat_tab <-
   filter(!vars_nice %in% c("crop*", "state*", "site*", "nrate_kgha")) %>% 
   gt() %>% 
   tab_header(
-    title = "Predictors Included In Models")
+    title = "Predictors Included In Models") %>% 
+  tab_source_note(
+    source_note = "*Not predictor, included for reference only"
+  )
 
+
+dat_tab
 
 gtsave(dat_tab, filename = "4_tbl_preds.png", path = "01_create-features/")
 
