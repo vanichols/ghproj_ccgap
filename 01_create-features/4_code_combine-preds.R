@@ -28,126 +28,39 @@ library(tidyr)
 
 wea <- read_csv("01_create-features/1_dat_preds-wea.csv")
 soi <- read_csv("01_create-features/2_dat_preds-soil.csv")
-
-
-# what else should we add? ------------------------------------------------
-
-#--add previous year's continuous corn yield at max nrate (indicative of residue amt)
-prev_yield <- 
-  ilia_yields %>%
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "cc") %>% 
-  mutate(prevyrccyield_kgha = lag(yield_kgha)) %>% 
-  select(site, year, prevyrccyield_kgha)
-
-#--use 'site production index' of cs at max n rate
-avg_yieldsc <- 
-  ilia_yields %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "sc") %>% 
-  summarise(avescyield_kgha = mean(yield_kgha, na.rm = T)) %>% 
-  select(site, avescyield_kgha)
-
-avg_yieldcc <- 
-  ilia_yields %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  #--make sure it's taken over the same time frame?
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "cc") %>% 
-  summarise(aveccyield_kgha = mean(yield_kgha, na.rm = T)) %>% 
-  select(site, aveccyield_kgha)
-
-
-avg_yield <- 
-  ilia_yields %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  #--make sure it's taken over the same time frame
-  select(site, year, rotation, yield_kgha) %>%
-  summarise(aveyield_kgha = mean(yield_kgha, na.rm = T)) %>% 
-  select(site, aveyield_kgha)
-
-#--is one better than the other? are they different?
-avg_yield %>% 
-  left_join(aveccyield_kgha) %>% 
-  left_join(avescyield_kgha) %>%
-  pivot_longer(3:4) %>% 
-  ggplot(aes(aveyield_kgha, value)) + 
-  geom_point(aes(color = name))
-
-#--I think the overall average is the best
-
-
-#--include # of years in corn
-
-yrs_corn <- 
-  ilia_yields %>% 
-  select(-state) %>% 
-  filter(rotation == "cc") %>% 
-  group_by(site) %>% 
-  group_modify(~{
-    .x %>% mutate(yearsincorn = group_indices(., year))
-  }) %>% 
-  select(site, year, yearsincorn) %>% 
-  distinct()
-  
-#--tiled or not?
-#--don't have info on IL right now
-drainage <- 
-  ia_siteinfo %>% 
-  select(site_name, site, drainage)
-
-il_siteinfo
+oth <- read_csv("01_create-features/3_dat_preds-other.csv")
 
 
 # put it all together -----------------------------------------------------
 
 dat <-  
-  ilia_yields %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(pen_kgha = sc - cc,
-         pen_pct = pen_kgha/sc * 100) %>% 
-  filter(pen_kgha > -1500) %>% #--that one lewis point, just seems weird
-  rename(cc_kgha = cc,
-         sc_kgha = sc) %>% 
-  left_join(prev_yield) %>% 
-  left_join(avg_yield) %>% 
-  left_join(yrs_corn) %>% 
+  oth %>% 
   left_join(wea) %>% 
   left_join(soi) %>% 
-  #left_join(drainage) %>% 
   mutate(yearF = paste0("Y", year)) %>% #--to ensure it isn't numeric
-  select(crop, state, site, yearsincorn, yearF, year, everything()) %>% 
-  filter(!is.na(prevyrccyield_kgha))
+  select(crop, state, site, yearsincorn, yearF, year, everything()) 
 
 
-#
+# independence?----------------------------------------------------------
 
-#--does pct gap dec over years? yes.
-dat %>% 
-  ggplot(aes(yearF, pen_pct)) + 
-  geom_point() + 
-  facet_grid(.~state, scales = "free_x")
+dat_cor <- 
+  dat %>%
+  ungroup() %>%
+  select(-year, -nrate_kgha, -cc_kgha, -sc_kgha) %>% 
+  select_if(is.numeric) %>% 
+  cor(., use="complete.obs")
+corrplot::corrplot.mixed(dat_cor)
+corrplot::corrplot(dat_cor)
 
-dat %>% 
-  ggplot(aes(years_in_corn, pen_pct)) + 
-  geom_point() +
-  geom_label(aes(label = site)) +
-#  geom_smooth(method = "lm") + 
-  facet_grid(.~state, scales = "free_x")
-
+#--looks ok
 
 # save data ---------------------------------------------------------------
 
 dat %>% 
-  write_csv("01_create-features/3_dat_preds-all.csv")
+  write_csv("01_create-features/4_dat_preds-all.csv")
+
+
+
 
 
 # summarize ---------------------------------------------------------------
@@ -212,7 +125,8 @@ dat_nice <-
   )
 
 
-dat_nice %>% 
+dat_tab <- 
+  dat_nice %>% 
   select(vars_nice, unit, min, max, mean) %>% 
   filter(!vars_nice %in% c("crop*", "state*", "site*", "nrate_kgha")) %>% 
   gt() %>% 
@@ -220,5 +134,5 @@ dat_nice %>%
     title = "Predictors Included In Models")
 
 
-gtsave(dat_tab, filename = "3_tbl_preds.png", path = "01_create-features/")
+gtsave(dat_tab, filename = "4_tbl_preds.png", path = "01_create-features/")
 
