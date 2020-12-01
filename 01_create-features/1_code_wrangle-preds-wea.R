@@ -325,6 +325,8 @@ corrplot::corrplot(corres)
 
 ggsave("01_create-features/1_fig_wea-corrs.png")
 
+
+
 #---this is just for deciding
 #--which have lots of correlations
 corres %>% 
@@ -356,34 +358,46 @@ corres %>%
 
 
 # do a pca? ---------------------------------------------------------------
+library(factoextra)
 
 wea_pca <- 
   wea_parms_all %>% 
-  unite(site, year, col = "site_year") %>% 
+  unite(state, site, year, col = "site_year") %>% 
   column_to_rownames("site_year")
 
-# res_pca <- prcomp(wea_pca, scale = TRUE)
-# fviz_eig(res_pca)
-# fviz_pca_ind(res_pca,
-#              col.ind = "cos2", # Color by the quality of representation
-#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-#              repel = TRUE     # Avoid text overlapping
-# )
-# fviz_pca_var(res_pca,
-#              col.var = "contrib", # Color by contributions to the PC
-#              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-#              repel = TRUE     # Avoid text overlapping
-# )
-# fviz_pca_biplot(res_pca, repel = TRUE,
-#                 col.var = "#2E9FDF", # Variables color
-#                 col.ind = "#696969"  # Individuals color
-# )
-# 
+res_pca <- prcomp(wea_pca, scale = TRUE)
+fviz_eig(res_pca)
 
+#--are my things independent?
+# hmm. 
+fviz_pca_var(res_pca,
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+)
+
+#--what is the max corr in this dataset?
+corres %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>% 
+  pivot_longer(2:ncol(.)) %>%
+  filter(value != 1) %>% 
+  summarise(mx = max(value))
+  
+
+wea_parms_all %>% 
+  unite(state, site, year, col = "site_year") %>% 
+  pivot_longer(2:ncol(.)) %>% 
+  ggplot(aes(value)) + 
+  geom_histogram() + 
+  facet_wrap(~name, scales= "free_x")
+
+ggsave("01_create-features/1_fig_weaparms-dist.png")
 
 # write what i like -------------------------------------------------------
 
-wea_parms_all %>% write_csv("01_create-features/1_preds-wea.csv")
+wea_parms_all %>% write_csv("01_create-features/1_dat_preds-wea.csv")
 
 
 # when did heatstres occur ------------------------------------------------
