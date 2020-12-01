@@ -1,5 +1,5 @@
 # Created:       3/30/2020
-# last edited:   
+# last edited:   12/1/2020 (add il data)
 # 
 # purpose: Create pred tibble for soil variables
 #
@@ -13,21 +13,28 @@ library(dplyr)
 library(tibble)
 library(ggplot2)
 library(readr)
+library(tidyr)
 
 # soil data, from package ----------------------------------------------
 
 #--these things come from ssurgo (except WT depth)
 sc <- 
-  saw_soilchar %>% 
+  ia_soilchar %>%
+  bind_rows(il_soilchar) %>% 
   as_tibble() %>% 
-  select(-cropprodindex_maj, -cropprodindex_wgt, -wtann_cm, -wtspring_cm)
+  select(site, wtdepth_cm, bhz_maj, om_maj)
 
 #--these from measurements
 sprof <- 
-  saw_soilprof %>% 
-  as_tibble()
+  ia_soilprof %>%
+  bind_rows(il_soilprof) %>% 
+  as_tibble() %>% 
+  ungroup()
 
+#--old note: (not sure what it means)
 #--this might be a problem, and might be why IACSR is not related to SOC%
+
+# I eliminated iacsr bc that doesn't exist in IL
 
 # wrangle -----------------------------------------------------------------
 
@@ -62,36 +69,33 @@ soil_dat <-
   left_join(ssoc) %>% 
   left_join(spaw) %>% 
   select(site, 
-         wtdepth_cm, #--I don't know where I originally got wtdepth, it's not in SSURGO?
-         iacsr_wgt,
-         bhz_wt,
+         wtdepth_cm, 
+         bhz_maj,
          om_maj,
          clay_pct,
          soc_pct,
          paw_mm) %>% 
-  rename(iacsr = iacsr_wgt,
-         bhzdepth_cm = bhz_wt,
+  rename(bhzdepth_cm = bhz_maj,
          clay_60cm_pct = clay_pct,
          soc_30cm_pct = soc_pct,
-         paw_150cm_mm = paw_mm) %>% 
-  mutate(wtdepth_cm = as.numeric(wtdepth_cm))
+         paw_150cm_mm = paw_mm) 
 
 
+# qc -------------------------------------------------------------------
+
+#--does soc data agree with ssurgo?
 soil_dat %>%
   mutate(soc_maj = om_maj/1.58) %>% 
   ggplot(aes(soc_30cm_pct, soc_maj)) + 
   geom_point()
+#--kind of
 
-soil_dat %>%
-  mutate(soc_maj = om_maj/1.58) %>% 
-  ggplot(aes(iacsr, soc_maj)) + 
-  geom_point(size = 3) + 
-  labs(x = "Iowa Corn Suitability Rating",
-       y = "% SOC",
-       title = "Why isn't ICSR related to SOC %")
-
-ggsave("01_create-features/fig_soil-iacsr-soc.png")
-
+soil_dat %>% 
+  pivot_longer(2:ncol(.)) %>% 
+  ggplot(aes(value)) + 
+  geom_histogram() + 
+  facet_wrap(~name, scales = "free")
+  
 # write -------------------------------------------------------------------
 
-soil_dat %>% write_csv("01_create-features/cf_pred-soil.csv")
+soil_dat %>% write_csv("01_create-features/2_dat_preds-soil.csv")
