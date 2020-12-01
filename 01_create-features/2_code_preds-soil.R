@@ -60,6 +60,13 @@ spaw <-
   group_by(site) %>% 
   summarise(paw_mm = sum(paw_mm))
 
+# I want paw in top 30 cm
+spaw30 <- 
+  sprof %>% 
+  filter(profile_cm %in% c("0-30")) %>% 
+  group_by(site) %>% 
+  summarise(paw30_mm = sum(paw_mm))
+
 
 # combine -----------------------------------------------------------------
 
@@ -68,13 +75,7 @@ soil_dat <-
   left_join(sclay) %>% 
   left_join(ssoc) %>% 
   left_join(spaw) %>% 
-  select(site, 
-         wtdepth_cm, 
-         bhz_maj,
-         om_maj,
-         clay_pct,
-         soc_pct,
-         paw_mm) %>% 
+  left_join(spaw30) %>% 
   rename(bhzdepth_cm = bhz_maj,
          clay_60cm_pct = clay_pct,
          soc_30cm_pct = soc_pct,
@@ -96,6 +97,30 @@ soil_dat %>%
   geom_histogram() + 
   facet_wrap(~name, scales = "free")
   
+
+
+# independence? -----------------------------------------------------------
+library(corrplot)
+
+soil_dat %>% 
+  select_if(is.numeric) %>% 
+  cor(., use="complete.obs") %>% 
+  corrplot::corrplot.mixed(.)
+
+#--let's just keep bhzdepth_cm
+#--clay vs paw. keep paw?
+ 
+soil_dat_sub <- 
+  soil_dat %>% 
+  select(-om_maj, -soc_30cm_pct, -paw_150cm_mm, -clay_60cm_pct)
+
+soil_dat_sub %>% 
+  select_if(is.numeric) %>% 
+  cor(., use="complete.obs") %>% 
+  corrplot::corrplot.mixed(.)
+
+
+
 # write -------------------------------------------------------------------
 
-soil_dat %>% write_csv("01_create-features/2_dat_preds-soil.csv")
+soil_dat_sub %>% write_csv("01_create-features/2_dat_preds-soil.csv")

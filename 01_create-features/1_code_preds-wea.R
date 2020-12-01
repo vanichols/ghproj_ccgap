@@ -318,10 +318,10 @@ library(corrplot)
 wea_cor <- 
   wea_parms_all %>%
   ungroup() %>% 
-  select_if(is.numeric) 
-corres <- cor(wea_cor, use="complete.obs")
-corrplot::corrplot.mixed(corres)
-corrplot::corrplot(corres)
+  select_if(is.numeric) %>% 
+  cor(., use="complete.obs")
+corrplot::corrplot.mixed(wea_cor)
+corrplot::corrplot(wea_cor)
 
 ggsave("01_create-features/1_fig_wea-corrs.png")
 
@@ -329,7 +329,7 @@ ggsave("01_create-features/1_fig_wea-corrs.png")
 
 #---this is just for deciding
 #--which have lots of correlations
-corres %>% 
+wea_cor %>% 
   as.data.frame() %>% 
   rownames_to_column() %>% 
   as_tibble() %>% 
@@ -339,22 +339,12 @@ corres %>%
   summarise(n = n()) %>% 
   arrange(-n)
 
-corres %>% 
+wea_cor %>% 
   as.data.frame() %>% 
   rownames_to_column() %>% 
   as_tibble() %>% 
   pivot_longer(2:ncol(.)) %>% 
   filter(abs(value) > 0.6, value != 1) 
-
-
-corres %>% 
-  as.data.frame() %>% 
-  rownames_to_column() %>% 
-  as_tibble() %>% 
-  pivot_longer(year:gs_tavg) %>% 
-  filter(abs(value) > 0.6, value != 1) %>% 
-  group_by(rowname) %>% 
-  mutate(n = n())
 
 
 # do a pca? ---------------------------------------------------------------
