@@ -4,7 +4,7 @@
 #
 # notes: 
 #
-# last edited:   
+# last edited:   12/2/2020
 #
 
 rm(list = ls())
@@ -13,56 +13,33 @@ library(tidyverse)
 
 # data --------------------------------------------------------------------
 
-datraw <- read_csv("01_create-features/cf_preds-all.csv") %>% 
-  filter(years_in_corn > 1)
+datraw <- read_csv("01_create-features/4_dat_preds-all.csv")
 
 
-datraw %>% 
-  filter(year > 2005, year < 2016) %>% 
-  ggplot(aes(reorder(year, cgap_max, mean), cgap_max)) + 
-  geom_point(aes(color = site, size = p2wk_precip_mm_tot)) + 
-  #facet_grid(.~drainage) +
-  coord_flip() 
-
-
-datraw %>% 
-  filter(year > 2005, year < 2016) %>% 
-  ggplot(aes(reorder(year, cgap_max, mean), cgap_max)) + 
-  geom_point(aes(color = site, size = wyprecip_mm)) + 
-  #facet_grid(.~drainage) +
-  coord_flip() 
-
-#--correct yield?
-datraw %>% 
-#  filter(year > 2005, year < 2016) %>% 
-  mutate(yield_corrected = cgap_max - 0.605*years_in_corn) %>% 
-  ggplot(aes(reorder(year, yield_corrected, mean), yield_corrected)) + 
-  geom_jitter(aes(color = site, size = p2wk_precip_mm_tot)) + 
-  coord_flip()
-
-  
-
-mdat <- datraw %>% 
-  dplyr::select(-crop, -site_name, -year, -yearF, -iacsr) 
+mdat <- 
+  datraw %>% 
+  unite(state, site, year, col = "site_year") %>% 
+  dplyr::select(-crop, -yearF, -nrate_kgha, -cc_kgha, -sc_kgha, -drainage)
 
 # simple regression -------------------------------------------------------
-#library(MASS) #--messes up select, has stepAIC but don't know diff btwn that and step
+library(MASS) #--messes up select, has stepAIC but don't know diff btwn that and step
 #--no interactions
 
-#--with %cgap as response
-# m1 <- lm(cgap_max_pct ~ ., 
-#          data = mdat %>% select(-cgap_max, -soc_30cm_pct))
-# sm1 <- step(m1, ,
-#             k = log(nrow(mdat))) #--gives BIC instead of AIC, this seriously limits what gets in
-# 
-# m1vars <- sm1$coefficients %>% enframe() %>% filter(name != "(Intercept)")
-# 
-# summary(sm1)
-# anova(sm1)
+#--with pen% as response
+ m1 <- lm(pen_pct ~ .,
+          data = mdat %>% dplyr::select(-site_year, -pen_kgha))
+
+sm1 <- step(m1, ,
+             k = log(nrow(mdat))) #--gives BIC instead of AIC, this seriously limits what gets in
+
+m1vars <- sm1$coefficients %>% enframe() %>% filter(name != "(Intercept)")
+
+summary(sm1)
+anova(sm1)
 
 #--with rawgap as response
-m2 <- lm(cgap_max ~ ., 
-         data = mdat %>% dplyr::select(-cgap_max_pct))
+m2 <- lm(pen_kgha ~ ., 
+         data = mdat %>% dplyr::select(-site_year, -pen_pct))
          
 sm2 <- step(m2, k = log(nrow(mdat)))
 summary(sm2)
@@ -79,26 +56,30 @@ resid_panel(sm2)
 #--let's try with interactions, only including things from m1a
 
 #--on percentage
-m1a <- lm(cgap_max_pct ~ .*., 
-         data = pctgap %>% select_at(vars(m1vars$name, cgap_max_pct)))
+m1a <- lm(pen_pct ~ .*.,
+         data = mdat %>% dplyr::select(-site_year, -pen_kgha))
 sm1a <- step(m1a)
 sm1a
-summary(sm1a) %>% 
-  tidy() %>% 
-  arrange(p.value)
 
+summary(sm1a)$coefficients %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>%
+  janitor::clean_names() %>% 
+  arrange(pr_t)
 
 #--on raw diff
-m1a <- lm(cgap_max ~ .*., 
-          data = mdat %>% select(-cgap_max_pct))
-# 
-# m1a <- lm(cgap_max ~ .*., 
-#           data = pctgap %>% select_at(vars(m1vars$name, cgap_max_pct)))
-sm1a <- step(m1a)
-sm1a
-summary(sm1a) %>% 
-  tidy() %>% 
-  arrange(p.value)
+m1b <- lm(pen_kgha ~ .*.,
+          data = mdat %>% dplyr::select(-site_year, -pen_pct))
+sm1b <- step(m1b)
+sm1b
+
+summary(sm1b)$coefficients %>% 
+  as.data.frame() %>% 
+  rownames_to_column() %>% 
+  as_tibble() %>%
+  janitor::clean_names() %>% 
+  arrange(pr_t)
 
 
 # extract parms

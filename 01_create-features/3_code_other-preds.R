@@ -91,12 +91,12 @@ yrs_corn <-
   distinct()
   
 #--tiled or not?
-#--don't have info on IL right now
 drainage <- 
   ia_siteinfo %>% 
-  select(site_name, site, drainage)
+  bind_rows(il_siteinfo) %>% 
+  select(site, drainage)
 
-il_siteinfo
+
 
 
 # put it all together -----------------------------------------------------
@@ -113,6 +113,7 @@ dat <-
   filter(pen_kgha > -1500) %>% #--that one lewis point, just seems weird
   rename(cc_kgha = cc,
          sc_kgha = sc) %>% 
+  left_join(drainage) %>%
   left_join(prev_yield) %>% 
   left_join(avg_yield) %>% 
   left_join(yrs_corn) %>% 
@@ -123,8 +124,6 @@ dat %>%
   ungroup() %>% 
   select(prevyrccyield_kgha, aveyield_kgha, yearsincorn) %>% 
   cor(., use="complete.obs")
-
-
 
 #--does pct gap dec over years? yes.
 dat %>% 

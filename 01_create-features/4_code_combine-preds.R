@@ -74,7 +74,7 @@ library(psych)
 dat_4table <-
   dat %>% 
   select(cc_kgha, sc_kgha, pen_kgha, pen_pct, yearsincorn, everything()) %>% 
-  select(-year, -yearF)
+  select(-year, -yearF, -drainage)
   
 
 dat_sum <- psych::describe(dat_4table)
@@ -96,6 +96,7 @@ dat_nice <-
   mutate(vars_nice = recode(vars,
                             "year" = "Year, all years included",
                             "yearsincorn" = "Years in corn",
+                            "drainage" = "Drainage",
                             "wyprecip_mm" = "Water year (Oct-Oct) precip total",
                             "gs_precip_mm_tot" = "Growing season precip total",
                             "heatstress_cum" = "Cumulative heatstress, base 30degC",
