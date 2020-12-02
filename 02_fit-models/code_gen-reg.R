@@ -32,7 +32,11 @@ library(MASS) #--messes up select, has stepAIC but don't know diff btwn that and
 sm1 <- step(m1, ,
              k = log(nrow(mdat))) #--gives BIC instead of AIC, this seriously limits what gets in
 
-m1vars <- sm1$coefficients %>% enframe() %>% filter(name != "(Intercept)")
+m1vars <- 
+  sm1$coefficients %>% 
+  enframe() %>% 
+  filter(name != "(Intercept)") %>% 
+  mutate(respvar = "pen_pct")
 
 summary(sm1)
 anova(sm1)
@@ -44,7 +48,16 @@ m2 <- lm(pen_kgha ~ .,
 sm2 <- step(m2, k = log(nrow(mdat)))
 summary(sm2)
 
-m2vars <- sm2$coefficients %>% enframe()
+m2vars <- 
+  sm2$coefficients %>% 
+  enframe() %>% 
+  filter(name != "(Intercept)") %>% 
+  mutate(respvar = "pen_kgha")
+
+m1vars %>% 
+  bind_rows(m2vars) %>% 
+  write_csv("02_fit-models/02_stepwise-selections.csv")
+
 
 #resid(sm2)
 library(broom)

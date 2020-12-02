@@ -1,0 +1,12 @@
+name,value,respvar
+yearsincorn,-0.7346623775975727,pen_pct
+prep2wk_precip_mm_tot,0.08114402026392449,pen_pct
+wintcolddays_n,0.2716481565305963,pen_pct
+heatstress_cum,0.07622212516893231,pen_pct
+paw30_mm,0.2586287245176923,pen_pct
+yearsincorn,-56.42389118054485,pen_kgha
+prep2wk_precip_mm_tot,6.805850382829145,pen_kgha
+wintcolddays_n,26.64913792625939,pen_kgha
+heatstress_cum,5.549201451731392,pen_kgha
+bhzdepth_cm,23.717301332693467,pen_kgha
+paw30_mm,23.594881502870887,pen_kgha
