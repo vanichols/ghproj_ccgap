@@ -17,25 +17,107 @@ library(tidyverse)
 
 
 
-# what is range in ccpen? -------------------------------------------------
+# what is range in gap? -------------------------------------------------
+
 
 
 gaps <- 
   ilia_yields %>% 
-  filter(nrate_kgha > 100) %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
   mutate(rotation = ifelse(rotation == "cs", "sc", rotation)) %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(pct = (sc - cc)/sc * 100)
+  mutate(pct = (sc - cc)/sc * 100,
+         gap = (sc - cc)) %>% 
+  ungroup()
 
-gaps %>% 
-  ggplot(aes(year, pct)) + 
-  geom_point() + 
-  facet_wrap(~site, scales = "free_x")
+#--gap by state
+gaps %>%
+  filter(!is.na(gap)) %>% 
+  bind_rows( gaps %>% 
+               group_by(state) %>% 
+               summarise(pct = mean(pct, na.rm = T),
+                         gap = mean(gap, na.rm = T)) %>% 
+               mutate(site = "MEAN")) %>% 
+  group_by(state) %>% 
+  arrange(gap) %>%
+  mutate(n = 1:n()) %>% 
+  ggplot(aes(n, gap)) + 
+  geom_point(color = "gray50") +
+  geom_point(data = . %>% filter(site == "MEAN"), color = "red", size = 3) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  facet_wrap(~state)
+
+#--pct by state
+gaps %>%
+  filter(!is.na(gap)) %>% 
+  bind_rows( gaps %>% 
+               group_by(state) %>% 
+               summarise(pct = mean(pct, na.rm = T),
+                         gap = mean(gap, na.rm = T)) %>% 
+               mutate(site = "MEAN")) %>% 
+  group_by(state) %>% 
+  arrange(pct) %>%
+  mutate(n = 1:n()) %>% 
+  ggplot(aes(n, pct)) + 
+  geom_point(color = "gray50") +
+  geom_point(data = . %>% filter(site == "MEAN"), color = "red", size = 3) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  facet_grid(.~state)
+
+
+#--overall gap
+gaps %>%
+  filter(!is.na(gap)) %>% 
+  bind_rows( gaps %>% 
+               summarise(pct = mean(pct, na.rm = T),
+                         gap = mean(gap, na.rm = T)) %>% 
+               mutate(site = "MEAN")) %>% 
+  arrange(gap) %>% 
+  mutate(n = 1:n()) %>% 
+  ggplot(aes(n, gap)) + 
+  geom_jitter(color = "gray50") +
+  geom_point(data = . %>% filter(site == "MEAN"), color = "red", size = 3) +
+  geom_hline(yintercept = 0) +
+  coord_flip()
+
+#--overall pct
+gaps %>%
+  filter(!is.na(gap)) %>% 
+  bind_rows( gaps %>% 
+               summarise(pct = mean(pct, na.rm = T),
+                         gap = mean(gap, na.rm = T)) %>% 
+               mutate(site = "MEAN")) %>% 
+  arrange(pct) %>% 
+  mutate(n = 1:n()) %>% 
+  ggplot(aes(n, pct)) + 
+  geom_jitter(color = "gray50") +
+  geom_point(data = . %>% filter(site == "MEAN"), color = "red", size = 3) +
+  geom_hline(yintercept = 0) +
+  coord_flip()
+
 
 gaps %>% 
   group_by(state, site) %>% 
   summarise(mn = min(pct, na.rm = T),
             mx = max(pct, na.rm = T))
+
+
+#--gap in one state, by site
+gaps %>%
+#  filter(!is.na(gap), state == "IA") %>%  
+  group_by(site) %>% 
+  arrange(gap) %>%
+  mutate(n = 1:n()) %>% 
+  ggplot(aes(n, gap)) + 
+  geom_point(aes(color = as.factor(state))) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  facet_wrap(~site)
+
+
 
 
 # recreate John's fig -----------------------------------------------------
