@@ -20,6 +20,37 @@ library(tidyverse)
 # what is range in gap? -------------------------------------------------
 
 
+gaps_allN <- 
+  ilia_yields %>% 
+  mutate(rotation = ifelse(rotation == "cs", "sc", rotation)) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(pct = (sc - cc)/sc * 100,
+         gap = (sc - cc),
+         nrateF = cut(nrate_kgha, breaks = 3)) %>% 
+  ungroup()
+
+gaps_allN %>%
+  filter(!is.na(gap)) %>% 
+  group_by(nrateF) %>% 
+  arrange(gap) %>%
+  mutate(n = 1:n(),
+         nfrac = n/n()) %>% 
+  ggplot(aes(nfrac, gap)) + 
+  geom_point(aes(color = nrateF)) +
+  geom_hline(yintercept = 0) +
+  coord_flip() 
+
+gaps_allN %>%
+  filter(!is.na(pct)) %>% 
+  group_by(nrateF) %>% 
+  arrange(pct) %>%
+  mutate(n = 1:n(),
+         nfrac = n/n()) %>% 
+  ggplot(aes(nfrac, pct)) + 
+  geom_point(aes(color = nrateF)) +
+  geom_hline(yintercept = 0) +
+  coord_flip() 
+
 
 gaps <- 
   ilia_yields %>% 
