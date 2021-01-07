@@ -32,7 +32,7 @@ dat %>%
   pivot_longer(5:ncol(.)) %>% 
   filter(name %in% pct_vars) %>% 
   ggplot(aes(value, pen_pct)) + 
-  geom_point() + 
+  geom_point(aes(color = state)) + 
   facet_wrap(~name, scales = "free") + 
   labs(title = "Stepwise selections, pen_pct")
 
@@ -46,4 +46,14 @@ dat %>%
   geom_point() + 
   facet_wrap(~name, scales = "free") + 
   labs(title = "Stepwise selections, pen_kgha")
-  
+
+dat %>%
+  select(-crop, -yearF, -nrate_kgha, -drainage, -pen_pct) %>% 
+  select(state, site, year, pen_kgha, everything()) %>% 
+  pivot_longer(5:ncol(.)) %>% 
+  filter(name %in% pct_vars) %>% 
+  ggplot(aes(value, pen_kgha)) + 
+  geom_point(aes(color = state)) + 
+  geom_smooth(aes(color = state), method = "lm", se=F) +
+  facet_wrap(~name, scales = "free") + 
+  labs(title = "Stepwise selections, pen_kgha")

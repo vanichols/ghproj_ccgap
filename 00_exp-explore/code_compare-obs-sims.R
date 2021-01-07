@@ -61,3 +61,14 @@ ylds %>%
 
 ggsave("00_exp-explore/fig_obs-vs-sim.png", height = 10, width = 7)
 
+
+#--
+obs_ylds %>%
+  select(state, site, year, rot2, yield_kgha) %>% 
+  pivot_wider(names_from = rot2, values_from = yield_kgha) %>% 
+  mutate(
+    env_ind = (cc + sc)/2,
+    gap_kgha = sc-cc) %>% 
+  ggplot(aes(env_ind, gap_kgha)) + 
+  geom_point(aes(color = state))
+  
