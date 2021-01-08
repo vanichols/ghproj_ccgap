@@ -138,16 +138,13 @@ ilia_gaps %>%
        y = "Annual Mean Air Temperature")
 
 
-# within site, rel to LTwea --------------------------------------------
-
+# within site, LTwea --------------------------------------------
 
 pcp_ann %>% 
   group_by(site) %>%
   summarise(n = n())
 
-#--need more weather data for Iowa sites
-
-# pretend for now
+#--great. 
 
 pcp_lt <- 
   pcp_ann %>% 
@@ -178,7 +175,7 @@ ilia_gaps %>%
   geom_vline(xintercept = 0) + 
   scale_fill_gradient2(low = "red", high = "darkblue", midpoint = 0) +
   labs(title = "Scaled to 'long-term'* mean within site",
-       subtitle = "Iowa sites only have 17 years, Illinois has 40",
+       subtitle = "40 years",
        x = "Annual Precipitation Total",
        y = "Annual Mean Air Temperature")
 
