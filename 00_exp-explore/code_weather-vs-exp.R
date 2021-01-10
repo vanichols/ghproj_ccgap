@@ -319,3 +319,12 @@ anova(lm(gap_kgha ~ prep2wk_precip_mm_tot,
            left_join(ilia_gaps) %>% 
            filter(!is.na(gap_kgha))))
 
+
+#--are annual and 2wk correlated?
+pcp_ann1 %>% 
+  left_join(ilia_gaps) %>%
+  left_join(wea) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  ggplot(aes(pcp_mm, prep2wk_precip_mm_tot)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F)
