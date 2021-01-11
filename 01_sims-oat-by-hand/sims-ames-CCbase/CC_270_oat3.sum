@@ -1,0 +1,46 @@
+     ###     ######     #####   #   #     #   
+    #   #    #     #   #        #   ##   ##   
+   #     #   #     #   #        #   ##   ##   
+   #######   ######     #####   #   # # # #   
+   #     #   #              #   #   #  #  #   
+   #     #   #         #####    #   #  #  #   
+                                              
+                                              
+ The Agricultural Production Systems Simulator
+             Copyright(c) APSRU               
+
+Version                = 7.10 r4158
+Title                  = CC_270_oat3
+   Component                        "clock" = %apsim%\Model\Clock.dll
+   Component                          "met" = %apsim%\Model\Input.dll
+Paddock:
+   Component                   "outputfile" = %apsim%\Model\Report.dll
+   Component                        "accum" = %apsim%\Model\Accum.dll
+   Component               "CC_maize_Nfert" = %apsim%\Model\Operations.dll
+   Component             "CC_corn_planitng" = %apsim%\Model\Operations.dll
+   Component                   "CC_harvest" = %apsim%\Model\Operations.dll
+   Component                   "fertiliser" = %apsim%\Model\Fertiliser.dll
+   Component                 "N Deposition" = %apsim%\Model\Manager.dll
+   Component                 "fall tillage" = %apsim%\Model\Manager.dll
+   Component               "Spring Tillage" = %apsim%\Model\Manager.dll
+   Component            "Spring Cultivator" = %apsim%\Model\Manager.dll
+   Component                 "Calculations" = %apsim%\Model\Manager.dll
+   Component               "Stage Day Info" = %apsim%\Model\Manager.dll
+   Component         "Temperature Day Info" = %apsim%\Model\Manager.dll
+   Component                    "WT_script" = %apsim%\Model\Manager.dll
+   Component                         "SWIM" = %apsim%\Model\SWIM3.dll
+   Component              "SoilTemperature" = %apsim%\Model\SoilTemp.dll
+   Component         "SurfaceOrganicMatter" = %apsim%\Model\SurfaceOM.dll
+   Component          "Soil_Ames1 Nitrogen" = %apsim%\Model\SoilN.dll
+   Component                      "soybean" = %apsim%\Model\Plant.dll
+   Component                        "maize" = %apsim%\Model\Maize.dll
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM  Fatal  Error
+                      -------------------
+     Cannot read parameter "default_crop_class" for module maize.
+     Component name: paddock.maize
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+

@@ -1,0 +1,16 @@
+     ###     ######     #####   #   #     #   
+    #   #    #     #   #        #   ##   ##   
+   #     #   #     #   #        #   ##   ##   
+   #######   ######     #####   #   # # # #   
+   #     #   #              #   #   #  #  #   
+   #     #   #         #####    #   #  #  #   
+                                              
+                                              
+ The Agricultural Production Systems Simulator
+             Copyright(c) APSRU               
+
+       Fatal  Error
+-------------------
+Error finding "Simulation=/simulations/Ames/diagniostics/SC0" in apsim file C:\Users\vnichols\Box\Gina_APSIM_modeling\sims-cal-factor-analysis-CCbase\CCgapcal-CCbase.apsim
+Could not find file 'C:\Users\vnichols\Box\Gina_APSIM_modeling\sims-cal-factor-analysis-CCbase\SurfaceOM_Ames_Forecast2016.xml'.
+

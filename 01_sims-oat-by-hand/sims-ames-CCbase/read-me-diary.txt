@@ -1,0 +1,16 @@
+# NOTE: These sims must be run on 7.9 r4044 using the xmls in this folder
+# the sim results are stored in this folder, but are read in by ghproj_ccgap code
+# the list of what each oat entails is contained in a doc in ghproj_ccgap
+# the management planting activities are stored in an excel file in data_raw
+
+# 3/31/2020
+
+Duplicated CC_270_base.
+Kept everythign linked. 
+Unlinked the node that contained the thing I want to change.
+Renamed the sim node to CC_270_oatxx
+Often change meant using a new cultivar which is defined in XML_corn7.9 file
+
+# 11/12/2020
+
+Added oat22, which has RFV dec by 50% (in addition to the 10%)

@@ -20,7 +20,7 @@ library(janitor)
 
 # read in .out files ------------------------------------------------------
 
-my_dir <- "../../../Box/Gina_APSIM_modeling/sims-explore-by-hand/sims-ames-CCbase/"
+my_dir <- "01_sims-oat-by-hand/sims-ames-CCbase/"
 
 apraw <-
   saf_readapout(my_dir) %>% 
@@ -34,4 +34,4 @@ apraw <-
 apraw %>% filter(!is.na(apsim_oat))
 
 apraw %>% 
-  write_csv("01_sims-oat-by-hand/sims_apsim-hand-oat-raw.csv")
+  write_csv("01_sims-oat-by-hand/sims-ames-CCbase/dat-ames-CCbase-raw.csv")

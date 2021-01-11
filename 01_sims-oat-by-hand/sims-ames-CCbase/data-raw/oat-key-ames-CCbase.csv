@@ -1,0 +1,25 @@
+oat_nu,oat_what,category,notes
+0,exp gap,"1 factor,2 factor,3 factor,4 factor,5 factor",this is the experimentally measured gap in ames
+99,current apsim gap,"1 factor,2 factor,3 factor,4 factor,5 factor",This is APSIM CS/SC - CC
+1,lp by 1/m2,1 factor,take whatever is in there and subtract 1
+2,late emergence,1 factor,changed sowing depth from 50 mm to 100 mm
+3,dec RUE12%,1 factor,"lowered from 1.6 to 1.4 for first 3 stages, saved as new cultivar psims_1xxRMrue NOTE the CC mgmt has a 104RM, but none of the SC/CS do"
+4,dec RFV10%,1 factor,"dec root_depth_rate to 4, 8, 30, 30, 27, 18 (dec each by ~10%), cultivar psims_1xxRMrfv"
+5,dec maize KL,1 factor,dec maize KL(/day) from 0.08 to 0.05 in all layers down to 120
+6,dec pot KN50,1 factor,"lowered head_grain_no_max from 770 to 720, saved as psims_1xxRMkn (reduced hail cultivar too)"
+7,lp + rue + rfv,3 factor,lp + oat7 
+8,lp + rue + lowKL,3 factor,lp + rue cult + KL
+9,lp + rue + less kernals,3 factor,lp + oat9
+10,lp + rfv + lowKL,3 factor,lp +rfv cult + KL
+11,lp + rfv + less kernals,3 factor,lp + oat11
+12,lp + lowKL + less kernals,3 factor,lp + kn cult + KL
+13,lp  + less kernals + rue + lowKL,4 factor,lp + oat9 + KL
+14,lp + rfv + less kernals + lowKL,4 factor,lp + oat11 + KL
+15,lp + rue + rfv + lowKL,4 factor,lp + oat7 + KL
+16,lp + rue + rfv + lowKL + less kernals,5 factor,lp + oat16 + KL
+17,RUE + RFV + KL,3 factor,oat7 + kl
+18,rue + rfv + less kernals,3 factor,oat16
+19,rue + kl + less kernals,3 factor,oat9 + kl
+20,rfv + lowkl + less kernals,3 factor,oat11 + kl
+21,rue + rfv + lowkl + less kernals,4 factor,oat16 + kl
+22,dec RFV50%,1 factor,"dec root_depth_rate to 2.5, 4.5, 17, 17, 15, 10 (dec each by ~50%), cultivar psims_1xxRMrfv2"
