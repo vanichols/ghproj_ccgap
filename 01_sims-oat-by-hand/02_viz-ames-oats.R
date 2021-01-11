@@ -21,25 +21,37 @@ library(janitor)
 
 #--oats
 oat_key <- 
-  read_csv("01_sims-oat-by-hand/rd_oats-calibrated-v1CC.csv") %>%  
+  read_csv("../../..//Box/Gina_APSIM_modeling/sims-explore-by-hand/sims-ames-CCbase/data-raw/oat-key-ames-CCbase.csv") %>%  
   separate_rows(category, sep = ",") %>% 
   remove_empty("rows") %>% 
   remove_empty("cols") 
 
 #--comes from 01_read-in-sim-res
-apraw <- read_csv("01_sims-oat-by-hand/sims_apsim-hand-oat-raw.csv")
+apall <- 
+  read_csv("01_sims-oat-by-hand/sims_apsim-hand-oat-raw.csv") 
+
+
+apraw <- 
+  apall %>% 
+  select(file, year, corn_buac) %>%
+  mutate(yield_kgha = saf_buac_to_kgha_corn(corn_buac))
+
+
 
 #--apsim cc yields
 base_contc <- 
+  suppressWarnings(
   apraw %>%
   mutate(oat_nu = parse_number(apsim_oat)) %>%
   filter(rot == "CC", apsim_oat == "base") %>% 
   mutate(dtype = "ap_contc", 
          oat_nu = 0) %>% 
   select(dtype, oat_nu, year, yield_kgha)
+  )
 
 #--apsim cs yields, un-tweaked (this is just for reference)
 base_rotc <- 
+  suppressWarnings(
   apraw %>%
   mutate(oat_nu = parse_number(apsim_oat)) %>%
   filter(rot != "CC", apsim_oat == "base") %>% 
@@ -47,7 +59,7 @@ base_rotc <-
   mutate(dtype = "ap_rotc",
          oat_nu = 0) %>% 
   select(dtype, oat_nu, year, yield_kgha)
-
+)
 
 # working apd ------------------------------------------------------------------
 
@@ -63,12 +75,11 @@ apw <-
 # calc yield gaps ---------------------------------------------------------
 
 ewgap <-
-  saw_cgap %>% 
+  ilia_gaps %>% 
   ungroup() %>% 
   filter(site == "ames") %>% 
   mutate(dtype = "exp_gap", 
-         oat_nu = 0,
-         gap_kgha = cgap_max) %>%  #--just renaming it lazily
+         oat_nu = 0) %>%  #--just renaming it lazily
   filter(!is.na(gap_kgha)) %>% 
   select(dtype, oat_nu, year, gap_kgha)
 
