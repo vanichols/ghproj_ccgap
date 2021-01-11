@@ -1,0 +1,1478 @@
+     ###     ######     #####   #   #     #   
+    #   #    #     #   #        #   ##   ##   
+   #     #   #     #   #        #   ##   ##   
+   #######   ######     #####   #   # # # #   
+   #     #   #              #   #   #  #  #   
+   #     #   #         #####    #   #  #  #   
+                                              
+                                              
+ The Agricultural Production Systems Simulator
+             Copyright(c) APSRU               
+
+Version                = 7.9 r4044
+Title                  = mcna-2008
+   Component                        "clock" = %apsim%\Model\Clock.dll
+   Component                          "met" = %apsim%\Model\Input.dll
+Paddock:
+   Component                   "outputfile" = %apsim%\Model\Report.dll
+   Component                        "accum" = %apsim%\Model\Accum.dll
+   Component                   "fertiliser" = %apsim%\Model\Fertiliser.dll
+   Component                    "WT_script" = %apsim%\Model\Manager.dll
+   Component                 "N Deposition" = %apsim%\Model\Manager.dll
+   Component                    "Tillage21" = %apsim%\Model\Manager.dll
+   Component                "Harvest maize" = %apsim%\Model\Manager.dll
+   Component          "Sow on a fixed date" = %apsim%\Model\Manager.dll
+   Component                         "SWIM" = %apsim%\Model\SWIM3.dll
+   Component              "SoilTemperature" = %apsim%\Model\SoilTemp.dll
+   Component         "SurfaceOrganicMatter" = %apsim%\Model\SurfaceOM.dll
+   Component           "McNaySoil Nitrogen" = %apsim%\Model\SoilN.dll
+   Component                        "maize" = %apsim%\Model\Maize.dll
+   Component         "InitialiseWaterTable" = %apsim%\Model\Manager2.dll
+
+------- clock Initialisation --------------------------------------------------
+     Sequencer phases:
+        prepare
+        init_step
+        do_management
+        run_one_step
+        do_pasture_water
+        process
+        do_pasture_growth
+        do_stock
+        post
+        end_step
+     Simulation start date =  1/01/2008
+     Simulation end date   = 31/12/2008
+     Time step =           = 1440 (mins)
+
+------- met Initialisation ----------------------------------------------------
+     Sparse data is not allowed
+     INPUT File name: C:\Users\vnichols\Box Sync\Gina_APSIM_modeling\yield-gap-gina\wea-data\mcnay_2000-2016.met
+
+------- outputfile Initialisation ---------------------------------------------
+     Output frequency:
+        post
+     Output variables:
+        dd/mm/yyyy as Date
+        year
+        yield
+        biomass
+        watertable
+        no3()
+        surfaceom_wt
+        lai
+        Rain
+        dlt_n_min()
+
+     Output file = mcna-2008.out
+     Format = normal
+
+------- paddock.accum Initialisation ------------------------------------------
+     Initialising
+
+------- paddock.WT_script Initialisation --------------------------------------
+     Manager rules:
+     
+     SECTION:- init
+     
+     SECTION:- start_of_day
+     bbc_potential = 390 - 130
+     if annualrain > 0 then
+     eorratio = annualeo / annualrain
+     endif
+     rainsurplus = annualrain - annualeo
+     
+     SECTION:- end_of_day
+     END of rules
+     
+
+------- paddock.N Deposition Initialisation -----------------------------------
+     Manager rules:
+     
+     SECTION:- start_of_day
+     n_deposition = rain * 0.0078
+     n_deposition_tot = n_deposition_tot + n_deposition
+     if (rain > 0) then
+        fertiliser apply amount = n_deposition(kg/ha), depth = 0 (mm), type = no3_n ()
+     endif
+     END of rules
+     
+
+------- paddock.Tillage21 Initialisation --------------------------------------
+     Manager rules:
+     
+     SECTION:- start_of_day
+              if (today = date('24-apr') then
+     if ('user_defined' = 'user_defined') then
+         'surfaceorganicmatter' tillage type = user_defined, f_incorp = 0.25 (), tillage_depth = 50
+     else
+         'surfaceorganicmatter' tillage type = user_defined
+     endif
+     ready_to_till_pre_sow = 0
+     till_day_pre_sow = 0
+              endif
+     END of rules
+     
+
+------- paddock.Harvest maize Initialisation ----------------------------------
+     Manager rules:
+     
+     SECTION:- end_of_day
+                if ('maize' = 'cotton') then
+       if (maize.ozcot_status > 0) then
+           maize harvest
+       endif
+                elseif (maize.stagename = 'harvest_ripe' or maize.plant_status = 'dead') then
+       maize  harvest
+       maize  end_crop
+                endif
+     END of rules
+     
+
+------- paddock.Sow on a fixed date Initialisation ----------------------------
+     Manager rules:
+     
+     SECTION:- start_of_day
+             if (today = date('15-apr') then
+       maize sow plants =0, sowing_depth = 50, cultivar = b_110, row_spacing = 500, crop_class = plant
+              endif
+     END of rules
+     
+
+------- paddock.SWIM Initialisation -------------------------------------------
+     
+     
+                           APSIM Soil Profile
+                           ------------------
+     
+     ---------------------------------------------------------------
+      x    dlayer   BD   SW     LL15   DUL   SAT      Ks      Psi
+     ---------------------------------------------------------------
+        0.0   25.0  1.25  0.319  0.182  0.319  0.494 467.00   -300.0
+       50.0   25.0  1.25  0.319  0.182  0.319  0.494 467.00   -300.0
+       50.0   50.0  1.25  0.319  0.182  0.319  0.494 467.00   -300.0
+      150.0  100.0  1.25  0.319  0.182  0.319  0.494  63.00   -300.0
+      250.0  100.0  1.25  0.341  0.220  0.341  0.483  63.00   -300.0
+      350.0  150.0  1.35  0.322  0.247  0.322  0.479  41.00   -300.0
+      550.0  150.0  1.35  0.322  0.247  0.322  0.479  41.00   -300.0
+      650.0  150.0  1.38  0.322  0.247  0.322  0.479  41.00   -300.0
+      850.0  150.0  1.38  0.322  0.247  0.322  0.479  41.00   -300.0
+      950.0  150.0  1.45  0.329  0.200  0.329  0.453  49.00   -300.0
+     1150.0  150.0  1.45  0.329  0.200  0.329  0.453  49.00   -300.0
+     1250.0  300.0  1.45  0.329  0.200  0.329  0.453  49.00   -300.0
+     1750.0  300.0  1.45  0.383  0.200  0.329  0.370   5.12 Infinity
+     1850.0  300.0  1.45  0.376  0.200  0.329  0.363   2.65 Infinity
+     2350.0  400.0  1.45  0.369  0.200  0.329  0.357   1.37 Infinity
+     2650.0  300.0  1.45  0.364  0.200  0.329  0.352   0.71 Infinity
+     2950.0  300.0  1.45  0.359  0.200  0.329  0.348   0.37 Infinity
+     3250.0  300.0  1.45  0.355  0.200  0.329  0.344   0.19 Infinity
+     3550.0  300.0  1.45  0.351  0.200  0.329  0.343   0.15 Infinity
+     4000.0  300.0  1.45  0.348  0.200  0.329  0.343   0.15 Infinity
+     ---------------------------------------------------------------
+     
+     
+                       Soil Moisture Characteristics
+                       -----------------------------
+     
+     --------------------------------------------------------------------
+                              Soil Water Potential (cm)
+         x       0      10      25    100   1000  15000   10^6   10^7
+     --------------------------------------------------------------------
+        0.0 | 0.4940 0.4497 0.4157 0.3595 0.2775 0.1820 0.0536 0.0000
+       50.0 | 0.4940 0.4497 0.4157 0.3595 0.2775 0.1820 0.0536 0.0000
+       50.0 | 0.4940 0.4497 0.4157 0.3595 0.2775 0.1820 0.0536 0.0000
+      150.0 | 0.4940 0.4497 0.4157 0.3595 0.2775 0.1820 0.0536 0.0000
+      250.0 | 0.4830 0.4477 0.4205 0.3748 0.3062 0.2200 0.0669 0.0000
+      350.0 | 0.4790 0.4358 0.4039 0.3540 0.2993 0.2470 0.0780 0.0000
+      550.0 | 0.4790 0.4358 0.4039 0.3540 0.2993 0.2470 0.0780 0.0000
+      650.0 | 0.4790 0.4358 0.4039 0.3540 0.2993 0.2470 0.0780 0.0000
+      850.0 | 0.4790 0.4358 0.4039 0.3540 0.2993 0.2470 0.0780 0.0000
+      950.0 | 0.4530 0.4239 0.4007 0.3606 0.2926 0.2000 0.0599 0.0000
+     1150.0 | 0.4530 0.4239 0.4007 0.3606 0.2926 0.2000 0.0599 0.0000
+     1250.0 | 0.4530 0.4239 0.4007 0.3606 0.2926 0.2000 0.0599 0.0000
+     1750.0 | 0.3700 0.3673 0.3626 0.3484 0.2959 0.2000 0.0599 0.0000
+     1850.0 | 0.3630 0.3608 0.3569 0.3451 0.2981 0.2000 0.0599 0.0000
+     2350.0 | 0.3570 0.3552 0.3520 0.3423 0.2999 0.2000 0.0599 0.0000
+     2650.0 | 0.3520 0.3505 0.3479 0.3399 0.3014 0.2000 0.0599 0.0000
+     2950.0 | 0.3480 0.3467 0.3446 0.3380 0.3026 0.2000 0.0599 0.0000
+     3250.0 | 0.3440 0.3430 0.3413 0.3361 0.3038 0.2000 0.0599 0.0000
+     3550.0 | 0.3430 0.3421 0.3405 0.3356 0.3041 0.2000 0.0599 0.0000
+     4000.0 | 0.3430 0.3421 0.3405 0.3356 0.3041 0.2000 0.0599 0.0000
+     --------------------------------------------------------------------
+     
+     
+                        Soil Hydraulic Conductivity
+                        ---------------------------
+     
+     -----------------------------------------------------------------------
+                              Soil Water Potential (cm)
+         x       0        10       25       100     1000    15000     10^6
+     -----------------------------------------------------------------------
+        0.0 | 491.     99.8     26.4     2.25     .280E-01 .221E-04 .220E-13
+       50.0 | 491.     99.8     26.4     2.25     .280E-01 .221E-04 .220E-13
+       50.0 | 491.     99.8     26.4     2.25     .280E-01 .221E-04 .220E-13
+      150.0 | 491.     99.8     26.4     2.25     .280E-01 .221E-04 .220E-13
+      250.0 | 422.     86.9     23.4     2.13     .316E-01 .319E-04 .525E-15
+      350.0 | .120E+06 .558E+04 470.     6.43     .277E-01 .536E-04 .287E-20
+      550.0 | .120E+06 .558E+04 470.     6.43     .277E-01 .536E-04 .287E-20
+      650.0 | .120E+06 .558E+04 470.     6.43     .277E-01 .536E-04 .287E-20
+      850.0 | .120E+06 .558E+04 470.     6.43     .277E-01 .536E-04 .287E-20
+      950.0 | 118.     34.1     11.9     1.66     .331E-01 .267E-04 .420E-14
+     1150.0 | 118.     34.1     11.9     1.66     .331E-01 .267E-04 .420E-14
+     1250.0 | 118.     34.1     11.9     1.66     .331E-01 .267E-04 .420E-14
+     1750.0 | 5.12     3.94     2.61     .948     .409E-01 .267E-04 .420E-14
+     1850.0 | 2.65     2.22     1.66     .771     .468E-01 .267E-04 .420E-14
+     2350.0 | 1.37     1.25     1.05     .625     .556E-01 .411E-02 .860E-02
+     2650.0 | 1.05     .971     .843     .547     .576E-01 .267E-04 .420E-14
+     2950.0 | .850     .794     .706     .492     .621E-01 .267E-04 .420E-14
+     3250.0 | .440     .417     .380     .285     .430E-01 .172E-04 .270E-14
+     3550.0 | .319     .303     .278     .212     .335E-01 .131E-04 .206E-14
+     4000.0 | .319     .303     .278     .212     .335E-01 .131E-04 .206E-14
+     -----------------------------------------------------------------------
+     
+     
+          bottom boundary condition = specified gradient (     0.000)
+          vapour conductivity       = on
+          Evaporation Source        = calc
+     
+
+------- paddock.SoilTemperature Initialisation --------------------------------
+     Initialising :
+
+------- paddock.SurfaceOrganicMatter Initialisation ---------------------------
+     
+         - Reading constants
+     
+         - Reading parameters
+     
+     
+     
+                         Initial Surface Organic Matter Data
+         ----------------------------------------------------------------------
+            Name   Type        Dry matter   C        N        P    Cover  Standing_fr
+                                (kg/ha)  (kg/ha)  (kg/ha)  (kg/ha) (0-1)     (0-1)
+         ----------------------------------------------------------------------
+          soybean   soybean       2000.0   800.0    17.8     0.0   0.330     0.0
+         ----------------------------------------------------------------------
+     
+                      Effective Cover from Surface Materials =   0.3
+     
+
+------- paddock.McNaySoil Nitrogen Initialisation -----------------------------
+     
+        - Reading Parameters
+     
+        - Reading Constants
+     Using standard soil mineralisation for soil type Primghar
+     
+     
+     
+           Soil temperature supplied externally
+     
+     
+     
+                      Soil Profile Properties
+          ------------------------------------------------
+           Layer    pH    OC     NO3     NH4    Urea
+                         (%) (kg/ha) (kg/ha) (kg/ha)
+          ------------------------------------------------
+             1     6.50  2.55    2.30    1.25    0.00
+             2     6.50  2.55    2.30    1.25    0.00
+             3     6.50  2.55    4.38    2.50    0.00
+             4     6.55  2.26    3.75    5.00    0.00
+             5     6.60  1.97    3.75    5.00    0.00
+             6     6.65  1.98    4.05    8.10    0.00
+             7     6.65  1.98    4.05    8.10    0.00
+             8     6.45  1.41    4.14    6.00    0.00
+             9     6.45  1.41    4.14    3.73    0.00
+            10     6.80  1.36    2.00    3.05    0.00
+            11     6.80  1.36    1.00    1.96    0.00
+            12     6.80  1.18    1.20    0.10    0.00
+            13     6.80  1.18    0.40    1.04    0.00
+            14     6.90  1.04    0.20    0.00    0.00
+            15     6.90  1.04    0.00    0.00    0.00
+            16     6.80  0.50    0.40    1.04    0.00
+            17     6.80  0.10    0.40    1.04    0.00
+            18     6.80  0.10    0.40    1.04    0.00
+            19     6.90  0.10    0.20    0.00    0.00
+            20     6.90  0.10    0.00    0.00    0.00
+          ------------------------------------------------
+           Totals               39.06   50.18    0.00
+          ------------------------------------------------
+     
+     
+     
+     
+     
+     
+                  Initial Soil Organic Matter Status
+          ---------------------------------------------------------
+           Layer      Hum-C   Hum-N  Biom-C  Biom-N   FOM-C   FOM-N
+                    (kg/ha) (kg/ha) (kg/ha) (kg/ha) (kg/ha) (kg/ha)
+          ---------------------------------------------------------
+             1       7070.6   589.2   895.1   111.9    93.4     3.1
+             2       7208.6   600.7   757.0    94.6    91.6     3.1
+             3      14920.5  1243.4  1010.7   126.3    88.3     3.0
+             4      27219.6  2268.3  1017.9   127.2    81.9     2.8
+             5      24283.7  2023.6   316.3    39.5    76.0     2.6
+             6      39866.1  3322.2   289.6    36.2    67.9     2.3
+             7      40154.5  3346.2     1.2     0.2    60.7     2.0
+             8      29124.2  2427.0     0.7     0.1    54.2     1.8
+             9      29124.2  2427.0     0.7     0.1    48.4     1.6
+            10      29579.4  2465.0     0.6     0.1    43.3     1.5
+            11      29579.5  2465.0     0.5     0.1    38.7     1.3
+            12      51329.2  4277.4     0.8     0.1    30.9     1.0
+            13      51329.3  4277.4     0.7     0.1    24.7     0.8
+            14      45282.9  3773.6     0.6     0.1    19.7     0.7
+            15      60377.3  5031.4     0.7     0.1    14.6     0.5
+            16      21749.8  1812.5     0.2     0.0    11.7     0.4
+            17       4350.0   362.5     0.0     0.0     9.3     0.3
+            18       4350.0   362.5     0.0     0.0     7.4     0.3
+            19       4350.0   362.5     0.0     0.0     5.9     0.2
+            20       4350.0   362.5     0.0     0.0     4.7     0.2
+          ---------------------------------------------------------
+           Totals  525599.3 43799.9  4293.5   536.7   873.2    29.4
+          ---------------------------------------------------------
+
+------- paddock.maize Initialisation ------------------------------------------
+      Initialising, V1.0 2000.01.21
+     
+         - Reading constants
+     
+         - Reading constants
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Using default root parameters for maize
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+
+------- InitialiseWaterTable Initialisation -----------------------------------
+------- Start of simulation  --------------------------------------------------
+1 January 2008(Day of year=1), paddock.SWIM: 
+     Bottom boundary condition now constant potential
+1 January 2008(Day of year=1): 
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Uninitialised variable "annualrain".
+     Variables should have a value before they are used in an expression.
+     Component name: paddock.WT_script
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+1 January 2008(Day of year=1), paddock.WT_script: 
+     Manager creating a new local real variable : annualrain = 0.00000
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Uninitialised variable "annualeo".
+     Variables should have a value before they are used in an expression.
+     Component name: paddock.WT_script
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     Manager creating a new local real variable : annualeo = 0.00000
+     Manager creating a new local real variable : rainsurplus = 0.00000
+1 January 2008(Day of year=1), paddock.N Deposition: 
+     Manager creating a new local real variable : n_deposition = 0.00991
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Uninitialised variable "n_deposition_tot".
+     Variables should have a value before they are used in an expression.
+     Component name: paddock.N Deposition
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     Manager creating a new local real variable : n_deposition_tot = 0.00000
+     Manager sending message :- fertiliser apply  amount = 0.00991 (kg/ha), depth = 0 (mm), type = no3_n
+1 January 2008(Day of year=1), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:       12.5000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:       35.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:       65.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:       95.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:      130.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:      165.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:      195.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:      225.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:      255.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                      APSIM Warning Error
+                      -------------------
+     Value of variable is out of bounds.
+     Variable: psi
+     Value:      300.0000000
+     Bounds: -10000000000.0000000 to        0.0000000
+     Component name: paddock.SWIM
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
+     
+9 January 2008(Day of year=9), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01388 (kg/ha), depth = 0 (mm), type = no3_n
+9 January 2008(Day of year=9), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+11 January 2008(Day of year=11), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.09906 (kg/ha), depth = 0 (mm), type = no3_n
+11 January 2008(Day of year=11), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.10 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+17 January 2008(Day of year=17), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04555 (kg/ha), depth = 0 (mm), type = no3_n
+17 January 2008(Day of year=17), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+22 January 2008(Day of year=22), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00593 (kg/ha), depth = 0 (mm), type = no3_n
+22 January 2008(Day of year=22), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 January 2008(Day of year=24), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00195 (kg/ha), depth = 0 (mm), type = no3_n
+24 January 2008(Day of year=24), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+29 January 2008(Day of year=29), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00195 (kg/ha), depth = 0 (mm), type = no3_n
+29 January 2008(Day of year=29), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+30 January 2008(Day of year=30), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00398 (kg/ha), depth = 0 (mm), type = no3_n
+30 January 2008(Day of year=30), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+4 February 2008(Day of year=35), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06934 (kg/ha), depth = 0 (mm), type = no3_n
+4 February 2008(Day of year=35), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.07 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+6 February 2008(Day of year=37), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.12683 (kg/ha), depth = 0 (mm), type = no3_n
+6 February 2008(Day of year=37), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.13 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+7 February 2008(Day of year=38), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01981 (kg/ha), depth = 0 (mm), type = no3_n
+7 February 2008(Day of year=38), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 February 2008(Day of year=43), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00398 (kg/ha), depth = 0 (mm), type = no3_n
+12 February 2008(Day of year=43), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+17 February 2008(Day of year=48), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.10304 (kg/ha), depth = 0 (mm), type = no3_n
+17 February 2008(Day of year=48), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.10 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+18 February 2008(Day of year=49), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06934 (kg/ha), depth = 0 (mm), type = no3_n
+18 February 2008(Day of year=49), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.07 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+26 February 2008(Day of year=57), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05546 (kg/ha), depth = 0 (mm), type = no3_n
+26 February 2008(Day of year=57), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.06 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+29 February 2008(Day of year=60), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01186 (kg/ha), depth = 0 (mm), type = no3_n
+29 February 2008(Day of year=60), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+3 March 2008(Day of year=63), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.11294 (kg/ha), depth = 0 (mm), type = no3_n
+3 March 2008(Day of year=63), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.11 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+15 March 2008(Day of year=75), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02176 (kg/ha), depth = 0 (mm), type = no3_n
+15 March 2008(Day of year=75), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+18 March 2008(Day of year=78), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04555 (kg/ha), depth = 0 (mm), type = no3_n
+18 March 2008(Day of year=78), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+23 March 2008(Day of year=83), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00398 (kg/ha), depth = 0 (mm), type = no3_n
+23 March 2008(Day of year=83), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+28 March 2008(Day of year=88), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02972 (kg/ha), depth = 0 (mm), type = no3_n
+28 March 2008(Day of year=88), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.03 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+31 March 2008(Day of year=91), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04360 (kg/ha), depth = 0 (mm), type = no3_n
+31 March 2008(Day of year=91), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.04 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+3 April 2008(Day of year=94), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04953 (kg/ha), depth = 0 (mm), type = no3_n
+3 April 2008(Day of year=94), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+7 April 2008(Day of year=98), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+7 April 2008(Day of year=98), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+8 April 2008(Day of year=99), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.14265 (kg/ha), depth = 0 (mm), type = no3_n
+8 April 2008(Day of year=99), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.14 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+9 April 2008(Day of year=100), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+9 April 2008(Day of year=100), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+10 April 2008(Day of year=101), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.20803 (kg/ha), depth = 0 (mm), type = no3_n
+10 April 2008(Day of year=101), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.21 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+11 April 2008(Day of year=102), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01585 (kg/ha), depth = 0 (mm), type = no3_n
+11 April 2008(Day of year=102), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 April 2008(Day of year=103), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+12 April 2008(Day of year=103), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+15 April 2008(Day of year=106), paddock.Sow on a fixed date: 
+     Manager sending message :- maize sow  plants = 0, sowing_depth = 50, cultivar = b_110, row_spacing = 500, crop_class = plant
+15 April 2008(Day of year=106), paddock.maize: 
+     Sowing initiate
+     
+     
+     
+                      Crop Sowing Data
+         -------------------------------------------------------
+         Sowing   Depth  Plants Spacing Skiprow Cultivar    FTN
+         Day no    mm      m^2    m      code     name       no
+         -------------------------------------------------------
+            106   50.0    0.0    0.5    0.0   b_110         0.00
+         -------------------------------------------------------
+     
+        - Reading root profile parameters
+     Module is using water uptake provided from Swim3
+     
+     
+     
+     
+                         Root Profile
+         ------------------------------------------------
+           Layer      Kl      Lower Exploration
+           Depth              limit   Factor
+           (mm)       ()     (mm/mm)    ()
+         ------------------------------------------------
+           25.000    0.080    0.182    1.000
+           25.000    0.080    0.182    1.000
+           50.000    0.080    0.182    1.000
+          100.000    0.080    0.182    1.000
+          100.000    0.080    0.220    1.000
+          150.000    0.080    0.267    0.700
+          150.000    0.080    0.273    0.700
+          150.000    0.080    0.280    0.700
+          150.000    0.080    0.285    0.700
+          150.000    0.080    0.275    0.700
+          150.000    0.080    0.283    0.900
+          300.000    0.040    0.293    0.900
+          300.000    0.040    0.304    0.900
+          300.000    0.030    0.315    0.400
+          400.000    0.020    0.317    0.000
+          300.000    0.020    0.317    0.000
+          300.000    0.010    0.317    0.000
+          300.000    0.010    0.317    0.000
+          300.000    0.000    0.317    0.000
+          300.000    0.000    0.317    0.000
+          ------------------------------------------------
+     
+            Crop factor for bounding water use is set to  100.0  times eo.
+     
+     
+     
+     
+        - Reading Cultivar Parameters
+         ------------------------------------------------
+         Cultivar                 = b_110
+         est_days_endjuv_to_init  =      20
+         tt_emerg_to_endjuv       =  214.00
+         tt_flower_to_maturity    =  885.00
+         head_grain_no_max        =  800.00
+         grain_gth_rate           =    9.17
+         tt_flag_to_flower        =    1.00
+         tt_flower_to_start_grain =  150.00
+         tt_maturity_to_ripe      =    1.00
+         x_stem_wt      =     0.0   80.0
+         y_height      =     0.0 2000.0
+         ------------------------------------------------
+     
+     
+     
+         kill. Standing above-ground dm =     0.0 (kg/ha)
+15 April 2008(Day of year=106), paddock.Harvest maize: 
+     Manager sending message :- maize harvest
+     
+     
+     
+     flowering (DAS) =    0                                maturity (DAS)  =       0
+      flowering day  =    0                                 stover (kg/ha) =       0.0
+      maturity day        =    0                            grain yield (kg/ha) =       0.0
+      grain % water content   =   15.5                      grain yield wet (kg/ha) =       0.0
+      grain wt (g) =     0.000                              grains/m^2   =     0.000
+      grains/head =   0.0                                   maximum lai = 0.000
+      total above ground biomass (kg/ha) =       0.0
+      live above ground biomass (kg/ha) =       0.0
+      green above ground biomass (kg/ha) =       0.0
+      senesced above ground biomass (kg/ha) =       0.0
+      dead above ground biomass (kg/ha) =       0.0
+      number of leaves =   0.0
+      grain N percent =      0.00                           total N content (kg/ha) =      0.00
+      grain N uptake (kg/ha) =      0.00                    senesced N content (kg/ha) =      0.00
+      green N content (kg/ha) =      0.00                   dead N content (kg/ha) =      0.00
+     
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence           to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile     to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation   to flag_leaf               0.000        0.000        0.000        0.000
+         flag_leaf           to flowering               0.000        0.000        0.000        0.000
+         flowering           to start_grain_fill        0.000        0.000        0.000        0.000
+         start_grain_fill    to end_grain_fill          0.000        0.000        0.000        0.000
+     
+     Crop harvested.
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                  0.00                    0.00
+                          N  (kg/ha) =                  0.00                    0.00
+     
+     Manager sending message :- maize end_crop
+         Crop ended. Yield (dw) =     0.0
+         Organic matter from crop:-      Tops to surface residue     Roots to soil FOM
+                          DM (kg/ha) =                  0.00                    0.00
+                          N  (kg/ha) =                  0.00                    0.00
+                          P  (kg/ha) =                  0.00                    0.00
+     
+17 April 2008(Day of year=108), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.18821 (kg/ha), depth = 0 (mm), type = no3_n
+17 April 2008(Day of year=108), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.19 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+18 April 2008(Day of year=109), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05349 (kg/ha), depth = 0 (mm), type = no3_n
+18 April 2008(Day of year=109), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+19 April 2008(Day of year=110), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+19 April 2008(Day of year=110), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+23 April 2008(Day of year=114), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04953 (kg/ha), depth = 0 (mm), type = no3_n
+23 April 2008(Day of year=114), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 April 2008(Day of year=115), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.03764 (kg/ha), depth = 0 (mm), type = no3_n
+24 April 2008(Day of year=115), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.04 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 April 2008(Day of year=115), paddock.Tillage21: 
+     Manager sending message :- surfaceorganicmatter tillage  type = user_defined, f_incorp = 0.25, tillage_depth = 50
+24 April 2008(Day of year=115), paddock.SurfaceOrganicMatter: 
+     Residue removed using user_defined
+                                             Fraction Incorporated =     0.25
+                                             Incorporated Depth    =    50.00
+     Manager creating a new local real variable : ready_to_till_pre_sow = 0.00000
+     Manager creating a new local real variable : till_day_pre_sow = 0.00000
+25 April 2008(Day of year=116), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.10698 (kg/ha), depth = 0 (mm), type = no3_n
+25 April 2008(Day of year=116), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.11 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+26 April 2008(Day of year=117), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+26 April 2008(Day of year=117), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+2 May 2008(Day of year=123), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.08321 (kg/ha), depth = 0 (mm), type = no3_n
+2 May 2008(Day of year=123), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.08 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+3 May 2008(Day of year=124), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00396 (kg/ha), depth = 0 (mm), type = no3_n
+3 May 2008(Day of year=124), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+6 May 2008(Day of year=127), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01981 (kg/ha), depth = 0 (mm), type = no3_n
+6 May 2008(Day of year=127), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+7 May 2008(Day of year=128), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.10104 (kg/ha), depth = 0 (mm), type = no3_n
+7 May 2008(Day of year=128), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.10 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+9 May 2008(Day of year=130), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.03368 (kg/ha), depth = 0 (mm), type = no3_n
+9 May 2008(Day of year=130), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.03 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+10 May 2008(Day of year=131), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.13868 (kg/ha), depth = 0 (mm), type = no3_n
+10 May 2008(Day of year=131), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.14 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+11 May 2008(Day of year=132), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00594 (kg/ha), depth = 0 (mm), type = no3_n
+11 May 2008(Day of year=132), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 May 2008(Day of year=133), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+12 May 2008(Day of year=133), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+22 May 2008(Day of year=143), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01981 (kg/ha), depth = 0 (mm), type = no3_n
+22 May 2008(Day of year=143), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+23 May 2008(Day of year=144), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06736 (kg/ha), depth = 0 (mm), type = no3_n
+23 May 2008(Day of year=144), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.07 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 May 2008(Day of year=145), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.19020 (kg/ha), depth = 0 (mm), type = no3_n
+24 May 2008(Day of year=145), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.19 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+25 May 2008(Day of year=146), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00991 (kg/ha), depth = 0 (mm), type = no3_n
+25 May 2008(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+27 May 2008(Day of year=148), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+27 May 2008(Day of year=148), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+30 May 2008(Day of year=151), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.17038 (kg/ha), depth = 0 (mm), type = no3_n
+30 May 2008(Day of year=151), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.17 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+1 June 2008(Day of year=153), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+1 June 2008(Day of year=153), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+3 June 2008(Day of year=155), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.18029 (kg/ha), depth = 0 (mm), type = no3_n
+3 June 2008(Day of year=155), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.18 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+5 June 2008(Day of year=157), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.40813 (kg/ha), depth = 0 (mm), type = no3_n
+5 June 2008(Day of year=157), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.41 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+6 June 2008(Day of year=158), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02576 (kg/ha), depth = 0 (mm), type = no3_n
+6 June 2008(Day of year=158), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.03 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+8 June 2008(Day of year=160), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.03566 (kg/ha), depth = 0 (mm), type = no3_n
+8 June 2008(Day of year=160), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.04 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+9 June 2008(Day of year=161), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00396 (kg/ha), depth = 0 (mm), type = no3_n
+9 June 2008(Day of year=161), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+11 June 2008(Day of year=163), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01585 (kg/ha), depth = 0 (mm), type = no3_n
+11 June 2008(Day of year=163), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 June 2008(Day of year=164), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.38435 (kg/ha), depth = 0 (mm), type = no3_n
+12 June 2008(Day of year=164), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.38 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+15 June 2008(Day of year=167), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04359 (kg/ha), depth = 0 (mm), type = no3_n
+15 June 2008(Day of year=167), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.04 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+18 June 2008(Day of year=170), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01189 (kg/ha), depth = 0 (mm), type = no3_n
+18 June 2008(Day of year=170), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+19 June 2008(Day of year=171), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.10698 (kg/ha), depth = 0 (mm), type = no3_n
+19 June 2008(Day of year=171), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.11 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+22 June 2008(Day of year=174), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00594 (kg/ha), depth = 0 (mm), type = no3_n
+22 June 2008(Day of year=174), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 June 2008(Day of year=176), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02576 (kg/ha), depth = 0 (mm), type = no3_n
+24 June 2008(Day of year=176), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.03 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+25 June 2008(Day of year=177), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.09510 (kg/ha), depth = 0 (mm), type = no3_n
+25 June 2008(Day of year=177), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.10 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+26 June 2008(Day of year=178), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.43586 (kg/ha), depth = 0 (mm), type = no3_n
+26 June 2008(Day of year=178), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.44 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+27 June 2008(Day of year=179), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+27 June 2008(Day of year=179), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+2 July 2008(Day of year=184), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05944 (kg/ha), depth = 0 (mm), type = no3_n
+2 July 2008(Day of year=184), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.06 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+6 July 2008(Day of year=188), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04953 (kg/ha), depth = 0 (mm), type = no3_n
+6 July 2008(Day of year=188), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+7 July 2008(Day of year=189), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.37841 (kg/ha), depth = 0 (mm), type = no3_n
+7 July 2008(Day of year=189), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.38 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+8 July 2008(Day of year=190), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01387 (kg/ha), depth = 0 (mm), type = no3_n
+8 July 2008(Day of year=190), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 July 2008(Day of year=194), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00594 (kg/ha), depth = 0 (mm), type = no3_n
+12 July 2008(Day of year=194), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+17 July 2008(Day of year=199), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.36454 (kg/ha), depth = 0 (mm), type = no3_n
+17 July 2008(Day of year=199), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.36 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+18 July 2008(Day of year=200), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.25756 (kg/ha), depth = 0 (mm), type = no3_n
+18 July 2008(Day of year=200), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.26 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+19 July 2008(Day of year=201), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04557 (kg/ha), depth = 0 (mm), type = no3_n
+19 July 2008(Day of year=201), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+21 July 2008(Day of year=203), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04359 (kg/ha), depth = 0 (mm), type = no3_n
+21 July 2008(Day of year=203), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.04 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 July 2008(Day of year=206), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.19416 (kg/ha), depth = 0 (mm), type = no3_n
+24 July 2008(Day of year=206), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.19 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+25 July 2008(Day of year=207), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.40218 (kg/ha), depth = 0 (mm), type = no3_n
+25 July 2008(Day of year=207), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.40 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+27 July 2008(Day of year=209), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.46162 (kg/ha), depth = 0 (mm), type = no3_n
+27 July 2008(Day of year=209), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.46 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+28 July 2008(Day of year=210), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.15453 (kg/ha), depth = 0 (mm), type = no3_n
+28 July 2008(Day of year=210), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.15 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 August 2008(Day of year=225), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05151 (kg/ha), depth = 0 (mm), type = no3_n
+12 August 2008(Day of year=225), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+13 August 2008(Day of year=226), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01585 (kg/ha), depth = 0 (mm), type = no3_n
+13 August 2008(Day of year=226), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+14 August 2008(Day of year=227), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02377 (kg/ha), depth = 0 (mm), type = no3_n
+14 August 2008(Day of year=227), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+15 August 2008(Day of year=228), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+15 August 2008(Day of year=228), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+21 August 2008(Day of year=234), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05151 (kg/ha), depth = 0 (mm), type = no3_n
+21 August 2008(Day of year=234), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+23 August 2008(Day of year=236), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00991 (kg/ha), depth = 0 (mm), type = no3_n
+23 August 2008(Day of year=236), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+27 August 2008(Day of year=240), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01189 (kg/ha), depth = 0 (mm), type = no3_n
+27 August 2008(Day of year=240), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+28 August 2008(Day of year=241), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01783 (kg/ha), depth = 0 (mm), type = no3_n
+28 August 2008(Day of year=241), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+2 September 2008(Day of year=246), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01189 (kg/ha), depth = 0 (mm), type = no3_n
+2 September 2008(Day of year=246), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+3 September 2008(Day of year=247), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01585 (kg/ha), depth = 0 (mm), type = no3_n
+3 September 2008(Day of year=247), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+4 September 2008(Day of year=248), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.10897 (kg/ha), depth = 0 (mm), type = no3_n
+4 September 2008(Day of year=248), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.11 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+7 September 2008(Day of year=251), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+7 September 2008(Day of year=251), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+8 September 2008(Day of year=252), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.21001 (kg/ha), depth = 0 (mm), type = no3_n
+8 September 2008(Day of year=252), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.21 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+10 September 2008(Day of year=254), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02774 (kg/ha), depth = 0 (mm), type = no3_n
+10 September 2008(Day of year=254), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.03 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 September 2008(Day of year=256), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.86182 (kg/ha), depth = 0 (mm), type = no3_n
+12 September 2008(Day of year=256), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.86 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+13 September 2008(Day of year=257), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05349 (kg/ha), depth = 0 (mm), type = no3_n
+13 September 2008(Day of year=257), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 September 2008(Day of year=268), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.07529 (kg/ha), depth = 0 (mm), type = no3_n
+24 September 2008(Day of year=268), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.08 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+25 September 2008(Day of year=269), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+25 September 2008(Day of year=269), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+29 September 2008(Day of year=273), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06142 (kg/ha), depth = 0 (mm), type = no3_n
+29 September 2008(Day of year=273), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.06 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+6 October 2008(Day of year=280), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.31501 (kg/ha), depth = 0 (mm), type = no3_n
+6 October 2008(Day of year=280), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.32 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+7 October 2008(Day of year=281), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.09371 (kg/ha), depth = 0 (mm), type = no3_n
+7 October 2008(Day of year=281), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.09 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+13 October 2008(Day of year=287), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06538 (kg/ha), depth = 0 (mm), type = no3_n
+13 October 2008(Day of year=287), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.07 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+15 October 2008(Day of year=289), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.07925 (kg/ha), depth = 0 (mm), type = no3_n
+15 October 2008(Day of year=289), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.08 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+16 October 2008(Day of year=290), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00198 (kg/ha), depth = 0 (mm), type = no3_n
+16 October 2008(Day of year=290), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+17 October 2008(Day of year=291), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01189 (kg/ha), depth = 0 (mm), type = no3_n
+17 October 2008(Day of year=291), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+21 October 2008(Day of year=295), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04953 (kg/ha), depth = 0 (mm), type = no3_n
+21 October 2008(Day of year=295), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+22 October 2008(Day of year=296), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.18227 (kg/ha), depth = 0 (mm), type = no3_n
+22 October 2008(Day of year=296), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.18 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+23 October 2008(Day of year=297), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.05191 (kg/ha), depth = 0 (mm), type = no3_n
+23 October 2008(Day of year=297), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 October 2008(Day of year=298), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.03903 (kg/ha), depth = 0 (mm), type = no3_n
+24 October 2008(Day of year=298), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.04 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+5 November 2008(Day of year=310), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06796 (kg/ha), depth = 0 (mm), type = no3_n
+5 November 2008(Day of year=310), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.07 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+6 November 2008(Day of year=311), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06043 (kg/ha), depth = 0 (mm), type = no3_n
+6 November 2008(Day of year=311), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.06 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+1 December 2008(Day of year=336), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.01786 (kg/ha), depth = 0 (mm), type = no3_n
+1 December 2008(Day of year=336), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+4 December 2008(Day of year=339), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00991 (kg/ha), depth = 0 (mm), type = no3_n
+4 December 2008(Day of year=339), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.01 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+9 December 2008(Day of year=344), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.06341 (kg/ha), depth = 0 (mm), type = no3_n
+9 December 2008(Day of year=344), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.06 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+10 December 2008(Day of year=345), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00195 (kg/ha), depth = 0 (mm), type = no3_n
+10 December 2008(Day of year=345), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+12 December 2008(Day of year=347), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00195 (kg/ha), depth = 0 (mm), type = no3_n
+12 December 2008(Day of year=347), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+17 December 2008(Day of year=352), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02379 (kg/ha), depth = 0 (mm), type = no3_n
+17 December 2008(Day of year=352), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+19 December 2008(Day of year=354), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.14859 (kg/ha), depth = 0 (mm), type = no3_n
+19 December 2008(Day of year=354), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.15 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+23 December 2008(Day of year=358), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.02379 (kg/ha), depth = 0 (mm), type = no3_n
+23 December 2008(Day of year=358), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.02 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+24 December 2008(Day of year=359), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00398 (kg/ha), depth = 0 (mm), type = no3_n
+24 December 2008(Day of year=359), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+25 December 2008(Day of year=360), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.00195 (kg/ha), depth = 0 (mm), type = no3_n
+25 December 2008(Day of year=360), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.00 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+27 December 2008(Day of year=362), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.15054 (kg/ha), depth = 0 (mm), type = no3_n
+27 December 2008(Day of year=362), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.15 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+28 December 2008(Day of year=363), paddock.N Deposition: 
+     Manager sending message :- fertiliser apply  amount = 0.04758 (kg/ha), depth = 0 (mm), type = no3_n
+28 December 2008(Day of year=363), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+         0.05 of N as nitrate (no3_n)
+                                         added at depth    0.00 (layer   1)
+31 December 2008(Day of year=366), clock: 
+     Simulation is terminating due to end criteria being met.
+

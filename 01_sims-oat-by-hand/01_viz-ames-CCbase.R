@@ -9,6 +9,7 @@
 # notes: keep apsim sims in box, all r code in github
 # last edited:   3/31/2020 (I was confused...)
 #                11/23/2020 cleaning, added rfv50% (oat22)
+#                1/11/2021 moved sims to github, much easier
 
 rm(list = ls())
 library(saapsim) #--has some functions
@@ -20,22 +21,31 @@ library(janitor)
 # read in output from read-in-sim-res code --------------------------------
 
 #--oats
-oat_key <- 
-  read_csv("../../..//Box/Gina_APSIM_modeling/sims-explore-by-hand/sims-ames-CCbase/data-raw/oat-key-ames-CCbase.csv") %>%  
+oat_key <-
+  read_csv("01_sims-oat-by-hand/sims-ames-CCbase/data-raw/oat-key-ames-CCbase.csv") %>%  
   separate_rows(category, sep = ",") %>% 
   remove_empty("rows") %>% 
   remove_empty("cols") 
 
 #--comes from 01_read-in-sim-res
 apall <- 
-  read_csv("01_sims-oat-by-hand/sims_apsim-hand-oat-raw.csv") 
+  read_csv("01_sims-oat-by-hand/sims-ames-CCbase/dat-ames-CCbase-raw.csv") 
 
+
+
+# emergence doy -----------------------------------------------------------
+
+apedoy <- 
+  apall %>% 
+  select(rot, Nrate, apsim_oat, year, emerg_doy)
+
+
+# yields ------------------------------------------------------------------
 
 apraw <- 
   apall %>% 
-  select(file, year, corn_buac) %>%
+  select(rot, Nrate, apsim_oat, year, corn_buac) %>%
   mutate(yield_kgha = saf_buac_to_kgha_corn(corn_buac))
-
 
 
 #--apsim cc yields
@@ -105,22 +115,6 @@ gaps <-
   bind_rows(agap) %>% 
   bind_rows(agap_notweaks) %>% 
   left_join(oat_key) 
-
-
-#--what is that one year? 2000. Huh. 
-
-gaps %>% 
-  filter(!category %in% c("2 factor")) %>% 
-  ggplot(aes(reorder(oat_what, gap_kgha), gap_kgha)) + 
-  geom_boxplot(aes(color = oat_what %in% c("exp gap", "current apsim gap"))) +
-  geom_point(aes(pch = year == 2000, size = year == 2000)) + 
-  coord_flip() + 
-  guides(color = F) +
-  labs(title = "ames") + 
-  facet_grid(category~., scales = "free")
-
-ewgap
-
 
 
 gaps_filt <- 
@@ -296,3 +290,34 @@ fac1 + fac2 #+ fac3
 ggsave("01_sims-oat-by-hand/fig_gaps-windmill.png")
 
 
+
+# look at emergence doy ---------------------------------------------------
+
+ggplot() + 
+  geom_point(data = apedoy %>% filter(apsim_oat == "base"),
+             aes(x = year, y = emerg_doy)) + 
+  geom_point(data = apedoy %>% filter(apsim_oat != "base"),
+             aes(x = year, y = emerg_doy, color = apsim_oat))
+
+
+oat_key
+
+#--why would there ever be a 
+ap_emdelay <- 
+  apedoy %>% 
+  filter(apsim_oat == "oat2", 
+         rot == "CC") %>% 
+  left_join(
+    apedoy %>% 
+      filter(apsim_oat == "base",
+             rot == "CC") %>% 
+      rename("emerg_doy_base" = emerg_doy) %>% 
+      select(-apsim_oat)
+  ) %>% 
+  mutate(delay_days = emerg_doy - emerg_doy_base) 
+
+
+#--2-5 day delay over the 15 year period
+ap_emdelay %>% 
+  ggplot(aes(x = year, y = delay_days)) + 
+  geom_line()
