@@ -106,14 +106,6 @@ tav_sc1 %>%
 
 ###add gap info----
 
-ilia_gaps <- 
-  ilia_yields %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(gap_kgha = sc - cc,
-         gap_pct = gap_kgha/sc)
-
 #--size by gap
 ilia_gaps %>% 
   left_join(tav_sc1) %>% 
@@ -328,3 +320,16 @@ pcp_ann1 %>%
   ggplot(aes(pcp_mm, prep2wk_precip_mm_tot)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = F)
+
+
+
+# planting date by gap ----------------------------------------------------
+
+ia_planting %>% 
+  bind_rows(il_planting) %>% 
+  left_join(ilia_gaps) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  ggplot(aes(plant_doy, gap_kgha)) + 
+  geom_point(aes(color = site)) + 
+  geom_smooth(aes(color = site), method = "lm", se = F) + 
+  facet_grid(.~state)
