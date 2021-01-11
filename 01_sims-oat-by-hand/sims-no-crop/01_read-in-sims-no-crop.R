@@ -20,12 +20,24 @@ apraw <-
 
 apmin <- 
   apraw %>% 
-  select(path, year, dlt_n_min) %>% 
+  select(path, year, doy, dlt_n_min) %>% 
   separate(path, into = c("x1", "x2", "x3", "x4"), sep = "/") %>% 
   separate(x4, into = c("site", "x5"), sep = "-") %>% 
-  select(!starts_with("x")) %>% 
-  group_by(site, year) %>% 
-  summarise(n_min = sum(dlt_n_min, na.rm = T))
+  select(!starts_with("x")) 
 
-apmin %>% 
+apmin_annual <- 
+  apmin %>% 
+  group_by(site, year) %>% 
+  summarise(n_min_annual = sum(dlt_n_min, na.rm = T))
+
+apmin_grow <- 
+  apmin %>% 
+  left_join(ia_planting) %>% 
+  filter(doy > plant_doy) %>% 
+  filter(doy < saf_date_to_doy("2001-09-01")) %>% 
+  group_by(site, year) %>% 
+  summarise(n_min_grow = sum(dlt_n_min, na.rm = T))
+
+apmin_annual %>% 
+  left_join(apmin_grow) %>% 
   write_csv("01_sims-oat-by-hand/sims-no-crop/dat_no-crops.csv")
