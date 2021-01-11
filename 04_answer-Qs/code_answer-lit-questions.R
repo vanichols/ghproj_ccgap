@@ -244,163 +244,61 @@ all_nmin <-
 
 ilia_gaps %>% 
   left_join(all_nmin) %>% 
-  filter(!is.na(n_min)) %>% #--only Iowa right now
-  ggplot(aes(n_min, gap_kgha)) + 
-  geom_point()
+  filter(!is.na(n_min_annual)) %>% #--only Iowa right now
+  filter(gap_kgha > -1000) %>% 
+  pivot_longer(n_min_annual:n_min_grow) %>% 
+  ggplot(aes(value, gap_kgha)) + 
+  geom_point(aes(color = name), size = 3) + 
+  geom_smooth(method = "lm", se = F, aes(color = name)) +
+  labs(title = "N mineralization versus gap, Iowa")
 
+ggsave("04_answer-Qs/fig_4-gap-vs-nmin.png")
 
-# across sites -------------------------------------------------
+# 5. residue vs gap -------------------------------------------------------
+#--comes from Box simulations
 
+ap_res <- 
+  read_csv("../../../Box/Gina_APSIM_modeling/apsim2/data-apsim-outs/02_wrangle-apsim-output/02_all-sites-noscripts.csv") 
 
-pcp_ann2 <- 
-  pcp_ann %>% 
-  mutate(pcp_sc = scale_this(pcp_mm))
-
-tav_ann2 <- 
-  tav_ann %>% 
-  mutate(tav_sc = scale_this(tav_c))
-
-ilia_gaps %>% 
-  left_join(tav_ann2) %>% 
-  left_join(pcp_ann2) %>% 
+ap_res %>% 
+  separate(outfile, into = c("x1", "rot", "x3")) %>% 
+  filter(rot == "CC") %>% 
+  select(set_id, site, year, corn_buac, ResidueWTatSowing) %>% 
+  left_join(ilia_gaps) %>% 
   filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(pcp_sc, tav_sc)) + 
-  geom_point(aes(fill = gap_kgha), pch = 21, size = 4) + 
-  geom_hline(yintercept = 0) + 
-  geom_vline(xintercept = 0) + 
-  scale_fill_gradient2(low = "red", high = "darkblue", midpoint = 0) +
-  labs(title = "Scaled across sites",
-       x = "Annual Precipitation Total",
-       y = "Annual Mean Air Temperature")
-
-
-
-# with yield amt ----------------------------------------------------------
-
-ilia_gaps %>% 
-  left_join(tav_ann) %>% 
-  left_join(pcp_ann) %>% 
-  left_join(pcp_lt) %>% 
-  left_join(tav_lt) %>% 
-  mutate(pcp_cen = pcp_mm - pcp_lt,
-         tav_cen = tav_c - tav_lt) %>%
-  group_by(state, site) %>% 
-  group_modify(~{
-    .x %>% mutate(tav_sc = scale_this2(tav_cen),
-                  pcp_sc = scale_this2(pcp_cen))
-  }) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(pcp_sc, tav_sc)) + 
-  geom_point(aes(fill = gap_kgha, size = sc), 
-             pch = 21) + 
-  geom_hline(yintercept = 0) + 
-  geom_vline(xintercept = 0) + 
-  scale_fill_gradient2(low = "red", high = "darkblue", midpoint = 0) +
-  labs(title = "Scaled to 'long-term'* mean within site",
-       subtitle = "Iowa sites only have 17 years, Illinois has 40",
-       x = "Annual Precipitation Total",
-       y = "Annual Mean Air Temperature")
-
-
-#--dslo and dsup have the same weather...
-#--one doesn't necessarily have larger penalties than the other
-ilia_gaps %>% 
-  filter(site %in% c("dsup", "dslo")) %>%
-  select(site, year, gap_kgha) %>% 
-  pivot_wider(names_from = site, values_from = gap_kgha) %>% 
-  ggplot(aes(dslo, dsup)) + 
+  ggplot(aes(ResidueWTatSowing, gap_kgha)) + 
   geom_point() + 
-  geom_abline()
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_wrap(~site, scales = "free")
+
+ggsave("04_answer-Qs/fig_5-gap-vs-residue.png")
 
 
-# site-LTprecip vs gap ---------------------------------------------------------------
+# 6. gaps at 0 vs HN ------------------------------------------------------
 
-pcp_lt %>% 
-  left_join(ilia_gaps) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(reorder(site, pcp_lt), gap_kgha)) + 
-  geom_point(aes(size = pcp_lt), color = "red") + 
-  stat_summary(fun = "mean", geom = "point", size = 5, color = "black", pch  = 17) + 
-  labs(title = "Penalty by long-term site avg precip")
-
-
-pcp_lt %>% 
-  left_join(ilia_gaps) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(pcp_lt, gap_kgha)) + 
-  geom_point(aes(size = pcp_lt), color = "red") + 
-  stat_summary(fun = "mean", geom = "point", size = 5, color = "black", pch  = 17) + 
-  labs(title = "Penalty by long-term site avg precip",
-       x = "Avg annual precip (mm)",
-       y = "Penalty (kg/ha)")
-
-ggsave("00_exp-explore/fig_gap-vs-ltprecip.png")
-
-mod_pcplt <- 
-  lm(gap_kgha ~ pcp_lt, 
-   data = pcp_lt %>% 
-     left_join(ilia_gaps) %>% 
-     filter(!is.na(gap_kgha)))
-
-anova(mod_pcplt)     
-
-# dry years ---------------------------------------------------------------
-
-pcp_ann1 %>% 
-  left_join(ilia_gaps) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(pcp_mm, gap_kgha)) + 
-  geom_point(color = "red", size = 4) + 
-  geom_smooth(method = "lm", se = F) +
-  labs(title = "Penalty by site-year annual precip",
-       x = "Annual precip (mm)",
-       y = "Penalty (kg/ha)")
-
-anova(lm(gap_kgha ~ pcp_mm, data = pcp_ann1 %>% 
-     left_join(ilia_gaps) %>% 
-     filter(!is.na(gap_kgha))))
-
-
-# 2 wk wet years ---------------------------------------------------------------
-
-wea <- read_csv("01_create-features/1_dat_preds-wea.csv")
-
-wea %>% 
-  left_join(ilia_gaps) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(prep2wk_precip_mm_tot, gap_kgha)) + 
-  geom_point(color = "red", size = 4) + 
-  geom_smooth(method = "lm", se = F) +
-  labs(title = "Penalty by pre-plant 2 wk precip",
-       x = "Cumulative precip the two weeks before planting (mm)",
-       y = "Penalty (kg/ha)")
-
-
-anova(lm(gap_kgha ~ prep2wk_precip_mm_tot, 
-         data = 
-           wea %>% 
-           left_join(ilia_gaps) %>% 
-           filter(!is.na(gap_kgha))))
-
-
-#--are annual and 2wk correlated?
-pcp_ann1 %>% 
-  left_join(ilia_gaps) %>%
-  left_join(wea) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(pcp_mm, prep2wk_precip_mm_tot)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = F)
-
-
-
-# planting date by gap ----------------------------------------------------
-
-ia_planting %>% 
-  bind_rows(il_planting) %>% 
-  left_join(ilia_gaps) %>% 
-  filter(!is.na(gap_kgha)) %>% 
-  ggplot(aes(plant_doy, gap_kgha)) + 
+ilia_yields %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  group_by(site) %>% 
+  filter((nrate_kgha == 0 | nrate_kgha == max(nrate_kgha))) %>% 
+  mutate(nrate_F = ifelse(nrate_kgha == 0, "none", "high")) %>% 
+  select(-cc, -sc, -nrate_kgha) %>% 
+  pivot_wider(names_from = nrate_F, values_from = gap_kgha) %>% 
+  ggplot(aes(none, high)) + 
   geom_point(aes(color = site)) + 
-  geom_smooth(aes(color = site), method = "lm", se = F) + 
-  facet_grid(.~state)
+  geom_smooth(method = "lm", se = F, aes(color = site))
+
+ilia_yields %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  group_by(site) %>% 
+  filter((nrate_kgha == 0 | nrate_kgha == max(nrate_kgha))) %>% 
+  mutate(nrate_F = ifelse(nrate_kgha == 0, "none", "high")) %>% 
+  select(-cc, -sc, -nrate_kgha) %>% 
+  pivot_wider(names_from = nrate_F, values_from = gap_kgha) %>% 
+  ggplot(aes(none, high)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F, color = "red") + 
+  facet_wrap(~site, scales = "free")
+
+
