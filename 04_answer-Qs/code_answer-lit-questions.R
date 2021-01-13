@@ -12,6 +12,8 @@ library(tidysawyer2)
 library(tidyverse)
 library(saapsim)
 
+library(scales)
+
 theme_set(theme_bw())
 
 scale_this <- function(x){
@@ -54,30 +56,68 @@ tav_lt <-
 # 1. high yields mean lower gaps? --------------------------------------------
 
 
+
 ilia_gaps %>%
   left_join(ilia_yields %>%
               group_by(site) %>%
-              summarise(env_yield = mean(yield_kgha, na.rm = T))) %>% 
-  ggplot(aes(env_yield, gap_kgha)) + 
-  geom_point(aes(color = site)) + 
-  stat_summary(fun = "mean", geom = "point", size = 5, color = "black", pch  = 17) + 
-  geom_smooth(method = "lm", se = F, linetype = "dashed", color = "black") +
+              summarise(env_yield = mean(yield_kgha, na.rm = T))) %>%
+  ggplot(aes(env_yield, gap_kgha)) +
+  geom_point(aes(color = site)) +
+  stat_summary(
+    fun = "mean",
+    geom = "point",
+    size = 5,
+    color = "black",
+    pch  = 17
+  ) +
+  geom_smooth(
+    method = "lm",
+    se = F,
+    linetype = "dashed",
+    color = "black"
+  ) +
   labs(title = "Penalty by site's average yields",
        x = "Avg corn yield (kg/ha)",
        y = "Penalty (kg/ha)")
 
-  ggsave("04_answer-Qs/fig_1-gap-vs-envyld.png")
+ggsave("04_answer-Qs/fig_1-gap-vs-envyld.png")
 
+ilia_gaps %>%
+  left_join(ilia_yields %>%
+              group_by(site) %>%
+              summarise(env_yield = mean(yield_kgha, na.rm = T))) %>%
+  ggplot(aes(env_yield, gap_pct)) +
+  geom_point(aes(color = site)) +
+  stat_summary(
+    fun = "mean",
+    geom = "point",
+    size = 5,
+    color = "black",
+    pch  = 17
+  ) +
+  geom_smooth(
+    method = "lm",
+    se = F,
+    linetype = "dashed",
+    color = "black"
+  ) +
+  guides(color = F) +
+  labs(title = "Penalty at highest N rate",
+       subtitle = "by site's average yield",
+       x = "Avg corn yield (kg/ha)",
+       y = "Penalty (%)") +
+  scale_y_continuous(labels = label_percent())
 
-mod_envyld <- 
-  lm(gap_kgha ~ env_yield, data = ilia_gaps %>%
-     left_join(ilia_yields %>%
-                 group_by(site) %>%
-                 summarise(env_yield = mean(yield_kgha, na.rm = T))))
+ggsave("04_answer-Qs/fig_1-gap-pct-vs-envyld.png")
+
+mod_envyld <-
+  lm(gap_kgha ~ env_yield,
+     data = ilia_gaps %>%
+       left_join(ilia_yields %>%
+                   group_by(site) %>%
+                   summarise(env_yield = mean(yield_kgha, na.rm = T))))
 
 anova(mod_envyld)
-
-
 # 2. drier areas have higher gaps -----------------------------------------
 
 pcp_lt %>% 

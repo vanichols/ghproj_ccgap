@@ -194,7 +194,7 @@ fac1 <-
   ggplot(aes(year, gap_kgha)) + 
   geom_bar(aes(fill = oat_what),
                #alpha = oat_what %in% c("1_exp gap")),
-           position = "dodge", stat = "identity", color = "black") + 
+           position = "dodge", stat = "identity") +#, color = "black") + 
   facet_grid(oat_what~category) + 
   guides(fill = F, alpha = F) +
   coord_flip() + 
@@ -285,7 +285,7 @@ ggsave("01_sims-oat-by-hand/fig_gaps-5fac-windmill.png")
 
 
 library(patchwork)
-fac1 + fac2 #+ fac3 
+fac1 + fac4 #+ fac3 
 
 ggsave("01_sims-oat-by-hand/fig_gaps-windmill.png")
 
