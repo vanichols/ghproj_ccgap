@@ -43,6 +43,8 @@ dat
 
 #1. How to estimate the uncertainty around the DIFFERENCE of cc and sc
 # NOTE: THIS IS WRONG? Use https://link.springer.com/chapter/10.1007%2F978-94-011-7241-7_15
+# THis might be wrong. Wiating on miranda
+
 dat2 <-
   dat %>%
   expand_grid(., n = c(4, 8, 16)) %>% 
@@ -63,10 +65,6 @@ dat2 %>%
   facet_wrap(~site)
 
 #--what I actually want is 95% confidence intervals around the difference value...
-
-
-#2. What years were the differences 'real'? I can assess this visually or programmatically (does the 95 CI include 0). 
-
 dat_sig <- 
   dat2 %>% 
   mutate(gap_hi = gap_kgha + 1.96*gap_sd,
@@ -76,6 +74,14 @@ dat_sig <-
            TRUE ~ "sig")
   )
 
+#--write it to use in other places
+dat_sig %>% 
+  filter(n == 4) %>% 
+  select(site, year, gap_kgha, gap_sd, gap_hi, gap_lo, sig_ind) %>% 
+  write_csv("00_exp-variability/dat_gap-cis.csv")
+
+
+#2. What years were the differences 'real'? I can assess this visually or programmatically (does the 95 CI include 0). 
 
 dat_sig %>% 
   ggplot(aes(year, gap_kgha)) + 
@@ -88,11 +94,133 @@ dat_sig %>%
   labs(title = "Which years had sig diffs?") 
 
 
+#--reorder that fig
+library(tidytext)
+
 dat_sig %>% 
   filter(n == 4) %>% 
-  select(site, year, gap_kgha, gap_hi, gap_lo, sig_ind) %>% 
-  write_csv("00_exp-variability/dat_gap-cis.csv")
+  mutate(site = as.factor(site),
+         year = reorder_within(year, -gap_kgha, site)) %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_linerange(aes(ymin = gap_kgha - 1.96*gap_sd,
+                     ymax = gap_kgha + 1.96*gap_sd,
+                     color = sig_ind), size = 1.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~site, scales = "free") + 
+  scale_x_reordered() +
+  scale_color_manual(values = c("gray70", "red")) +
+  labs(title = "How confident are we in the yearly variation of the penalty?",
+       subtitle = "Best case, can only say it was 'high' or 'low'") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggsave("00_exp-variability/fig_uncertain-variability.png")
+
+
+#--fix y scale to compare across sites
+dat_sig %>% 
+  filter(n == 4) %>% 
+  mutate(site = as.factor(site),
+         year = reorder_within(year, -gap_kgha, site)) %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_linerange(aes(ymin = gap_kgha - 1.96*gap_sd,
+                     ymax = gap_kgha + 1.96*gap_sd,
+                     color = sig_ind), size = 1.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~site, scales = "free_x") + 
+  scale_x_reordered() +
+  scale_color_manual(values = c("gray70", "red")) +
+  labs(title = "Is site or year explaining more variation?",
+       subtitle = "Greater variation over years than by site") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave("00_exp-variability/fig_site-effect.png")
+
+
+
+dat_sig %>% 
+  unite(site, year, col = "sy") %>% 
+  select(sy) %>% 
+  distinct() %>% 
+  count()
+
+#--combine into one
+dat_sig %>% 
+  filter(n == 4) %>% 
+  unite(site, year, col = "site_year") %>% 
+  ggplot(aes(reorder(site_year, -gap_kgha), gap_kgha)) + 
+  geom_linerange(aes(ymin = gap_kgha - 1.96*gap_sd,
+                     ymax = gap_kgha + 1.96*gap_sd,
+                     color = sig_ind), size = 1.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values = c("gray80", "red")) +
+  labs(title = "Continuous corn penalty",
+       subtitle = "104 site years",
+       x = NULL, 
+       y = "95%CI yield penalty (kg/ha)") + 
+  theme(axis.text.x = element_blank())
+
+ggsave("00_exp-variability/fig_iowa-penalty.png")
+
+#--express as a percent
+dat_sig %>% 
+  filter(n == 4) %>% 
+  left_join(ylds) %>% 
+  mutate(yld_cc = (cc),
+         gap_p = gap_kgha/yld_cc,
+         gap_sdp = gap_sd/yld_cc,
+         gap_hip = gap_hi/yld_cc,
+         gap_lop = gap_lo/yld_cc) %>%
+  unite(site, year, col = "site_year") %>% 
+  ggplot(aes(reorder(site_year, -gap_p), gap_p)) + 
+  geom_point(aes(color = sig_ind, size = yld_cc)) +
+  # geom_linerange(aes(ymin = gap_lop,
+  #                    ymax = gap_hip,
+  #                    color = sig_ind), size = 1.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values = c("gray80", "red")) +
+  labs(title = "Continuous corn penalty",
+       subtitle = "104 site years",
+       x = NULL, 
+       y = "95%CI yield penalty (percent)") + 
+  theme(axis.text.x = element_blank())
+
+#ggsave("00_exp-variability/fig_iowa-penalty.png")
+
+
+#--weight line by avg yield
+
+dat_sig %>% 
+  filter(n == 4) %>% 
+  left_join(ylds) %>% 
+  mutate(yld_avg = (cc + sc)/2) %>% 
+  unite(site, year, col = "site_year") %>% 
+  ggplot(aes(reorder(site_year, -gap_kgha), gap_kgha)) + 
+  geom_linerange(aes(ymin = gap_kgha - 1.96*gap_sd,
+                     ymax = gap_kgha + 1.96*gap_sd,
+                     color = yld_avg)) +
+#  geom_point(aes(y = gap_kgha, size = yld_avg)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_grafify_c() +
+  labs(title = "Continuous corn penalty",
+       subtitle = "104 site years",
+       x = NULL, 
+       y = "95%CI yield penalty (kg/ha)") + 
+  theme(axis.text.x = element_blank())
+
+dat_sig %>% 
+  filter(n == 4) %>% 
+  left_join(ylds) %>% 
+  mutate(yld_avg = (cc + sc)/2) %>% 
+  unite(site, year, col = "site_year") %>% 
+  ggplot(aes(yld_avg, gap_kgha)) + 
+  geom_linerange(aes(ymin = gap_kgha - 1.96*gap_sd,
+                     ymax = gap_kgha + 1.96*gap_sd, 
+                     color = sig_ind), size = 0.9) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_color_manual(values = c("gray70", "red")) +
+  labs(title = "Penalty not strongly related to size of yield")
+
+ggsave("00_exp-variability/fig_yld-vs-pensize.png")
 
 # power analysis ----------------------------------------------------------
 

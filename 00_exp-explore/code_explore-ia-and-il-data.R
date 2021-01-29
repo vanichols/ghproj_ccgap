@@ -13,24 +13,15 @@ library(tidyverse)
 
 # data --------------------------------------------------------------------
 
-
-ia_gap <- saw_cgap %>% mutate(state = "IA") %>% filter(year > 2000, cgap_max > -1000)
-il_gap <- il_cgap %>% mutate(state = "IL")
-
-cgap <- bind_rows(ia_gap, il_gap)
-
-
-ia_ylds <- saw_tidysawyer %>% mutate(state = "IA") %>% select(-sd_kgha, -nreps) %>% filter(year > 2000)
-il_ylds <- il_yields %>% mutate(state = "IL")
-
-ylds <- bind_rows(ia_ylds, il_ylds)
+cgap <- ilia_gaps %>% filter(year > 2000, gap_kgha > -1000)
+ylds <- ilia_yields %>% filter(year > 2000)
 
 
 # look at things ----------------------------------------------------------
 
 
 cgap %>% 
-  ggplot(aes(year, cgap_max)) + 
+  ggplot(aes(year, gap_kgha)) + 
   geom_point() +
   geom_smooth(method = "lm", se = F) +
   geom_hline(yintercept = 0) +
