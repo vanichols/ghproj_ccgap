@@ -123,6 +123,8 @@ gaps_filt <-
   filter(year > 2000)
   
 
+gaps_filt %>% write_csv("01_sims-oat-by-hand/dat_tidy-hand-oats.csv")
+
 # look at gaps ------------------------------------------------------------
 
 #--for quality check (oat number)

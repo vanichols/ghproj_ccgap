@@ -42,6 +42,10 @@ ylds_mn <-
   distinct() %>% 
   pivot_wider(names_from = rot2, values_from = yield_mean)
 
+
+# plots -------------------------------------------------------------------
+
+
 ylds %>%
   ggplot(aes(rot2, yield_kgha)) +
   geom_violin(aes(fill = state), alpha = 0.2) +
