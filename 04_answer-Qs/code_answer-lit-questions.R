@@ -290,9 +290,28 @@ ilia_gaps %>%
   ggplot(aes(value, gap_kgha)) + 
   geom_point(aes(color = name), size = 3) + 
   geom_smooth(method = "lm", se = F, aes(color = name)) +
-  labs(title = "N mineralization versus gap, Iowa")
+  labs(title = "N mineralization versus gap at high N, Iowa")
 
 ggsave("04_answer-Qs/fig_4-gap-vs-nmin.png")
+
+ilia_yields %>% 
+  filter(nrate_kgha == 0) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  bind_rows(ilia_gaps) %>% 
+  left_join(all_nmin) %>% 
+  filter(!is.na(n_min_annual)) %>% #--only Iowa right now
+  filter(gap_kgha > -1000) %>% 
+  pivot_longer(n_min_annual:n_min_grow) %>% 
+  ggplot(aes(value, gap_kgha)) + 
+  geom_point(aes(color = name), size = 3) + 
+  geom_smooth(method = "lm", se = F, aes(color = name)) +
+  facet_grid(.~nrate_kgha) +
+  labs(title = "N mineralization versus gap at different Nrates, Iowa")
+
+ggsave("04_answer-Qs/fig_4-gap-vs-nmin.png")
+
+
 
 # 5. residue vs gap -------------------------------------------------------
 #--comes from Box simulations
@@ -310,6 +329,16 @@ ap_res %>%
   geom_point() + 
   geom_smooth(method = "lm", se = F, color = "red") +
   facet_wrap(~site, scales = "free")
+
+ap_res %>% 
+  separate(outfile, into = c("x1", "rot", "x3")) %>% 
+  filter(rot == "CC") %>% 
+  select(set_id, site, year, corn_buac, ResidueWTatSowing) %>% 
+  left_join(ilia_gaps) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  ggplot(aes(ResidueWTatSowing, gap_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F, color = "red") 
 
 ggsave("04_answer-Qs/fig_5-gap-vs-residue.png")
 

@@ -1,0 +1,224 @@
+---
+title: "Gina Nichols - meta analysis of treatment diffs"
+author: "Miranda Tilton `r Sys.Date()`"
+date: "1/28/2021"
+output: pdf_document
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r message = FALSE}
+dat_miranda <- read_csv("./dat_miranda.csv")
+```
+
+```{r}
+ylds <- 
+  dat_miranda %>% 
+  select(site, year, rotation, nrate_kgha, yield_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  filter(!is.na(sc)) 
+  
+ylds
+```
+
+```{r}
+sds <- 
+  dat_miranda %>% 
+  select(site, year, rotation, nrate_kgha, sd_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = sd_kgha) %>% 
+  rename("cc_sd" = cc,
+         "sc_sd" = sc) %>% 
+  filter(!is.na(sc_sd))
+sds
+```
+
+```{r}
+dat <- 
+  ylds %>% 
+  left_join(sds) %>% 
+  mutate(gap_kgha = sc - cc)
+dat    
+```
+
+\newpage
+
+# 1. How to estimate the uncertainty around the DIFFERENCE of cc and sc
+
+### The theory behind t-tests
+
+For simpler notation, assume that we first choose a specific site and year. Then we have two populations represented by the two treatment groups (e.g., 1 = corn, 2 = soybean), where each population is normally distributed with its own mean but shared variance:
+
+$$X_{1,i} \sim N(\mu_1, var = \sigma^2), \quad X_{2,i} \sim N(\mu_2, var = \sigma^2)$$
+
+Then, given four reps ($i = 1, 2, 3, 4$), $\overline{X}_{1, \cdot} = \frac{1}{4} \sum_{i=1}^4 X_{1,i}$ is the mean of those four reps for treatment 1 (corn), and is normally distributed
+
+$$\overline{X}_{1\cdot} \sim N(\mu_1, var = \sigma^2/4)$$
+
+The same holds for $\overline{X}_{2, \cdot}$. Then, assuming the two means are independent of each other, 
+$$\overline{X}_{1, \cdot} - \overline{X}_{2, \cdot} \sim N(\mu_1 - \mu_2, var = \frac{\sigma^2}{4} + \frac{\sigma^2}{4} = \frac{\sigma^2}{2})$$
+
+$$\overline{X}_{1, \cdot} - \overline{X}_{2, \cdot} \sim N(\mu_1 - \mu_2, sd = \frac{\sigma}{\sqrt{2}})$$
+
+\newpage
+
+### The formulas
+
+We assume that the two observed standard deviations $\sigma_1, \sigma_2$ are unbiased estimators of the true $\sigma$, so we can use the usual formula for pooling variance estimates (where $s_1$ and $s_2$ are the standard deviations provided in your data).
+
+$$s_p = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2}{n_1 + n_2 - 2}}$$
+
+So the 95% CI is $$\overline{X}_{1, \cdot} - \overline{X}_{2, \cdot} \pm t_{1 - \alpha/2, df} * s_p * \sqrt{\frac{1}{n_1} + \frac{1}{n_2}},$$
+where $s_p$ is the unbiased estimator of $\sigma$ and the final term simplifies to $\frac{1}{\sqrt{2}}$. We use a $t$ critical value because we are estimating standard deviations/variances from a small number of cases.
+
+```{r warning = FALSE, fig.height = 3.5, fig.width = 7}
+crit_val <- qt(p = .975, df = 4 + 4 - 2) # p = 1 - (.05)/2
+
+dat2 <- dat %>%
+  mutate(cc_s2 = (cc_sd) ^ 2, 
+         sc_s2 = (sc_sd) ^ 2,
+         sp = sqrt(3 * (cc_s2 + sc_s2) / (4 + 4 - 2)), # pool sp by year and site
+         gap_se = sp * sqrt(1/4 + 1/4)) # standard error
+
+dat2 %>% 
+  ggplot(aes(year, gap_kgha)) + 
+  geom_linerange(aes(ymin = gap_kgha - crit_val*gap_se, 
+                     ymax = gap_kgha + crit_val*gap_se,
+                     color = site)) + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~site, nrow = 2) # changed to facet_wrap, personal preference :)
+```
+
+\newpage
+
+The previous plot pooled the standard error information for each *pair* of treatments within a single site and year. If we believe that the variance is going to be similar for, say, all years within a site, then we can pool error information within a site using a similar procedure. Pooling variances can give us narrower confidence intervals.
+
+Essentially, to get $s_p$ you square the stdev terms and take their average. It would be more complicated to weight them if they didn't all come from 4 reps, but in this balanced case it simplifies to just averaging them. The only piece then is the degrees of freedom, which is $4*n$ where $n$ is the number of *groups* you're averaging over, which is two (corn, soybean) per year per site. Recall that when $df > 30$, which is the case for all years within each site, the t-quantile can be a z-quantile from `qnorm()`.
+
+```{r}
+table(dat2$site)
+```
+
+Since each site has more than 4 years, the site-wise pooled error will have more than $4*4*2 = 32$ df, meaning we can just use the z-quantile from `qnorm()`.
+
+```{r warning = FALSE, fig.height = 3.5, fig.width = 7}
+crit_val <- qnorm(p = .975)
+
+dat3 <- dat2 %>%
+  group_by(site) %>%
+  mutate(sp_site = sqrt(mean(c(cc_s2, sc_s2), na.rm = TRUE)),
+         gap_se_site = sp_site * sqrt(1/4 + 1/4)) # standard error
+  
+  
+ggplot(dat3, aes(x = year, y = gap_kgha)) + # reuse same plot code from above
+  geom_linerange(aes(ymin = gap_kgha - crit_val*gap_se_site, 
+                     ymax = gap_kgha + crit_val*gap_se_site,
+                     color = site)) + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~site, nrow = 2) # changed to facet_wrap, personal preference :)
+```
+
+\newpage
+
+2. You can assess significance visually, as you suggested, by determining whether the 95% CI contains zero. However, this is likely to produce false positives, since these are essentially 105 independent t-tests with false-positive probability $\alpha = 0.05$ for each test, so you can expect $\approx$ 5 false positive tests in the bunch.
+
+ANOVA post-hoc testing uses Tukey's HSD to adjust all pairwise differences within a group, but you usually need all of the data to run these tests automatically. You can run them by hand, but you only care about the pairwise adjustments instead of family-wise. 
+
+I think it might be easiest to use a Bonferroni-style adjustment to control the family-wise error rate (FWER): use $\alpha/n$ where $n$ is the number of tests being done.
+
+```{r}
+nrow(na.omit(dat2)) # 105 rows with complete data
+```
+Thus, using a smaller significance level makes the family-wise probability of Type I error 0.05, or 1/20, across all 105 tests by widening intervals, making them slightly more likely to contain zero, and thus fewer will be significantly non-zero (but those are the ones that are most likely to be a false positive if the null hypothesis is true).
+
+```{r warning = FALSE, fig.height = 3.5, fig.width = 7}
+crit_val <- qnorm(p = 1 - (.05 / 105)/2)
+
+ggplot(dat3, aes(x = year, y = gap_kgha)) + # reuse same plot code from above
+  geom_linerange(aes(ymin = gap_kgha - crit_val*gap_se, # or use gap_se_site
+                     ymax = gap_kgha + crit_val*gap_se, # or use gap_se_site
+                     color = site)) + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~site, nrow = 2) # changed to facet_wrap, personal preference :)
+```
+
+\newpage
+
+# 3/4. Power analysis
+
+Following [this resource](https://www.statmethods.net/stats/power.html), given any three of the following items, the fourth can be exactly determined:
+
+1. sample size
+2. effect size
+3. significance level = P(Type I error) = probability of finding an effect that is not there *(usually .05)*
+4. power = 1 - P(Type II error) = probability of finding an effect that is there *(commonly .8 or .95)*
+
+The `pwr` package will let us conduct a power analysis by providing three of the four items above and calculating the fourth. However, it takes effect size as Cohen's $d$, which is the difference of the two group means, contained in `dat2$gap_kgha`, divided by the pooled standard deviation, contained in `dat2$sp`.
+
+```{r}
+pwr::pwr.t.test(n = 4, sig.level = .05, power = .8)
+```
+
+According to these results, when two groups both contain 4 observations, we have an 80% chance of correctly detecting a true difference of 2.38 or larger and a 5% chance of falsely claiming a true difference when none exists.
+
+In context, say a pair (or site) has $s_p = 500$, then we can calculate the mean difference associated with $d = 2.38$:
+
+$$d = 2.38 = \frac{1190}{500}$$
+We can compute the same under the more strict conditions of power = .95 and $\alpha = .01$
+
+```{r}
+pwr::pwr.t.test(n = 4, sig.level = .01, power = .95)
+```
+
+\newpage
+
+You can also go in reverse, and use a hypothetical effect size to determine the required sample size. First, let's look at the effect sizes in the data:
+
+```{r warning = FALSE, fig.height = 3.5, fig.width = 7}
+dat_d <- dat3 %>% mutate(cohens_d = gap_kgha / sp)
+
+ggplot(dat_d) + 
+  geom_point(aes(x = year, y = abs(cohens_d), color = site)) + 
+  facet_wrap(~site, nrow = 2)
+```
+
+I'll use the common values of $\alpha = .05$, power = .8:
+
+```{r}
+dat_d$samp_size <- sapply(abs(dat_d$cohens_d), function(d) {
+  
+  if(!is.na(d)) {
+    
+    out <- tryCatch({ # weird error with some d values
+      pwr::pwr.t.test(sig.level = .05, power = .8, type = "two", d = d)
+    }, error = function(e) { return(NA) })
+    
+    # At this point, `out` is either a list or NA from weird error 
+    # If list, return out$n
+    if(any(is.na(out))) { return (NA)} else {return(out$n)}
+    
+  } else { return(NA) } # if d was NA to start
+})
+```
+
+
+After figuring this out, I found `stats::power.t.test()` which lets you provide the means and sds without converting them to Cohen's d. You're welcome to adapt this code to use that function instead!
+
+\newpage
+
+```{r fig.height = 4, fig.width = 7, warning = FALSE}
+ggplot(dat_d) + geom_point(aes(x = year, y = samp_size, color = site)) + 
+  facet_wrap(~site)
+
+# again with smaller y-lim
+ggplot(dat_d) + geom_point(aes(x = year, y = samp_size, color = site)) + 
+  facet_wrap(~site) +
+  coord_cartesian(ylim = c(0, 50))
+```
+
+
+
+
