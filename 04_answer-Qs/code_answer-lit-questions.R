@@ -31,10 +31,7 @@ scale_this2 <- function(x){
 dat_gaps <- 
   ilia_yields %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(ogap_kgha = sc - cc,
-         nrate_kgha = case_when(
-           
-         ))
+  mutate(ogap_kgha = sc - cc)
 
 # weather data --------------------------------------------------------------------
 
@@ -327,8 +324,8 @@ ggsave("04_answer-Qs/fig_4-gap-vs-nmin.png")
 
 #--comes from Box simulations
 ap_res <- 
-  read_csv("../../../Box/Gina_APSIM_modeling/apsim2/data-apsim-outs/02_wrangle-apsim-output/02_all-sites-noscripts.csv") 
-
+  read_csv("../../../../Box/Gina_APSIM_modeling/apsim2/data-apsim-outs/02_wrangle-apsim-output/02_all-sites-noscripts.csv")
+ 
 ap_res %>% 
   separate(outfile, into = c("x1", "rot", "x3")) %>% 
   filter(rot == "CC") %>% 
@@ -347,8 +344,8 @@ ap_res %>%
   left_join(ilia_gaps) %>% 
   filter(!is.na(gap_kgha)) %>% 
   ggplot(aes(ResidueWTatSowing, gap_kgha)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = F, color = "red") 
+  geom_point() 
+  #geom_smooth(method = "lm", se = F, color = "red") 
 
 #--new sims from mitch 2/5
 
@@ -365,7 +362,6 @@ dat_gaps2 <-
     TRUE ~ nrate_kgha)
   )
   
-
 dres <- 
   ia_sims %>% 
   select(-res_sowing_kgha) %>% 
@@ -381,12 +377,12 @@ dres %>%
 
 dres %>%  
   filter((!(site == "suth" & year == 2001))) %>% 
-  filter(nrate_kgha %in% c(0, 135, 270)) %>% 
+  filter(nrate_kgha %in% c(270)) %>% 
   filter(ogap_kgha > 0) %>% 
-  ggplot(aes(res_sowing_kgha, ogap_kgha, color = site, group = nrate_kgha)) + 
+  ggplot(aes(res_sowing_kgha, ogap_kgha)) + 
   geom_point() + 
-  labs(title = "Obs gap related to sim residue at planting",
-       subtitle = "Excludes Suth 2001, 10000 kg res") +
+  labs(title = "Obs gap not related to simulated surface residue at planting",
+       subtitle = "At 270 kgN, excludes Suth 2001, 10000 kg res") +
   #geom_smooth(method = "lm", se = F, (aes(color = nrate_kgha))) + 
   facet_wrap(~nrate_kgha, scales = "free", ncol = 2)
   #facet_grid(nrate_kgha ~ .)

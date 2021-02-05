@@ -35,9 +35,10 @@ fig_dat %>%
   scale_x_continuous(labels = c("notill", "striptill", "chisel", "deeprip", "moldboard")) +
   labs(y = "Contin. Corn Penalty (Mg/ha)",
        title = "Higher tillage intensity relieves penalty?",
-       subtitle = "Not really",
+       subtitle = "Not really. Data from Al-Kaisi et al. 2015 table 4 ",
        x = "Tillage intensity (low to high)")
 
+ggsave("00-lit-explore/fig_alkaisi-tillage-absolute.png")
 
 fig_dat %>%
     filter(site != "mcna") %>% 
@@ -51,4 +52,4 @@ fig_dat %>%
        subtitle = "Maybe. Data from Al Kaisi, Iowa, excluding McNay",
        x = "Tillage intensity (low to high)")
 
-ggsave("00-lit-explore/fig_alkaisi-tillage.png")
+ggsave("00-lit-explore/fig_alkaisi-tillage-pct.png")

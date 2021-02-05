@@ -38,7 +38,9 @@ gaps <-
     left_join(sgap) %>% 
     filter(!is.na(ogap)) %>% 
     select(-cc, -sc) %>% 
-    mutate(sim_pct_obs = sgap/ogap * 100,
+    mutate(
+      sgap = ifelse(sgap < 0, 0, sgap),
+      sim_pct_obs = sgap/ogap * 100,
            sim_pct_obs2 = ifelse(sim_pct_obs < 0, 0, sim_pct_obs))
 
 
@@ -57,4 +59,8 @@ gaps %>%
   ggplot(aes(nrate_kgha, sim_pct_obs2)) + 
   geom_col() +
   facet_wrap(~site) +
-  coord_cartesian(ylim = c(0, 100))
+  coord_cartesian(ylim = c(0, 100)) + 
+  labs(title = "Percentage of gap due to N limitation",
+       subtitle = "If you believe Apsim captures N limitation")
+
+ggsave("04_answer-Qs/fig_sim-pct-of-obs.png")
