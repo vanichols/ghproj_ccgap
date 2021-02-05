@@ -1,13 +1,13 @@
 # Created:       jan 8 2021
-# last edited:   
 #
 # purpose: answer literature questions
 #
 # notes: 
+# last edited:   2/5/2021, added gap versus res at diff nrates
 
 
 rm(list = ls())
-#devtools::install_github("wilkelab/ungeviz")
+devtools::install_github("femiguez/nlraa")
 library(tidysawyer2) 
 library(tidyverse)
 library(saapsim)
@@ -25,6 +25,16 @@ scale_this2 <- function(x){
   (x) / sd(x, na.rm=TRUE)
 }
 
+
+# data --------------------------------------------------------------------
+
+dat_gaps <- 
+  ilia_yields %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(ogap_kgha = sc - cc,
+         nrate_kgha = case_when(
+           
+         ))
 
 # weather data --------------------------------------------------------------------
 
@@ -314,8 +324,8 @@ ggsave("04_answer-Qs/fig_4-gap-vs-nmin.png")
 
 
 # 5. residue vs gap -------------------------------------------------------
-#--comes from Box simulations
 
+#--comes from Box simulations
 ap_res <- 
   read_csv("../../../Box/Gina_APSIM_modeling/apsim2/data-apsim-outs/02_wrangle-apsim-output/02_all-sites-noscripts.csv") 
 
@@ -340,8 +350,61 @@ ap_res %>%
   geom_point() + 
   geom_smooth(method = "lm", se = F, color = "red") 
 
-ggsave("04_answer-Qs/fig_5-gap-vs-residue.png")
+#--new sims from mitch 2/5
 
+#--need obs nrateas to match
+dat_gaps2 <- 
+  dat_gaps %>% 
+  filter(state == "IA") %>% 
+  select(-cc, -sc, -state, -crop) %>% 
+  mutate(
+    nrate_kgha = round(nrate_kgha, 0),
+    nrate_kgha = case_when(
+    nrate_kgha == 67 ~ 68,
+    nrate_kgha == 202 ~ 203,
+    TRUE ~ nrate_kgha)
+  )
+  
+
+dres <- 
+  ia_sims %>% 
+  select(-res_sowing_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(sgap_kgha = sc - cc) %>% 
+  select(-cc, -sc) %>% 
+  left_join(ia_sims %>% filter(rotation == "cc") %>% select(-yield_kgha)) %>% 
+  left_join(dat_gaps2) %>% 
+  filter(!is.na(ogap_kgha))
+
+dres %>% 
+  filter(res_sowing_kgha > 7500)
+
+dres %>%  
+  filter((!(site == "suth" & year == 2001))) %>% 
+  filter(nrate_kgha %in% c(0, 135, 270)) %>% 
+  filter(ogap_kgha > 0) %>% 
+  ggplot(aes(res_sowing_kgha, ogap_kgha, color = site, group = nrate_kgha)) + 
+  geom_point() + 
+  labs(title = "Obs gap related to sim residue at planting",
+       subtitle = "Excludes Suth 2001, 10000 kg res") +
+  #geom_smooth(method = "lm", se = F, (aes(color = nrate_kgha))) + 
+  facet_wrap(~nrate_kgha, scales = "free", ncol = 2)
+  #facet_grid(nrate_kgha ~ .)
+
+#--what if I fit a bilinear to these?
+library(nlraa)
+dex <- 
+  dres %>% 
+  filter((!(site == "suth" & year == 2001))) %>% 
+  filter(nrate_kgha %in% c(0, 135, 270)) %>% 
+  filter(ogap_kgha > 0) %>% 
+  filter(nrate_kgha == 270)
+dex %>% 
+  ggplot(aes(res_sowing_kgha, ogap_kgha)) + 
+  geom_point()
+  
+fit <- nls(ogap_kgha ~ SSblin(res_sowing_kgha, a, b, xs, c), data = dex)  
+  
 
 # 6. gaps at 0 vs HN ------------------------------------------------------
 
