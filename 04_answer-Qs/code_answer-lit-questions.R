@@ -469,6 +469,7 @@ ilia_yields %>%
        x = "Gap at 0N",
        y = "Gap at highest N")
 
+#--gap related to sc yield?
 dat_gaps %>% 
   ggplot(aes(sc, ogap_kgha)) + 
   geom_point() + 
@@ -478,6 +479,23 @@ dat_gaps %>%
        #subtitle = "Relationship strongest at 0N, reduces to no relation >150 kg/ha",
        subtitle = "At low N, gap is driven by SC yields")
 
+
+#--gap at high N related to sc yield at 0N?
+dat_gaps %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  left_join(
+    ilia_yields %>% 
+              filter(nrate_kgha == 0,
+                     rotation == "sc") %>% 
+      rename("sc0_yield" = yield_kgha) %>% 
+      select(state, site, year, sc0_yield)
+  ) %>% 
+  ggplot(aes(sc0_yield, ogap_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F, color = "red") +
+  labs(title = "Gap at high N not related to sc yield at 0N")
+
 dat_gaps %>% 
   ggplot(aes(cc, ogap_kgha)) + 
   geom_point() + 
@@ -485,3 +503,4 @@ dat_gaps %>%
   facet_wrap(~nrate_kgha) + 
   labs(title = "Observed penalty vs cont rotated corn yield",
        subtitle = "At high N, gap driven by CC yields")
+
