@@ -322,6 +322,7 @@ ggsave("04_answer-Qs/fig_4-gap-vs-nmin.png")
 
 # 5. residue vs gap -------------------------------------------------------
 
+###old 'uncalibrated' sims----
 #--comes from Box simulations
 ap_res <- 
   read_csv("../../../../Box/Gina_APSIM_modeling/apsim2/data-apsim-outs/02_wrangle-apsim-output/02_all-sites-noscripts.csv")
@@ -347,7 +348,8 @@ ap_res %>%
   geom_point() 
   #geom_smooth(method = "lm", se = F, color = "red") 
 
-#--new sims from mitch 2/5
+
+###new sims from mitch 2/5----
 
 #--need obs nrateas to match
 dat_gaps2 <- 
@@ -402,6 +404,36 @@ dex %>%
 fit <- nls(ogap_kgha ~ SSblin(res_sowing_kgha, a, b, xs, c), data = dex)  
   
 
+###prev cc yield (res)----
+#--practive
+ilia_yields %>% 
+  mutate_if(is.numeric, round, 0) %>% 
+  filter(site == "ames") %>% 
+  filter(rotation == "cc") %>% 
+  filter(nrate_kgha %in% c(0, 270),
+         year %in% c(2002, 2003, 2004)) %>%
+  arrange(nrate_kgha, year) %>% 
+  group_by(nrate_kgha) %>% 
+  mutate(yield_lag = lag(yield_kgha))
+
+prev_yld <- 
+  ilia_yields %>% 
+  filter(rotation == "cc") %>% 
+  arrange(site, nrate_kgha, year) %>% 
+  group_by(site, nrate_kgha) %>%
+  mutate(prev_cc_yield = lag(yield_kgha)) %>% 
+  select(-rotation, -crop, -yield_kgha)
+
+dat_gaps %>% 
+  left_join(prev_yld) %>% 
+  ggplot(aes(prev_cc_yield, ogap_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F) +
+  facet_wrap(~nrate_kgha) + 
+  labs(title = "Prev CC yield (~residue) not related to obs penalty")
+
+
+
 # 6. gaps at 0 vs HN ------------------------------------------------------
 
 ilia_yields %>% 
@@ -414,7 +446,11 @@ ilia_yields %>%
   pivot_wider(names_from = nrate_F, values_from = gap_kgha) %>% 
   ggplot(aes(none, high)) + 
   geom_point(aes(color = site)) + 
-  geom_smooth(method = "lm", se = F, aes(color = site))
+  geom_smooth(method = "lm", se = F, aes(color = site)) + 
+  labs(title = "Gap at high N not strongly related to gap at low N within a site",
+       x = "Gap at 0N",
+       y = "Gap at highest N")
+
 
 ilia_yields %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
@@ -427,6 +463,25 @@ ilia_yields %>%
   ggplot(aes(none, high)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = F, color = "red") + 
-  facet_wrap(~site, scales = "free")
+  #facet_wrap(~site, scales = "free") + 
+  labs(title = "Gap at high N not strongly related to gap at low N",
+       subtitle = "Across sites, confounding factors",
+       x = "Gap at 0N",
+       y = "Gap at highest N")
 
+dat_gaps %>% 
+  ggplot(aes(sc, ogap_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_wrap(~nrate_kgha) + 
+  labs(title = "Observed penalty vs observed rotated corn yield",
+       #subtitle = "Relationship strongest at 0N, reduces to no relation >150 kg/ha",
+       subtitle = "At low N, gap is driven by SC yields")
 
+dat_gaps %>% 
+  ggplot(aes(cc, ogap_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F, color = "green") +
+  facet_wrap(~nrate_kgha) + 
+  labs(title = "Observed penalty vs cont rotated corn yield",
+       subtitle = "At high N, gap driven by CC yields")
