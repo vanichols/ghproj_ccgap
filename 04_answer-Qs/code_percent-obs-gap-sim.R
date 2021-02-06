@@ -60,7 +60,28 @@ gaps %>%
   geom_col() +
   facet_wrap(~site) +
   coord_cartesian(ylim = c(0, 100)) + 
-  labs(title = "Percentage of gap due to N limitation",
+  labs(title = "Percentage of gap due to N limitation (avg over years)",
        subtitle = "If you believe Apsim captures N limitation")
 
 ggsave("04_answer-Qs/fig_sim-pct-of-obs.png")
+
+
+gaps %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>%
+  mutate(n_based = sim_pct_obs2,
+         other = 100-sim_pct_obs2) %>%
+  select(site, year, n_based, other) %>% 
+  pivot_longer(n_based:other) %>%
+  mutate(name = factor(name, levels = c("other", "n_based"))) %>% 
+  filter(!is.na(value)) %>% 
+  ggplot(aes(year, value)) + 
+  geom_col(aes(fill = name)) +
+  facet_wrap(~site, scales = "free") + 
+  scale_fill_manual(values = c("other" = "gray70", 
+                               "n_based" = "red")) + 
+  labs(title = "% of penalty related to nitrogen",
+       subtitle = "Iowa, at max N fert rate (235-270)",
+       x = NULL, y = "Percent")
+
+ggsave("04_answer-Qs/fig_Nbased-penalty-pct.png")
