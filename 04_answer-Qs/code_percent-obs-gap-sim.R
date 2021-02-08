@@ -60,8 +60,10 @@ gaps %>%
   geom_col() +
   facet_wrap(~site) +
   coord_cartesian(ylim = c(0, 100)) + 
-  labs(title = "Percentage of gap due to N limitation (avg over years)",
-       subtitle = "If you believe Apsim captures N limitation")
+  labs(title = "Percentage of penalty due to N-availability at various N rates (avg over all years)",
+       subtitle = "If you believe Apsim captures N cycling",
+       x = "N fert rate (kg/ha",
+       y = "Simulated penalty as % of observed penalty")
 
 ggsave("04_answer-Qs/fig_sim-pct-of-obs.png")
 
@@ -80,7 +82,7 @@ gaps %>%
   facet_wrap(~site, scales = "free") + 
   scale_fill_manual(values = c("other" = "gray70", 
                                "n_based" = "red")) + 
-  labs(title = "% of penalty related to nitrogen",
+  labs(title = "% of penalty due to lack of nitrogen availability by year",
        subtitle = "Iowa, at max N fert rate (235-270)",
        x = NULL, y = "Percent")
 

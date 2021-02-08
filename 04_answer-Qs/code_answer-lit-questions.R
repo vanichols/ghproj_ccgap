@@ -504,3 +504,51 @@ dat_gaps %>%
   labs(title = "Observed penalty vs cont rotated corn yield",
        subtitle = "At high N, gap driven by CC yields")
 
+
+# 7. Penalty over time? ---------------------------------------
+tibble(
+  counts = c(1:100, 1:50, 1:20, rep(1:10, 3), 
+             rep(1:5, 5), rep(1:2, 10), rep(1, 20))
+) %>%
+  mutate(
+    counts_cut_number   = cut_number(counts, n = 4),
+    counts_cut_interval = cut_interval(counts, n = 4),
+    counts_cut_width    = cut_width(counts, width = 25)
+  ) 
+
+mutate(fcut =
+         fancycut(
+           p_values_from_a_model,
+           positive = "[0.5,1]",
+           negative = "[0,0.5)"
+         ))
+
+
+
+dat_gaps %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low",
+           nrateF == 2 ~ "Med",
+           nrateF == 3 ~ "High")
+  ) %>% 
+  ggplot(aes(year, ogap_kgha)) + 
+  geom_point() + 
+  facet_grid(nrateF ~ site, scales = "free_x")
+
+dat_gaps %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  ) %>% 
+  arrange(nrate) %>% 
+  mutate(nrateF = fct_inorder(nrateF)) %>% 
+  ggplot(aes(year, ogap_kgha)) + 
+  geom_jitter() + 
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_grid(.~nrateF, scales = "free_x") + 
+  labs(title = "Continuous corn penalty persists over time at all N rates")
