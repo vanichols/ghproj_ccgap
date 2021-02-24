@@ -134,6 +134,13 @@ aonrs <-
   mutate(aonr = -0.5 * (bval/cval)) %>% 
   select(site, year, rot, aonr)
 
+aonrs %>% 
+  filter(aonr < 400,
+         aonr > 0) %>% 
+  ggplot(aes(year, aonr, color = rot)) + 
+  geom_point() + 
+  facet_wrap(~site)
+
 # get predicted yields ----------------------------------------------------
 
 prd <- predict_nlme(fmm3b, interval = "conf", plevel = 1) #-I think this is site level? 

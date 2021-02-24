@@ -7,12 +7,12 @@
 
 
 rm(list = ls())
-devtools::install_github("femiguez/nlraa")
+#devtools::install_github("femiguez/nlraa")
 library(tidysawyer2) 
 library(tidyverse)
 library(saapsim)
-
 library(scales)
+library(fancycut)
 
 theme_set(theme_bw())
 
@@ -524,7 +524,7 @@ mutate(fcut =
          ))
 
 
-
+#--testing
 dat_gaps %>% 
   mutate(nrate = cut_interval(nrate_kgha, n = 3),
          nrateF = as.numeric(nrate),
@@ -537,7 +537,11 @@ dat_gaps %>%
   geom_point() + 
   facet_grid(nrateF ~ site, scales = "free_x")
 
-dat_gaps %>% 
+#--obseved gaps, all sites
+
+
+fig_ogap <- 
+  dat_gaps %>% 
   mutate(nrate = cut_interval(nrate_kgha, n = 3),
          nrateF = as.numeric(nrate),
          nrateF = case_when(
@@ -552,3 +556,48 @@ dat_gaps %>%
   geom_smooth(method = "lm", se = F, color = "red") +
   facet_grid(.~nrateF, scales = "free_x") + 
   labs(title = "Continuous corn penalty persists over time at all N rates")
+
+
+fig_ogap
+
+
+fig_dat <- 
+  ilia_yields %>% 
+  bind_rows(
+  dat_gaps %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  )  %>% 
+  mutate(rotation = "gap",
+         yield_kgha = ogap_kgha)
+  ) %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  ) %>% 
+  arrange(nrate) %>% 
+  mutate(nrateF = fct_inorder(nrateF),
+         rotation = factor(rotation, levels = c("sc", "cc", "gap"))) 
+
+#--separated by state
+fig_dat %>% 
+  ggplot(aes(year, yield_kgha)) + 
+  geom_jitter(aes(color = nrateF), alpha = 0.5) + 
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_grid(rotation~nrateF+state, scales = "free") 
+
+
+#--all together
+fig_dat %>% 
+  ggplot(aes(year, yield_kgha)) + 
+  geom_jitter(color = "gray80") + 
+  geom_smooth(method = "lm", se = F, color = "red", size = 2) +
+  facet_grid(rotation~nrateF, scales = "free") 
+

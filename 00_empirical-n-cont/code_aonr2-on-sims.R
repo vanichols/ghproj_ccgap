@@ -1,14 +1,45 @@
 # created 2/12/21
 # gina
-# purpose: mike thinks I can get some kind of info from aonr stuff
-# updated
+# purpose: find n-cont from sim data
 
 library(tidysawyer2)
 library(tidyverse)
 library(scales)
 
 
-# functions ---------------------------------------------------------------------
+# dat ---------------------------------------------------------------------
+
+ilia_aonr %>% 
+  ggplot(aes(year, aonr, color = rotation)) + 
+  geom_jitter() + 
+  facet_wrap(~site)
+
+#--filter out years where aonr is max value
+
+
+ilia_aonr %>%
+  anti_join( ilia_aonr %>% 
+              group_by(site) %>%
+              filter(aonr > max(aonr) - 5)) %>% 
+  ggplot(aes(year, aonr, color = rotation)) + 
+  geom_point() + 
+  facet_wrap(~site)
+
+library(tidyverse)
+
+atmax <- 
+  ilia_aonr %>% 
+  group_by(site) %>%
+  filter(aonr > max(aonr) - 5)
+
+
+ilia_yields %>%
+  filter(site == "ames", 
+         year %in% c(2001, 2002)) %>% 
+  ggplot(aes(nrate_kgha, yield_kgha)) + 
+  geom_point(aes(color = rotation)) + 
+  facet_wrap(~site+year)
+
 
 tst <- 
   ilia_yields %>%
@@ -73,7 +104,6 @@ tst.coef <-
 qpfit_fun(tst = tst)
 qpcoefs_fun(tst = tst)
 
-
 # try on all sites --------------------------------------------
 #--note: what happens in years where no plateau is reached?
 
@@ -116,7 +146,7 @@ tst.mods <-
   filter(!is.null(model)) %>%
   ungroup()
 
-#--50 didn't converge. Mixed model might help with this? 
+#--50 didn't converge. Mixed model might help with this. 
 tst.noconv <- 
   tst.tib %>% 
   group_by(site, year, rotation) %>%
@@ -145,77 +175,21 @@ tst.prds <-
 
 #--want gap at rot aonr, then gap at cont aonr
 #--maybe not
-#--actually maybe. The fits are much more stable
-tst.rotaonrgap <-
-  tst.prds %>%
-  ungroup() %>%
-  left_join(tst.aonrs) %>%
-  filter(aonr_rot == "aonr_sc") %>%
-  filter(nrate_kgha == aonr_kgha) %>%
-  select(site, year, rotation, pred_yield, aonr_rot)  %>%
-  pivot_wider(names_from = rotation, values_from = pred_yield) %>%
-  mutate(gap_at_rotaonr_kgha = sc - cc) %>%
-  select(-cc,-sc, -aonr_rot) %>%
-  mutate(gap_at_rotaonr_kgha = ifelse(gap_at_rotaonr_kgha < 0, 0, gap_at_rotaonr_kgha))
-
-tst.contaonrgap <-
-  tst.prds %>%
-  ungroup() %>%
-  left_join(tst.aonrs) %>%
-  filter(aonr_rot == "aonr_cc") %>%
-  filter(nrate_kgha == aonr_kgha) %>%
-  select(site, year, rotation, pred_yield, aonr_rot)  %>%
-  pivot_wider(names_from = rotation, values_from = pred_yield) %>%
-  mutate(gap_at_contaonr_kgha = sc - cc) %>%
-  select(-cc,-sc, -aonr_rot) %>%
-  mutate(gap_at_contaonr_kgha = ifelse(gap_at_contaonr_kgha < 0, 0, gap_at_contaonr_kgha))
-
-tst.npct <-
-  tst.rotaonrgap %>%
-  left_join(tst.contaonrgap) %>%
-  mutate(ngap_frac = (gap_at_rotaonr_kgha - gap_at_contaonr_kgha)/gap_at_rotaonr_kgha,
-         ngap_frac = case_when(
-           ngap_frac < 0 ~ 0,
-           (gap_at_contaonr_kgha == 0)&(gap_at_rotaonr_kgha==0) ~ 1,
-           TRUE ~ ngap_frac
-         ))
-
-tst.npct %>% write_csv("00_empirical-n-cont/fits-npct.csv")
-
-#--try: gap at rot aonr, then smallest gap above rot aonr
-# tst.rotaonrgap <- 
-#   tst.prds %>%
-#   ungroup() %>%
-#   left_join(tst.aonrs) %>%
-#     filter(aonr_rot == "aonr_sc") %>% 
-#   filter(nrate_kgha == aonr_kgha) %>%
-#   select(site, year, rotation, pred_yield, aonr_rot)  %>%
-#   pivot_wider(names_from = rotation, values_from = pred_yield) %>%
-#   mutate(gap_at_rotaonr_kgha = sc - cc) %>%
-#   select(-cc, -sc) %>%
-#   mutate(gap_at_rotaonr_kgha = ifelse(gap_at_rotaonr_kgha < 0, 0, gap_at_rotaonr_kgha))
-# 
-# #--I'm not convinced this is best. What if sc peaks at it's aonr then goes down?
-# tst.biggestgap <- 
-#   ilia_yields %>% 
-#   left_join(tst.aonrs) %>%
-#   filter(aonr_rot == "aonr_sc") %>% 
-#   filter(nrate_kgha > aonr_kgha) %>%
-#   select(state, site, year, rotation, nrate_kgha, yield_kgha)  %>%
-#   pivot_wider(names_from = rotation, values_from = yield_kgha) %>%
-#   mutate(gap_at_highn_kgha = sc - cc) %>%
-#   group_by(state, site, year) %>% 
-#   mutate(mingap = min(gap_at_highn_kgha)) %>% #--I think?
-#   filter(gap_at_highn_kgha == mingap) %>% 
-#   mutate(gap_at_highn_kgha = ifelse(gap_at_highn_kgha < 0, 0, gap_at_highn_kgha)) %>% 
-#   select(-cc, -sc, -mingap)
-# 
-# tst.npct <- 
-#   tst.biggestgap %>% 
-#   left_join(tst.rotaonrgap) %>% 
-#   mutate(ngap_frac = (gap_at_rotaonr_kgha - gap_at_highn_kgha)/gap_at_rotaonr_kgha,
-#          ngap_frac = ifelse(ngap_frac < 0, 0, ngap_frac))
-# 
+# tst.diffs <- 
+#   tst.prds %>% 
+#   ungroup() %>% 
+#   left_join(tst.aonrs) %>% 
+#   filter(nrate_kgha == aonr_kgha) %>% 
+#   select(site, year, rotation, pred_yield, aonr_rot)  %>% 
+#   pivot_wider(names_from = rotation, values_from = pred_yield) %>% 
+#   mutate(gap_kgha = sc - cc) %>% 
+#   select(-cc, -sc) %>% 
+#   pivot_wider(names_from = aonr_rot, values_from = gap_kgha) %>% 
+#   mutate(aonr_sc = ifelse(aonr_sc < 0, 0, aonr_sc),
+#          aonr_cc = ifelse(aonr_cc < 0, 0, aonr_cc)) %>% 
+#   rename("gap_at_rotaonr" = aonr_sc,
+#          "gap_at_contaonr" = aonr_cc) %>% 
+#   mutate(ngap_frac = (gap_at_rotaonr - gap_at_contaonr)/gap_at_rotaonr)
 
 #--rotaonr in brow 2005 was 60?! Yup
 tst.tib %>% 
@@ -223,6 +197,41 @@ tst.tib %>%
          year == 2006) %>% 
   ggplot(aes(nrate_kgha, yield_kgha, color = rotation)) + 
   geom_point(size = 3) 
+
+#--try: gap at rot aonr, then smallest gap above rot aonr
+tst.rotaonrgap <- 
+  tst.prds %>%
+  ungroup() %>%
+  left_join(tst.aonrs) %>%
+    filter(aonr_rot == "aonr_sc") %>% 
+  filter(nrate_kgha == aonr_kgha) %>%
+  select(site, year, rotation, pred_yield, aonr_rot)  %>%
+  pivot_wider(names_from = rotation, values_from = pred_yield) %>%
+  mutate(gap_at_rotaonr_kgha = sc - cc) %>%
+  select(-cc, -sc) %>%
+  mutate(gap_at_rotaonr_kgha = ifelse(gap_at_rotaonr_kgha < 0, 0, gap_at_rotaonr_kgha))
+
+#--I'm not convinced this is best. What if sc peaks at it's aonr then goes down?
+tst.biggestgap <- 
+  ilia_yields %>% 
+  left_join(tst.aonrs) %>%
+  filter(aonr_rot == "aonr_sc") %>% 
+  filter(nrate_kgha > aonr_kgha) %>%
+  select(state, site, year, rotation, nrate_kgha, yield_kgha)  %>%
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>%
+  mutate(gap_at_highn_kgha = sc - cc) %>%
+  group_by(state, site, year) %>% 
+  mutate(mingap = min(gap_at_highn_kgha)) %>% #--I think?
+  filter(gap_at_highn_kgha == mingap) %>% 
+  mutate(gap_at_highn_kgha = ifelse(gap_at_highn_kgha < 0, 0, gap_at_highn_kgha)) %>% 
+  select(-cc, -sc, -mingap)
+
+tst.npct <- 
+  tst.biggestgap %>% 
+  left_join(tst.rotaonrgap) %>% 
+  mutate(ngap_frac = (gap_at_rotaonr_kgha - gap_at_highn_kgha)/gap_at_rotaonr_kgha,
+         ngap_frac = ifelse(ngap_frac < 0, 0, ngap_frac))
+
 
 #--compare to yield gap at max N
 #--might be underestimating n-cont in some instances. 
@@ -438,8 +447,8 @@ ilia_yields %>%
 #--make a nice npct one
 
 tst.npct %>% 
-  filter(!is.na(ngap_frac),
-         state == "IA") %>%
+  filter(!is.na(ngap_frac)) %>% 
+  #filter(state == "IA") %>%
   select(state, site, year, ngap_frac) %>% 
   mutate(anonngap_frac = 1 - ngap_frac) %>% 
   pivot_longer(ngap_frac:anonngap_frac) %>% 
@@ -454,4 +463,3 @@ tst.npct %>%
        subtitle = "Empirical approach")
 
 #--idea = should do a mosaic plot, with widths related to size of gap
-
