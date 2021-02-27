@@ -13,6 +13,8 @@ library(tidyverse)
 library(saapsim)
 library(scales)
 library(fancycut)
+library(lme4)
+library(lmerTest)
 
 theme_set(theme_bw())
 
@@ -28,10 +30,16 @@ scale_this2 <- function(x){
 
 # data --------------------------------------------------------------------
 
-dat_gaps <- 
+gaps_alln <-
   ilia_yields %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(ogap_kgha = sc - cc)
+  mutate(ogap_kgha = sc - cc,
+         ogap_pct = ogap_kgha/sc)
+
+gaps_maxn <- 
+  ilia_gaps %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha))
 
 # weather data --------------------------------------------------------------------
 
@@ -62,9 +70,43 @@ tav_lt <-
 
 # 1. high yields mean lower gaps? --------------------------------------------
 
+#--look at gaps at high N category
+gaps_alln %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  ) %>% 
+  filter(grepl("High", nrateF)) %>% 
+  mutate(avg = (cc + sc)/2) %>% 
+  pivot_longer(cols = c("cc", "sc", "avg")) %>% 
+  ggplot(aes(value, ogap_kgha)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F) +
+  facet_grid(.~name)
+
+#--look at gaps at high N category
+gaps_alln %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  ) %>% 
+  filter(grepl("High", nrateF)) %>% 
+  mutate(avg = (cc + sc)/2) %>% 
+  pivot_longer(cols = c("cc", "sc", "avg")) %>% 
+  filter(name == "sc") %>% 
+  ggplot(aes(value, ogap_pct)) + 
+  geom_point() + 
+  geom_vline(xintercept = 9000, color = "red") +
+  facet_grid(.~name)
 
 
-ilia_gaps %>%
+gaps_maxn %>%
   left_join(ilia_yields %>%
               group_by(site) %>%
               summarise(env_yield = mean(yield_kgha, na.rm = T))) %>%
@@ -89,7 +131,7 @@ ilia_gaps %>%
 
 ggsave("04_answer-Qs/fig_1-gap-vs-envyld.png")
 
-ilia_gaps %>%
+gaps_maxn %>%
   left_join(ilia_yields %>%
               group_by(site) %>%
               summarise(env_yield = mean(yield_kgha, na.rm = T))) %>%
@@ -119,7 +161,7 @@ ggsave("04_answer-Qs/fig_1-gap-pct-vs-envyld.png")
 
 mod_envyld <-
   lm(gap_kgha ~ env_yield,
-     data = ilia_gaps %>%
+     data = gaps_maxn %>%
        left_join(ilia_yields %>%
                    group_by(site) %>%
                    summarise(env_yield = mean(yield_kgha, na.rm = T))))
@@ -128,7 +170,7 @@ anova(mod_envyld)
 # 2. drier areas have higher gaps -----------------------------------------
 
 pcp_lt %>% 
-  left_join(ilia_gaps) %>% 
+  left_join(gaps_maxn) %>% 
   filter(!is.na(gap_kgha)) %>% 
   ggplot(aes(pcp_lt, gap_kgha)) + 
   geom_point(aes(size = pcp_lt), color = "red") + 
@@ -202,7 +244,7 @@ tav_sc1 %>%
 
 
 #--size by gap
-ilia_gaps %>% 
+gaps_maxn %>% 
   left_join(tav_sc1) %>% 
   left_join(pcp_sc1) %>% 
   ggplot(aes(pcp_sc, tav_sc)) + 
@@ -211,7 +253,7 @@ ilia_gaps %>%
   geom_vline(xintercept = 0)
 
 #--color by gap
-ilia_gaps %>% 
+gaps_maxn %>% 
   left_join(tav_sc1) %>% 
   left_join(pcp_sc1) %>%
   filter(!is.na(gap_kgha)) %>% 
@@ -238,7 +280,7 @@ pcp_ann %>%
 
 #--great, about even for LT calcs 
 
-ilia_gaps %>% 
+gaps_maxn %>% 
   left_join(tav_ann) %>% 
   left_join(pcp_ann) %>% 
   left_join(pcp_lt) %>% 
@@ -279,7 +321,7 @@ ames_nmin <-
   filter(apsim_oat == "base") %>% 
   filter(rot == "CC")
 
-ilia_gaps %>% 
+gaps_maxn %>% 
   left_join(ames_nmin) %>% 
   filter(!is.na(net_miner)) %>% 
   ggplot(aes(gross_miner, gap_kgha)) + 
@@ -289,7 +331,7 @@ ilia_gaps %>%
 all_nmin <- 
   read_csv("01_sims-oat-by-hand/sims-no-crop/dat_no-crops.csv")
 
-ilia_gaps %>% 
+gaps_maxn %>% 
   left_join(all_nmin) %>% 
   filter(!is.na(n_min_annual)) %>% #--only Iowa right now
   filter(gap_kgha > -1000) %>% 
@@ -305,7 +347,7 @@ ilia_yields %>%
   filter(nrate_kgha == 0) %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
   mutate(gap_kgha = sc - cc) %>% 
-  bind_rows(ilia_gaps) %>% 
+  bind_rows(gaps_maxn) %>% 
   left_join(all_nmin) %>% 
   filter(!is.na(n_min_annual)) %>% #--only Iowa right now
   filter(gap_kgha > -1000) %>% 
@@ -331,7 +373,7 @@ ap_res %>%
   separate(outfile, into = c("x1", "rot", "x3")) %>% 
   filter(rot == "CC") %>% 
   select(set_id, site, year, corn_buac, ResidueWTatSowing) %>% 
-  left_join(ilia_gaps) %>% 
+  left_join(gaps_maxn %>% group_by(site) %>% filter(nrate_kgha == max(nrate_kgha))) %>% 
   filter(!is.na(gap_kgha)) %>% 
   ggplot(aes(ResidueWTatSowing, gap_kgha)) + 
   geom_point() + 
@@ -342,7 +384,7 @@ ap_res %>%
   separate(outfile, into = c("x1", "rot", "x3")) %>% 
   filter(rot == "CC") %>% 
   select(set_id, site, year, corn_buac, ResidueWTatSowing) %>% 
-  left_join(ilia_gaps) %>% 
+  left_join(gaps_maxn) %>% 
   filter(!is.na(gap_kgha)) %>% 
   ggplot(aes(ResidueWTatSowing, gap_kgha)) + 
   geom_point() 
@@ -352,18 +394,11 @@ ap_res %>%
 ###new sims from mitch 2/5----
 
 #--need obs nrateas to match
-dat_gaps2 <- 
-  dat_gaps %>% 
+gaps_alln2 <- 
+  gaps_alln %>% 
   filter(state == "IA") %>% 
-  select(-cc, -sc, -state, -crop) %>% 
-  mutate(
-    nrate_kgha = round(nrate_kgha, 0),
-    nrate_kgha = case_when(
-    nrate_kgha == 67 ~ 68,
-    nrate_kgha == 202 ~ 203,
-    TRUE ~ nrate_kgha)
-  )
-  
+  select(-cc, -sc, -state, -crop) 
+
 dres <- 
   ia_sims %>% 
   select(-res_sowing_kgha) %>% 
@@ -371,7 +406,7 @@ dres <-
   mutate(sgap_kgha = sc - cc) %>% 
   select(-cc, -sc) %>% 
   left_join(ia_sims %>% filter(rotation == "cc") %>% select(-yield_kgha)) %>% 
-  left_join(dat_gaps2) %>% 
+  left_join(gaps_alln2) %>% 
   filter(!is.na(ogap_kgha))
 
 dres %>% 
@@ -389,20 +424,53 @@ dres %>%
   facet_wrap(~nrate_kgha, scales = "free", ncol = 2)
   #facet_grid(nrate_kgha ~ .)
 
-#--what if I fit a bilinear to these?
-library(nlraa)
-dex <- 
-  dres %>% 
-  filter((!(site == "suth" & year == 2001))) %>% 
-  filter(nrate_kgha %in% c(0, 135, 270)) %>% 
-  filter(ogap_kgha > 0) %>% 
-  filter(nrate_kgha == 270)
-dex %>% 
-  ggplot(aes(res_sowing_kgha, ogap_kgha)) + 
-  geom_point()
-  
-fit <- nls(ogap_kgha ~ SSblin(res_sowing_kgha, a, b, xs, c), data = dex)  
-  
+###new sims from mitch again, 2/25
+resdat <- 
+  ilia_simsall %>% 
+  filter(rotation == "cc") %>% 
+  select(sim_type, state, site, year, nrate_kgha, residue_w_tat_sowing, stover_wt) %>% 
+  mutate(nrate_kgha = round(nrate_kgha, 0)) %>% 
+  left_join(
+    gaps_alln %>% 
+      select(-cc, -sc, -crop) 
+  ) %>% 
+  filter(!is.na(ogap_kgha))
+
+
+resdat %>%
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  filter(sim_type == "cal_scripts") %>% 
+  ggplot(aes(residue_w_tat_sowing, ogap_kgha)) + 
+  geom_point(aes(color = sim_type), color = "gray50") + 
+  geom_smooth(method = "lm", color = "red", se = F) +
+  facet_wrap(~site, scales = "free") + 
+  labs(title = "Penalty vs residue")
+
+resdat %>%
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  filter(sim_type == "cal_scripts") %>% 
+  ggplot(aes(stover_wt, ogap_kgha)) + 
+  geom_point(aes(color = sim_type), color = "gray50") + 
+  geom_smooth(method = "lm", color = "red", se = F) +
+  facet_wrap(~site, scales = "free") + 
+  labs(title = "Penalty vs stover prod")
+
+resdat %>%
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  filter(sim_type == "cal_scripts") %>% 
+  ggplot(aes(stover_wt, residue_w_tat_sowing)) + 
+  geom_point(aes(color = sim_type), color = "gray50") + 
+  geom_smooth(method = "lm", color = "red", se = F) +
+  facet_wrap(~site, scales = "free") + 
+  labs(title = "Penalty vs stover prod")
+
+
+ilia_simsall %>% 
+  select(sim_type:yield_kgha, stover_wt) %>% 
+  filter(stover_wt < 0)
 
 ###prev cc yield (res)----
 #--practive
@@ -424,7 +492,7 @@ prev_yld <-
   mutate(prev_cc_yield = lag(yield_kgha)) %>% 
   select(-rotation, -crop, -yield_kgha)
 
-dat_gaps %>% 
+gaps_alln %>% 
   left_join(prev_yld) %>% 
   ggplot(aes(prev_cc_yield, ogap_kgha)) + 
   geom_point() + 
@@ -470,7 +538,7 @@ ilia_yields %>%
        y = "Gap at highest N")
 
 #--gap related to sc yield?
-dat_gaps %>% 
+gaps_alln %>% 
   ggplot(aes(sc, ogap_kgha)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = F, color = "red") +
@@ -481,7 +549,7 @@ dat_gaps %>%
 
 
 #--gap at high N related to sc yield at 0N?
-dat_gaps %>% 
+gaps_alln %>% 
   group_by(site) %>% 
   filter(nrate_kgha == max(nrate_kgha)) %>% 
   left_join(
@@ -496,7 +564,7 @@ dat_gaps %>%
   geom_smooth(method = "lm", se = F, color = "red") +
   labs(title = "Gap at high N not related to sc yield at 0N")
 
-dat_gaps %>% 
+gaps_alln %>% 
   ggplot(aes(cc, ogap_kgha)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = F, color = "green") +
@@ -506,42 +574,10 @@ dat_gaps %>%
 
 
 # 7. Penalty over time? ---------------------------------------
-tibble(
-  counts = c(1:100, 1:50, 1:20, rep(1:10, 3), 
-             rep(1:5, 5), rep(1:2, 10), rep(1, 20))
-) %>%
-  mutate(
-    counts_cut_number   = cut_number(counts, n = 4),
-    counts_cut_interval = cut_interval(counts, n = 4),
-    counts_cut_width    = cut_width(counts, width = 25)
-  ) 
-
-mutate(fcut =
-         fancycut(
-           p_values_from_a_model,
-           positive = "[0.5,1]",
-           negative = "[0,0.5)"
-         ))
-
-
-#--testing
-dat_gaps %>% 
-  mutate(nrate = cut_interval(nrate_kgha, n = 3),
-         nrateF = as.numeric(nrate),
-         nrateF = case_when(
-           nrateF == 1 ~ "Low",
-           nrateF == 2 ~ "Med",
-           nrateF == 3 ~ "High")
-  ) %>% 
-  ggplot(aes(year, ogap_kgha)) + 
-  geom_point() + 
-  facet_grid(nrateF ~ site, scales = "free_x")
 
 #--obseved gaps, all sites
 
-
-fig_ogap <- 
-  dat_gaps %>% 
+gaps_alln %>% 
   mutate(nrate = cut_interval(nrate_kgha, n = 3),
          nrateF = as.numeric(nrate),
          nrateF = case_when(
@@ -558,46 +594,124 @@ fig_ogap <-
   labs(title = "Continuous corn penalty persists over time at all N rates")
 
 
-fig_ogap
+#--obseved gaps by years in corn (instead of year)
 
-
-fig_dat <- 
-  ilia_yields %>% 
+gaps_alln %>%
+  filter(!is.na(ogap_kgha)) %>% 
+  group_by(site) %>% 
+  mutate(years_in_corn = year - min(year)) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  
   bind_rows(
-  dat_gaps %>% 
-  mutate(nrate = cut_interval(nrate_kgha, n = 3),
-         nrateF = as.numeric(nrate),
-         nrateF = case_when(
-           nrateF == 1 ~ "Low (0-90 kgN/ha)",
-           nrateF == 2 ~ "Med (90-180 kgN/ha)",
-           nrateF == 3 ~ "High (180-270 kgN/ha")
-  )  %>% 
-  mutate(rotation = "gap",
-         yield_kgha = ogap_kgha)
+    gaps_alln %>%
+      filter(!is.na(ogap_kgha)) %>% 
+      group_by(site) %>% 
+      mutate(years_in_corn = year - min(year)) %>% 
+      filter(nrate_kgha == max(nrate_kgha)) %>% 
+      mutate(site = "zcombined")
   ) %>% 
-  mutate(nrate = cut_interval(nrate_kgha, n = 3),
-         nrateF = as.numeric(nrate),
-         nrateF = case_when(
-           nrateF == 1 ~ "Low (0-90 kgN/ha)",
-           nrateF == 2 ~ "Med (90-180 kgN/ha)",
-           nrateF == 3 ~ "High (180-270 kgN/ha")
+  
+  ggplot(aes(years_in_corn, ogap_kgha)) + 
+  geom_point(color = "gray30") + 
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_wrap(~site)
+
+
+
+
+#--look at cc and sc yields in addition to gap over time
+
+fig_gap <-
+  ilia_yields %>%
+  bind_rows(
+    gaps_alln %>%
+      mutate(
+        nrate = cut_interval(nrate_kgha, n = 3),
+        nrateF = as.numeric(nrate),
+        nrateF = case_when(
+          nrateF == 1 ~ "Low (0-90 kgN/ha)",
+          nrateF == 2 ~ "Med (90-180 kgN/ha)",
+          nrateF == 3 ~ "High (180-270 kgN/ha")
+        )  %>%
+      mutate(rotation = "gap",
+             yield_kgha = ogap_kgha)
+  ) %>%
+  bind_rows(
+    gaps_alln %>%
+      mutate(
+        nrate = cut_interval(nrate_kgha, n = 3),
+        nrateF = as.numeric(nrate),
+        nrateF = case_when(
+          nrateF == 1 ~ "Low (0-90 kgN/ha)",
+          nrateF == 2 ~ "Med (90-180 kgN/ha)",
+          nrateF == 3 ~ "High (180-270 kgN/ha")
+      )  %>%
+      mutate(rotation = "gap_pct",
+             yield_kgha = ogap_pct)
   ) %>% 
-  arrange(nrate) %>% 
+  mutate(
+    nrate = cut_interval(nrate_kgha, n = 3),
+    nrateF = as.numeric(nrate),
+    nrateF = case_when(
+      nrateF == 1 ~ "Low (0-90 kgN/ha)",
+      nrateF == 2 ~ "Med (90-180 kgN/ha)",
+      nrateF == 3 ~ "High (180-270 kgN/ha"
+    )
+  ) %>%
+  arrange(nrate) %>%
   mutate(nrateF = fct_inorder(nrateF),
-         rotation = factor(rotation, levels = c("sc", "cc", "gap"))) 
+         rotation = factor(rotation, levels = c("sc", "cc", "gap", "gap_pct")))
+
 
 #--separated by state
-fig_dat %>% 
+fig_gap %>% 
   ggplot(aes(year, yield_kgha)) + 
   geom_jitter(aes(color = nrateF), alpha = 0.5) + 
   geom_smooth(method = "lm", se = F, color = "red") +
   facet_grid(rotation~nrateF+state, scales = "free") 
 
+# #--179 site years
+# fig_dat %>% 
+#   unite(site, year, col = "siteyear") %>% 
+#   select(siteyear) %>% 
+#   distinct()
 
 #--all together
-fig_dat %>% 
+fig_gap %>% 
   ggplot(aes(year, yield_kgha)) + 
   geom_jitter(color = "gray80") + 
   geom_smooth(method = "lm", se = F, color = "red", size = 2) +
-  facet_grid(rotation~nrateF, scales = "free") 
+  facet_grid(rotation~nrateF, scales = "free") +
+  labs(title = "179 site-years, IA and IL",
+       subtitle = "Continuous corn penalty has not changed over time")
 
+ggsave("04_answer-Qs/fig_7-gap-over-time.png", height = 12)
+
+#--stats to get slope
+fig_gap
+
+m7sc <- lmer(yield_kgha ~ year + (1|site),
+           data = fig_gap %>% filter(rotation == "sc",
+                                     grepl("High", nrateF)))
+m7cc <- lmer(yield_kgha ~ year + (1|site),
+           data = fig_gap %>% filter(rotation == "cc",
+                                     grepl("High", nrateF)))
+summary(m7cc)
+summary(m7sc)
+
+summary(lmer(yield_kgha ~ 1 + (1|site),
+               data = fig_gap %>% filter(grepl("High", nrateF))))
+  
+
+fig_gap %>% 
+  filter(grepl("High", nrateF)) %>% 
+  summarise(ogap_kgha = mean(ogap_kgha, na.rm = T))
+
+summary(lmer(ogap_kgha ~ 1 + (1|site),
+             data = fig_gap %>% filter(grepl("High", nrateF))))
+fig_gap %>% 
+  filter(grepl("Low", nrateF)) %>% 
+  summarise(ogap_kgha = mean(ogap_kgha, na.rm = T))
+
+summary(lmer(ogap_kgha ~ 1 + (1|site),
+             data = fig_gap %>% filter(grepl("Low", nrateF))))

@@ -6,7 +6,7 @@
 library(tidysawyer2)
 library(tidyverse)
 library(scales)
-
+library(ggmosaic)
 
 # functions ---------------------------------------------------------------------
 
@@ -433,14 +433,11 @@ ilia_yields %>%
 
 
 
-# nice figs ---------------------------------------------------------------
-
-#--make a nice npct one
+# nice fig, each year nfrac ---------------------------------------------------------------
 
 tst.npct %>% 
-  filter(!is.na(ngap_frac),
-         state == "IA") %>%
-  select(state, site, year, ngap_frac) %>% 
+  filter(!is.na(ngap_frac)) %>%
+  select(site, year, ngap_frac) %>% 
   mutate(anonngap_frac = 1 - ngap_frac) %>% 
   pivot_longer(ngap_frac:anonngap_frac) %>% 
   ggplot(aes(as.factor(year), value)) + 
@@ -453,5 +450,58 @@ tst.npct %>%
   labs(title = "Percentage of penalty related to nitrogen",
        subtitle = "Empirical approach")
 
-#--idea = should do a mosaic plot, with widths related to size of gap
+ggsave("00_empirical-n-cont/fig_gap-nfrac.png")
 
+
+
+# ggmosaic ----------------------------------------------------------------
+
+
+#--idea = should do a mosaic plot, with widths related to size of gap
+#--done w/miranda's help
+
+#--take averages of sites
+tst.npct %>% 
+  filter(!is.na(ngap_frac)) %>%
+  select(site, year, ngap_frac) %>%
+  group_by(site) %>% 
+  summarise(ngap_frac = mean(ngap_frac)) %>%
+  arrange(-ngap_frac) %>% 
+  mutate(site = fct_inorder(site)) %>% 
+  mutate(anonngap_frac = 1 - ngap_frac) %>% 
+  pivot_longer(ngap_frac:anonngap_frac) %>% 
+  ggplot(aes(site, value)) + 
+  geom_col(aes(fill = name)) + 
+  scale_y_continuous(labels = label_percent()) +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  coord_cartesian(ylim = c(0, 1)) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_manual(values = c("gray60", "red")) +
+  labs(title = "Percentage of penalty related to nitrogen",
+       subtitle = "Empirical approach, averaged over site-years")
+
+ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg.png")
+
+
+#--take averages of sites, just nfrac w/errors
+tst.npct %>% 
+  filter(!is.na(ngap_frac)) %>%
+  select(site, year, ngap_frac) %>%
+  group_by(site) %>% 
+  mutate(mn = mean(ngap_frac)) %>% 
+  arrange(-mn) %>% 
+  mutate(site = fct_inorder(site)) %>% 
+  ggplot(aes(reorder(site,-mn), ngap_frac)) + 
+  stat_summary(geom = "bar", fill = "red") +
+  stat_summary(geom = "errorbar", width = 0.2) +
+  scale_y_continuous(labels = label_percent()) +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  coord_cartesian(ylim = c(0, 1)) +
+  theme(axis.text.x = element_text(angle = 45)) +
+  scale_fill_manual(values = c("gray60", "red")) +
+  labs(title = "Percentage of penalty related to nitrogen",
+       subtitle = "Empirical approach, averaged over site-years",
+       x = "Site",
+       y = "Percentage of penalty overcome by nitrogen fertilization")
+
+ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg-errors.png")

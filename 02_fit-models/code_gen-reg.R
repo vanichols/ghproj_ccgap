@@ -36,7 +36,8 @@ m1vars <-
   sm1$coefficients %>% 
   enframe() %>% 
   filter(name != "(Intercept)") %>% 
-  mutate(respvar = "pen_pct")
+  mutate(respvar = "pen_pct") %>% 
+  arrange(value)
 
 summary(sm1)
 anova(sm1)
@@ -52,7 +53,8 @@ m2vars <-
   sm2$coefficients %>% 
   enframe() %>% 
   filter(name != "(Intercept)") %>% 
-  mutate(respvar = "pen_kgha")
+  mutate(respvar = "pen_kgha") %>% 
+  arrange(value)
 
 m1vars %>% 
   bind_rows(m2vars) %>% 
