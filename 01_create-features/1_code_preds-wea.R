@@ -5,6 +5,7 @@
 #                4/8/2020 (add Alison suggestions, play w/machine learning)
 #                4/30/2020 (update file structure)
 #                11/30/2020 (revisting. added illinois)
+#                2/27/2021 (making sure everything is correct)
 # 
 # purpose: Create pred tibble for weather variables
 #
@@ -235,15 +236,13 @@ wea_hs2 %>%
 #--others?
 #--sa uses precip_mmy days > 1inch, growing season GDD, heat days (Tmax > 34C), cold days (Tmin < 4), rad, avg T
 
-
-#--mean july max temp
-wea_july <- 
+wea_apr <- 
   wea %>% 
-  filter(day < 212, day > 181) %>% 
+  filter(day < 120, day > 91) %>% 
   group_by(site, year) %>% 
-  summarise(jul_tmin_c_mean = mean(tmin_c),
-            jul_tmax_c_mean = mean(tmax_c),
-            jul_precip_mm_tot = sum(precip_mm))
+  summarise(apr_tmin_c_mean = mean(tmin_c),
+            apr_tmax_c_mean = mean(tmax_c),
+            apr_precip_mm_tot = sum(precip_mm))
 
 wea_may <- 
   wea %>% 
@@ -253,13 +252,33 @@ wea_may <-
             may_tmax_c_mean = mean(tmax_c),
             may_precip_mm_tot = sum(precip_mm))
 
-wea_apr <- 
+#--june temp + precip
+wea_june <- 
   wea %>% 
-  filter(day < 120, day > 91) %>% 
+  filter(day < 211, day > 151) %>% 
   group_by(site, year) %>% 
-  summarise(apr_tmin_c_mean = mean(tmin_c),
-            apr_tmax_c_mean = mean(tmax_c),
-            apr_precip_mm_tot = sum(precip_mm))
+  summarise(jun_tmin_c_mean = mean(tmin_c),
+            jun_tmax_c_mean = mean(tmax_c),
+            jun_precip_mm_tot = sum(precip_mm))
+
+#--mean july things
+wea_july <- 
+  wea %>% 
+  filter(day < 212, day > 181) %>% 
+  group_by(site, year) %>% 
+  summarise(jul_tmin_c_mean = mean(tmin_c),
+            jul_tmax_c_mean = mean(tmax_c),
+            jul_precip_mm_tot = sum(precip_mm))
+
+#--mean aug things
+wea_aug <- 
+  wea %>% 
+  filter(day < 244, day > 212) %>% 
+  group_by(site, year) %>% 
+  summarise(aug_tmin_c_mean = mean(tmin_c),
+            aug_tmax_c_mean = mean(tmax_c),
+            aug_precip_mm_tot = sum(precip_mm))
+
 
 wea_aprmay <- 
   wea %>% 
@@ -286,6 +305,36 @@ wea_gsP <-
 # combine wea metrics -------------------------------------------
 
 
+wea_parms_all_raw <- 
+  wea1 %>% 
+  left_join(wea2) %>% #--water year precip
+  left_join(wea3) %>% #--precip_mmy days >1" from planting to 60 DAP, not much variation
+  left_join(wea4) %>% #--days to reach 140 (or 120?)
+  left_join(wea5) %>% #--precip_mm tot 2 weeks after planting
+  left_join(wea6) %>% #--3 wks
+  left_join(wea7) %>% #--4 wks
+  left_join(wea8) %>% #--2 wks before
+  left_join(wea9) %>% #--3 wks
+  left_join(wea10) %>% #--4wks
+  left_join(wea11) %>% #--mo avg tmax 2 mo ap, corr w/days to gdd140 for some reason
+  left_join(wea12) %>% #--avg tmin in the month surrounding planting
+  left_join(wea13) %>% #--# days < 4degF (-15C) before planting. Why 4 deg? Anna? Don't remember...
+  left_join(wea14) %>% #--gdd in 2 months after planting
+  left_join(wea_hs) %>% #-heat stress yes/no days
+  left_join(wea_hs2) %>% #--heat stress gradient
+  left_join(wea_june) %>% #--I kind of don't like the things not referenced to planting
+  left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
+  left_join(wea_aug) %>% #--I kind of don't like the things not referenced to planting
+  left_join(wea_may) %>%
+  left_join(wea_apr) %>%
+  left_join(wea_aprmay) %>%
+  left_join(wea_gsT) %>% #--gs_tavg
+  left_join(wea_gsP) %>% #--gs_precip_mm_tot
+  ungroup() %>% 
+  mutate_if(is.numeric, list(~replace_na(., 0)))
+
+wea_parms_all_raw %>% write_csv("01_create-features/1_dat_candidate-preds-wea.csv")
+
 wea_parms_all <- 
   wea1 %>% 
   left_join(wea2) %>% #--water year precip
@@ -303,6 +352,8 @@ wea_parms_all <-
   #left_join(wea14) %>% #--gdd in 2 months after planting
   #left_join(wea_hs) %>% #-heat stress yes/no days
   left_join(wea_hs2) %>% #--heat stress gradient
+  #left_join(wea_aug) %>% #--I kind of don't like the things not referenced to planting
+  #left_join(wea_june) %>% #--I kind of don't like the things not referenced to planting
   #left_join(wea_july) %>% #--I kind of don't like the things not referenced to planting
   #left_join(wea_may) %>% 
   #left_join(wea_apr) %>% 
