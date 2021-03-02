@@ -116,6 +116,47 @@ tst.prds %>%
 
 # viz ---------------------------------------------------------------------
 
+#--create one for a site-year (as example of methodology)
+
+viz.aonr <- 
+  tst.aonrs %>% 
+  separate(aonr_rot, into = c("x", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  select(-x) %>% 
+  left_join(tst.prds) %>% 
+  filter(site == "ames",
+         year == 2003)
+
+viz.prds <- 
+  tst.prds %>% 
+  filter(site == "ames",
+         year == 2003) %>% 
+  filter(nrate_kgha < 300)
+
+viz.obs <- 
+  ilia_yields %>% 
+  mutate(nrate_kgha = round(nrate_kgha, 0)) %>% 
+  filter(site == "ames",
+         year == 2003)
+
+ggplot() + 
+  geom_point(data = viz.obs, aes(x = nrate_kgha, y = yield_kgha, color = rotation)) + 
+  geom_line(data = viz.obs, aes(x = nrate_kgha, y = yield_kgha, color = rotation), linetype = "dashed") + 
+  geom_line(data = viz.prds, aes(x = nrate_kgha, y = pred_yield, color = rotation), size = 2) + 
+  geom_point(data = viz.aonr, aes(x = nrate_kgha, y = pred_yield, fill = rotation), pch = 23, size = 2, stroke = 2) + 
+  facet_wrap(~year) + 
+  theme_bw()
+
+ggsave("00_empirical-n-cont/fig_ex-calculation.png")
+
+
+
+
+# pwalk -------------------------------------------------------------------
+
+
+
+
 qsite <- c("brow")
 
 siteopts <- 
