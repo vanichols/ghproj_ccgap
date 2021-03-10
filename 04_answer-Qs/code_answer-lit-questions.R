@@ -793,3 +793,44 @@ fig_gap %>%
 
 summary(lmer(ogap_kgha ~ 1 + (1|site),
              data = fig_gap %>% filter(grepl("Low", nrateF))))
+
+
+#--yields and rain over time - confounded?
+pcp_ann %>% 
+  ggplot(aes(year, pcp_mm)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F) +
+  facet_wrap(~site)
+
+ilia_yields %>% 
+  filter(nrate_kgha == 0) %>% 
+  left_join(pcp_ann) %>% 
+  ggplot(aes(yield_kgha, pcp_mm)) + 
+  geom_point()
+
+dat <- 
+  ilia_yields %>% 
+  filter(nrate_kgha == 0) %>% 
+  left_join(pcp_ann) %>% 
+  group_by(site) %>% 
+  mutate(years_in_corn = year - min(year)) 
+  
+  
+library(lme4)
+library(lmerTest)
+
+dat
+
+m1 <- lmer(yield_kgha ~ years_in_corn + pcp_mm + (1|site), data = dat)
+anova(m1)
+summary(m1)
+
+m2 <- lmer(yield_kgha ~ years_in_corn + (1|site), data = dat)
+anova(m2)
+summary(m2)
+
+anova(m1, m2)
+
+dat %>% 
+  ggplot(aes(years_in_corn, yield_kgha)) + 
+  geom_point()
