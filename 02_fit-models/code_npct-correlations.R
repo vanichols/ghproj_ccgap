@@ -15,41 +15,57 @@ library(tidysawyer2)
 
 # data --------------------------------------------------------------------
 
-npct <- read_csv("00_empirical-n-cont/fits-npct.csv")
+npct <- 
+  read_csv("00_empirical-n-cont/fits-npct-manual-adds.csv") 
 
-wp <- read_csv("01_create-features/1_dat_candidate-preds-wea.csv")
+#--see if I use the curated batch instead
+# wp <- 
+#   read_csv("01_create-features/1_dat_candidate-preds-wea.csv") %>% 
+#   #--add years in corn
+#   group_by(site) %>% 
+#   mutate(yrs_in_corn = year - min(year) + 1) %>% 
+#   dplyr::select(state:year, yrs_in_corn, everything()) %>% 
+#   ungroup()
+
+wp <- read_csv("01_create-features/1_dat_preds-wea.csv") %>%
+#--add years in corn
+  group_by(site) %>%
+  mutate(yrs_in_corn = year - min(year) + 1) %>%
+  dplyr::select(state:year, yrs_in_corn, everything()) %>%
+  ungroup()
 
 
+
+#--w/o manual edits to ngap_frac
 dat <- 
   wp %>% 
-  left_join(npct %>% select(site, year, ngap_frac)) %>% 
-  select(state, site, year, ngap_frac, everything()) 
+  left_join(npct %>% dplyr::select(site, year, ngap_frac, manual_edit)) %>% 
+  filter(is.na(manual_edit)) %>% 
+  dplyr::select(state, site, year, ngap_frac, yrs_in_corn, everything(), -manual_edit)  
   
-dat_site <- 
+dat_gap <- 
   wp %>% 
-  pivot_longer(-(state:year)) %>% 
-  group_by(site, name) %>% 
-  summarise(value = mean(value, na.rm = T)) %>% 
-  left_join(npct %>% group_by(site) %>% summarise(ngap_frac = mean(ngap_frac, na.rm = T))) %>% 
-  filter(!is.na(ngap_frac)) 
+  left_join(npct %>% dplyr::select(site, year, gap_at_rotaonr_kgha)) %>% 
+  dplyr::select(state, site, year, gap_at_rotaonr_kgha, yrs_in_corn, everything()) 
+
+#--w/manual edits to ngap_frac
+dat_man <- 
+  wp %>% 
+  left_join(npct %>% dplyr::select(site, year, ngap_frac)) %>% 
+  dplyr::select(state, site, year, ngap_frac, yrs_in_corn, everything())  
+
+
+#--includes manual edit values
+dat_site <-
+  wp %>%
+  pivot_longer(-(state:year)) %>%
+  group_by(site, name) %>%
+  summarise(value = mean(value, na.rm = T)) %>%
+  left_join(npct %>% group_by(site) %>% summarise(ngap_frac = mean(ngap_frac, na.rm = T))) %>%
+  filter(!is.na(ngap_frac))
   
 
 # correlations ------------------------------------------------------------
-#--test
-tst <- 
-  dat %>% 
-  pivot_longer(wyprecip_mm:gs_precip_mm_tot) %>%
-  filter(name == "wyprecip_mm") %>% 
-  filter(!is.na(ngap_frac))
-
-tst
-
-cor(tst$ngap_frac, tst$value)
-
-tst %>%
-  nest() %>% 
-  mutate(corr =data %>% map_dbl(~cor(.$ngap_frac, .$value)))
-
 
 dcor <- 
   dat %>% 
@@ -67,6 +83,13 @@ dcor %>%
   coord_flip()
 
 #--just look at top corrs
+dcor %>% 
+  filter(abs(corr) > 0.2) %>%
+  ggplot(aes(reorder(name, corr), corr)) + 
+  geom_point(size = 3) +
+  geom_segment(aes(x = name, xend = name, y = 0, yend = corr)) +
+  coord_flip()
+
 tops <- 
   dcor %>%
   filter(abs(corr) > 0.2) %>%
@@ -84,7 +107,45 @@ dat %>%
 #--more winter cold days --> less gap closed by n?
 
 
+# simple stepwise regression -------------------------------------------------------
+
+#library(MASS) #--messes up select, has stepAIC but don't know diff btwn that and step
+
+#--no interactions
+
+m1 <- lm(ngap_frac*100 ~ ., data = dat %>% dplyr::select(-state, -site, -year))
+sm1 <- step(m1, k = log(nrow(dat))) #--gives BIC instead of AIC, this seriously limits what gets in
+sm1$coefficients %>%  
+  enframe() %>% 
+  filter(name != "(Intercept)") %>% 
+  mutate(respvar = "n_pct") %>% 
+  arrange(value)
+
+#--does this change if I include the 'manual' assignments? No. 
+m1a <- lm(ngap_frac*100 ~ ., data = dat_man %>% dplyr::select(-state, -site, -year))
+sm1a <- step(m1a, k = log(nrow(dat_man))) #--gives BIC instead of AIC, this seriously limits what gets in
+sm1a$coefficients %>%  
+  enframe() %>% 
+  filter(name != "(Intercept)") %>% 
+  mutate(respvar = "n_pct") %>% 
+  arrange(value)
+
+
+
+#--compare this to the results for the gap itself
+m2 <- lm(gap_at_rotaonr_kgha ~ ., data = dat_gap %>% dplyr::select(-state, -site, -year))
+sm2 <- step(m2, k = log(nrow(dat_gap))) #--gives BIC instead of AIC, this seriously limits what gets in
+
+sm2$coefficients %>%  
+  enframe() %>% 
+  filter(name != "(Intercept)") %>% 
+  mutate(respvar = "gap") %>% 
+  arrange(value)
+
+
 # do site avgs ------------------------------------------------------------
+
+#--not in love with this
 
 dcor_site <- 
   dat_site %>% 
@@ -124,3 +185,4 @@ ilia_gaps %>%
     ) %>% 
   ggplot(aes(gap_kgha, ngap_frac)) + 
   geom_point(aes(color = site, shape = state), size = 5)
+
