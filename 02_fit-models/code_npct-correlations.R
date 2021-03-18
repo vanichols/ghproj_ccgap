@@ -112,8 +112,10 @@ dat %>%
 #library(MASS) #--messes up select, has stepAIC but don't know diff btwn that and step
 
 #--no interactions
-
-m1 <- lm(ngap_frac*100 ~ ., data = dat %>% dplyr::select(-state, -site, -year))
+#--can I include site?
+m1 <- lm(ngap_frac*100 ~ ., data = dat %>% dplyr::select(-state, 
+                                                         #-site, 
+                                                         -year))
 sm1 <- step(m1, k = log(nrow(dat))) #--gives BIC instead of AIC, this seriously limits what gets in
 sm1$coefficients %>%  
   enframe() %>% 

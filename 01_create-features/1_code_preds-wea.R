@@ -367,7 +367,7 @@ wea_parms_all <-
 library(corrplot)
 
 wea_cor <- 
-  wea_parms_all %>%
+  wea_parms_all_raw %>%
   ungroup() %>% 
   select_if(is.numeric) %>% 
   cor(., use="complete.obs")

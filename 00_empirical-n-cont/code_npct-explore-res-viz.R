@@ -8,7 +8,9 @@ library(tidysawyer2)
 library(tidyverse)
 library(scales)
 library(ggmosaic)
+library(ggExtra)
 
+theme_set(theme_bw())
 
 # data --------------------------------------------------------------------
 
@@ -21,8 +23,35 @@ tst.npct <-
   read_csv("00_empirical-n-cont/fits-npct.csv") %>% 
   left_join(tst.tib %>% select(state, site) %>% distinct())
 
+npct_mean <- 
+  tst.npct %>% 
+  summarise(ngap_frac = mean(ngap_frac, na.rm = T)) %>% 
+  pull(ngap_frac)
+
 tst.npct %>% 
-  summarise(ngap_frac = mean(ngap_frac, na.rm = T))
+  ggplot(aes(ngap_frac)) + 
+  geom_histogram(bins = 40)
+
+p1 <- 
+  tst.npct %>% 
+  filter(!is.na(ngap_frac)) %>% 
+  arrange(-ngap_frac) %>% 
+  mutate(rown = 1:n(),
+         rown2 = rown/max(rown)) %>% 
+  ggplot(aes(rown2, ngap_frac, color = state)) + 
+  geom_point() + 
+  geom_hline(yintercept = npct_mean, color = "red") +
+  geom_segment(aes(x = rown2, xend = rown2, y = 0, yend = ngap_frac)) +
+  coord_flip() +
+  theme(axis.text.y = element_blank()) + 
+  scale_y_continuous(labels = label_percent()) +
+  labs(x = "Observation",
+       y = "Percent of gap closed by Nfert")
+
+ggExtra::ggMarginal(p1, margins = "x", type = "histogram", bins = 40)
+
+ggsave("00_empirical-n-cont/fig_gap-nfrac-lollypop.png")
+
 
 #--look at it by year
 tst.npct %>% 
