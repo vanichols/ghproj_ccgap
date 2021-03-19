@@ -74,13 +74,15 @@ tav_lt <-
 #--look at gaps at high N category compared to cc/sc yields
 gaps_alln %>% 
   mutate(nrate = cut_interval(nrate_kgha, n = 3),
-         nrateF = as.numeric(nrate),
+         nrateN = as.numeric(nrate),
          nrateF = case_when(
-           nrateF == 1 ~ "Low (0-90 kgN/ha)",
-           nrateF == 2 ~ "Med (90-180 kgN/ha)",
-           nrateF == 3 ~ "High (180-270 kgN/ha")
-  ) %>% 
-  filter(grepl("High", nrateF)) %>% 
+           nrateN == 1 ~ "Low (0-90 kgN/ha)",
+           nrateN == 2 ~ "Med (90-180 kgN/ha)",
+           nrateN == 3 ~ "High (180-270 kgN/ha")
+  ) %>%
+  arrange(nrateN) %>% 
+  mutate(nrateF = fct_inorder(nrateF)) %>% 
+  #filter(grepl("High", nrateF)) %>% 
   mutate(avg = (cc + sc)/2) %>% 
   pivot_longer(cols = c("cc", "sc", "avg")) %>% 
   mutate(name = case_when(
@@ -93,11 +95,52 @@ gaps_alln %>%
                            "Yield - Rotated Corn", 
                            "Yield - Environmental Average"))) %>%  
   ggplot(aes(value, ogap_kgha)) + 
-  geom_point(size = 2, color = "gray30") + 
-  geom_smooth(method = "lm", se = F) +
-  facet_grid(.~name) + 
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_point(size = 2, aes(color = nrateF)) +#color = "gray30") + 
+  scale_color_manual(values = c("gray80", "gray50", "black")) +
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_grid(nrateF~name) + 
   labs(x = "Corn Yield (kg/ha)",
-       y = "Continuous Corn Penalty (kg/ha)")
+       y = "Continuous Corn Penalty (kg/ha)",
+       title = "As N fert inc, yields of rot corn are less important in gap size",
+       subtitle = "At high N, as cont corn yields inc, gap dec")
+
+ggsave("04_answer-Qs/fig_1-gap-vs-types-of-yields-allNrates.png")
+
+#--what does this look like within a site?
+gaps_alln %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateN = as.numeric(nrate),
+         nrateF = case_when(
+           nrateN == 1 ~ "Low (0-90 kgN/ha)",
+           nrateN == 2 ~ "Med (90-180 kgN/ha)",
+           nrateN == 3 ~ "High (180-270 kgN/ha")
+  ) %>%
+  arrange(nrateN) %>% 
+  mutate(nrateF = fct_inorder(nrateF)) %>% 
+  #filter(grepl("High", nrateF)) %>% 
+  mutate(avg = (cc + sc)/2) %>% 
+  pivot_longer(cols = c("cc", "sc", "avg")) %>% 
+  mutate(name = case_when(
+    grepl("cc", name) ~ "Yield - Continuous Corn",
+    grepl("sc", name) ~ "Yield - Rotated Corn",
+    grepl("avg", name) ~ "Yield - Environmental Average"
+  ),
+  name = factor(name, 
+                levels = c("Yield - Continuous Corn", 
+                           "Yield - Rotated Corn", 
+                           "Yield - Environmental Average"))) %>%  
+  ggplot(aes(value, ogap_kgha)) + 
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_point(size = 2, aes(fill = nrateF), pch = 21, alpha = 0.5, stroke = 0.1) +#color = "gray30") + 
+  scale_fill_manual(values = c("gray80", "gray50", "black")) +
+  geom_smooth(method = "lm", se = F, aes(color = site), size = 2) +
+  facet_grid(nrateF~name) + 
+  guides(color = F) +
+  labs(x = "Corn Yield (kg/ha)",
+       y = "Continuous Corn Penalty (kg/ha)",
+       title = "As N fert inc, yields of rot corn are less important in gap size")
+
 
 #--pathwork them
 #--look at gaps at high N category compared to cc/sc yields
@@ -133,8 +176,8 @@ f1b <-
   f1dat %>%  
   filter(name == "Yield - Rotated Corn") %>% 
   ggplot(aes(value, ogap_kgha)) + 
-  geom_vline(xintercept = 9000, color = "red", linetype = "dashed") +
-  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  #geom_vline(xintercept = 9000, color = "red", linetype = "dashed") +
+  #geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
   geom_point(size = 2, color = "gray30") + 
   geom_smooth(method = "lm", se = F) +
   labs(x = "Rotated Corn Yield (kg/ha)",
@@ -151,7 +194,9 @@ f1c <-
        y = NULL) + 
   theme(axis.text.y = element_blank())
 
-f1a + f1b + f1c
+f1a + f1b + f1c +  plot_annotation(
+  title = 'Gap at high N rates (180-270 kg/ha)',
+)
 
 ggsave("04_answer-Qs/fig_1-gap-vs-types-of-yields.png")
 
@@ -197,7 +242,7 @@ gaps_maxn %>%
        x = "Avg corn yield (kg/ha)",
        y = "Penalty (kg/ha)")
 
-ggsave("04_answer-Qs/fig_1-gap-vs-envyld.png")
+ggsave("04_answer-Qs/fig_1-gap-vs-site-yld-pot.png")
 
 gaps_maxn %>%
   left_join(ilia_yields %>%
@@ -834,3 +879,5 @@ anova(m1, m2)
 dat %>% 
   ggplot(aes(years_in_corn, yield_kgha)) + 
   geom_point()
+
+
