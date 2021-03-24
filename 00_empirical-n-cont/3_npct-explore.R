@@ -104,6 +104,28 @@ summary(m1)
 (0.03419) / (0.03419+0.09243)
 
 
+# include residue in models? ----------------------------------------------
+
+#--want highest yield achieved in cc in the year beofre
+
+prev_yield <- 
+  ilia_yields %>% 
+  filter(rotation == "cc") %>% 
+  group_by(state, site, year, rotation) %>% 
+  summarise(max_yield = max(yield_kgha, na.rm = T)) %>%
+  group_by(state, site) %>% 
+  mutate(prev_yr_ccyield = lag(max_yield)/1000) %>% 
+  ungroup() %>% 
+  select(site, year, prev_yr_ccyield) %>% 
+  unite(site, year, col = "year") 
+
+dat_anova2 <- 
+  dat_anova %>% 
+  left_join(prev_yield)
+
+m3 <- lmer(ngap_frac ~ prev_yr_ccyield + (1|site), data = dat_anova2)
+summary(m3)
+
 
 # pie chart of variation --------------------------------------------------
 
@@ -414,3 +436,6 @@ npct %>%
        y = "Percentage of penalty overcome by nitrogen fertilization")
 
 ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg-errors.png")
+
+
+
