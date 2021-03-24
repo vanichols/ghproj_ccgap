@@ -42,6 +42,9 @@ gaps_maxn <-
   group_by(site) %>% 
   filter(nrate_kgha == max(nrate_kgha))
 
+aonrs <- read_csv("00_empirical-n-cont/dat_aonrs.csv")
+
+
 # weather data --------------------------------------------------------------------
 
 pcp_ann <- 
@@ -879,5 +882,37 @@ anova(m1, m2)
 dat %>% 
   ggplot(aes(years_in_corn, yield_kgha)) + 
   geom_point()
+
+
+
+
+
+# 8. gap vs aonr ----------------------------------------------------------
+
+gaps_aonrs <- 
+  gaps_alln %>% 
+  select(state, site, year, nrate_kgha, ogap_kgha) %>% 
+  left_join(aonrs) %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  ) %>% 
+  arrange(nrate) %>%
+  mutate(nrateF = fct_inorder(nrateF))
+
+  
+gaps_aonrs %>% 
+  filter(!is.na(aonr_rot)) %>% 
+  ggplot(aes(aonr_kgha, ogap_kgha)) + 
+  geom_point(aes(color = aonr_rot)) +
+  geom_smooth(method = "lm", se = F) +
+  facet_grid(nrateF~aonr_rot)
+
+
+# 9. site vs year variation --------------------------------------------------
+
 
 

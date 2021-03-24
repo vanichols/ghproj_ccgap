@@ -86,9 +86,11 @@ dat_anova <-
 
 dat_anova
 
-#--seems like year has higher sum squares?
-m0 <- lm(ngap_frac ~ site * year, data = dat.anova)
+#--site is 32% of total, using this method
+m0 <- lm(ngap_frac ~ site * year, data = dat_anova)
 anova(m0)
+
+4.6595/(4.6596+9.853)
 
 #--include site as random, whatever is left over is site-year
 m1 <- lmer(ngap_frac ~ 1 + (1|site), data = dat_anova)
@@ -96,21 +98,90 @@ m2 <- lm(ngap_frac ~ site, data = dat_anova) #--but not same # of points...
 
 AIC(m1, m2) #--lm is better? You want low AIC, right?
 anova(m2)
+summary(m1)
 
+#--site is 27% using this method
+(0.03419) / (0.03419+0.09243)
+
+
+
+# pie chart of variation --------------------------------------------------
+
+dpie <- tibble(name = c("Site", "Year"),
+               rxsum = c(0.3, 0.7))
+
+# You have to do weird things to make the labels get on the right place
+dpie %>%
+  mutate(name = factor(name, levels = c("Year", "Site")),
+         name2 = fct_rev(name)) %>% 
+  arrange(name2) %>% 
+  mutate(half = rxsum/2,
+         prev = lag(rxsum),
+         prev = ifelse(is.na(prev), 0, prev),
+         cumprev = cumsum(prev),
+         pos = half + cumprev)  %>%
+  ggplot(aes(x = "", y = rxsum, fill = name)) +
+  geom_bar(stat = "identity") +
+  guides(fill = F) +
+  coord_polar("y", start = 0) + 
+  theme_minimal() +
+  theme(axis.text.x = element_blank(),
+        axis.title = element_blank()) +
+  geom_text(aes(y = pos,
+                label = name), size = 5) + 
+  scale_fill_manual(values = c("deepskyblue", "red"))
+
+
+
+# get fixed effect estimates for each site ---------------------------------------------
 
 #--fixed effect estimates for site
 emmeans(m2, specs = "site") %>% 
   broom::tidy() %>% 
   arrange(estimate) %>%
+  left_join(ilia_yields %>% select(state, site) %>% distinct()) %>% 
 #  mutate(site = fct_inorder(site)) %>% 
   ggplot(aes(reorder(site, -estimate), estimate)) + 
-  geom_col() + 
+  geom_col(aes(fill = state)) + 
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
   geom_linerange(aes(ymin = estimate - std.error,
                      ymax = estimate + std.error)) + 
   scale_y_continuous(label = label_percent()) + 
   labs(x = NULL,
        y = "Percent of cont corn penalty due to nitrogen",
        title = "Nitrogen contribution to penalty, averaged over years")
+
+
+# get averrage prod of each site
+site_avgs <- 
+  ilia_yields %>% 
+  filter(nrate_kgha > 150) %>% 
+  group_by(state, site) %>% 
+  summarise(site_yield_avg = mean(yield_kgha))
+
+
+#--fixed effect estimates for site
+emmeans(m2, specs = "site") %>% 
+  broom::tidy() %>% 
+  arrange(estimate) %>%
+  left_join(ilia_yields %>% select(state, site) %>% distinct()) %>% 
+  left_join(site_avgs) %>% 
+  ggplot(aes(reorder(site, -estimate), estimate)) + 
+  geom_col(aes(fill = site_yield_avg, color = state), size = 2) + 
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_linerange(aes(ymin = estimate - std.error,
+                     ymax = estimate + std.error)) + 
+  scale_y_continuous(label = label_percent()) + 
+  scale_color_manual(values = c("white", "black")) +
+  scale_fill_viridis_c() +
+  labs(x = NULL,
+       y = "Percent of cont corn penalty due to nitrogen",
+       title = "Nitrogen contribution to penalty, averaged over years")
+
+ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg.png")
+
+# use random effect apporach ----------------------------------------------
+
 
 #--try blubs of mixed model
 coef(m1)$site %>% 
