@@ -110,6 +110,50 @@ gaps_alln %>%
 
 ggsave("04_answer-Qs/fig_1-gap-vs-types-of-yields-allNrates.png")
 
+
+#--simple stats
+md1 <- 
+  gaps_alln %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateN = as.numeric(nrate),
+         nrateF = case_when(
+           nrateN == 1 ~ "Low (0-90 kgN/ha)",
+           nrateN == 2 ~ "Med (90-180 kgN/ha)",
+           nrateN == 3 ~ "High (180-270 kgN/ha")
+  ) %>%
+  filter(nrateN == 3) %>% 
+  mutate(avg = (cc + sc)/2) %>% 
+  pivot_longer(cols = c("cc", "sc", "avg")) %>% 
+  mutate(name = case_when(
+    grepl("cc", name) ~ "ContCorn",
+    grepl("sc", name) ~ "RotCorn",
+    grepl("avg", name) ~ "Env"
+  ),
+  #value = scale(value),
+  #ogap_kgha = scale(ogap_kgha)
+  ) %>% 
+  filter(!is.na(ogap_kgha)) %>% 
+  pivot_wider(names_from = name, values_from = value)
+
+cor(md1$ogap_kgha, md1$ContCorn)
+cor(md1$ogap_kgha, md1$RotCorn)
+cor(md1$ogap_kgha, md1$Env)
+
+m1 <- (lm(ogap_kgha ~ ContCorn, data = md1))
+m2 <- (lm(ogap_kgha ~ RotCorn, data = md1))
+m3 <- (lm(ogap_kgha ~ Env, data = md1))
+
+AIC(m1, m2, m3)
+
+#--cont corn % variation explained
+47276327/373877336
+
+#--rot corn % variation explained
+7872478/413281185
+
+#--env avg
+4926129/416227535
+
 #--what does this look like within a site?
 gaps_alln %>% 
   mutate(nrate = cut_interval(nrate_kgha, n = 3),

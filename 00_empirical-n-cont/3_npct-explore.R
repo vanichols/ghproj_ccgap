@@ -34,6 +34,25 @@ npct %>%
   ggplot(aes(ngap_frac)) + 
   geom_histogram(bins = 40)
 
+#--how does gap estimated by quad plat differ from gap at max N?
+ilia_gaps %>%
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  select(state, site, year, gap_kgha) %>% 
+  left_join(npct %>% select(site, year, gap_at_contaonr_kgha)) %>% 
+  ggplot(aes(gap_kgha, gap_at_contaonr_kgha)) + 
+  geom_point(aes(color = site)) +
+  geom_abline()
+
+ilia_gaps %>%
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  select(state, site, year, gap_kgha) %>% 
+  left_join(npct %>% select(site, year, gap_at_contaonr_kgha)) %>% 
+  filter(gap_kgha < 1000,
+         gap_at_contaonr_kgha > 2000)
+
+
 
 # lollypop fig npct -------------------------------------------------------
 
