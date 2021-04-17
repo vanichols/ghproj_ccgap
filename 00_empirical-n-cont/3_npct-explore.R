@@ -24,6 +24,17 @@ npct <-
   read_csv("00_empirical-n-cont/dat_npct.csv") %>% 
   left_join(tst.tib %>% select(state, site) %>% distinct())
 
+nsims <- 
+  read_csv("00_empirical-n-cont/dat_npct-sims.csv") %>% 
+  left_join(tst.tib %>% select(state, site) %>% distinct())
+
+
+#--gap components
+gapc <- read_csv("00_empirical-n-cont/dat_npct.csv") %>% 
+  rename("gap" = 3,
+         "gap_nonn" = 4) %>% 
+  mutate(gap_n = gap - gap_nonn) %>% 
+  select(site, year, gap, gap_n, gap_nonn)
 
 npct_mean <- 
   npct %>% 
@@ -33,6 +44,9 @@ npct_mean <-
 npct %>% 
   ggplot(aes(ngap_frac)) + 
   geom_histogram(bins = 40)
+
+
+# quad plat gap vs max N gap ----------------------------------------------
 
 #--how does gap estimated by quad plat differ from gap at max N?
 ilia_gaps %>%
@@ -44,6 +58,27 @@ ilia_gaps %>%
   geom_point(aes(color = site)) +
   geom_abline()
 
+
+#obs sim components vs obs ---------------------------------------------------
+
+#--which sims are these? myabe this isn't wht i think it is
+nsims %>%
+  rename("sim_gap" = 3,
+         "sim_nonn" = 4) %>%
+  mutate(sim_n = sim_gap - sim_nonn) %>%
+  select(site, year, sim_gap, sim_nonn, sim_n) %>%
+  left_join(
+    npct %>%
+      rename("obs_gap" = 3,
+             "obs_nonn" = 4) %>%
+      mutate(obs_n = obs_gap - obs_nonn) %>%
+      select(site, year, obs_gap, obs_nonn, obs_n)
+  ) %>% 
+  ggplot(aes(sim_n, obs_n)) + 
+  geom_point() + 
+  geom_abline()
+
+
 ilia_gaps %>%
   group_by(site) %>% 
   filter(nrate_kgha == max(nrate_kgha)) %>% 
@@ -53,6 +88,25 @@ ilia_gaps %>%
          gap_at_contaonr_kgha > 2000)
 
 
+
+# n vs non-n comp ---------------------------------------------------------
+
+
+#--not related at all
+gapc %>% 
+  ggplot(aes(gap_n, gap_nonn)) + 
+  geom_point(aes(color = site, size = gap))
+
+
+
+# higher sc aonr = higher n pct? ------------------------------------------
+
+aonrs %>% 
+  filter(aonr_rot == "aonr_sc") %>% 
+  left_join(gapc %>% 
+              mutate(gap_npct = gap_n/gap)) %>% 
+  ggplot(aes(aonr_kgha, gap_npct)) + 
+  geom_point()
 
 # lollypop fig npct -------------------------------------------------------
 

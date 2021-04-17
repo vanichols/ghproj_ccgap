@@ -127,6 +127,7 @@ tst.prds <-
   mutate(nrate_kgha = as.numeric(as.character(seq(0,300)))) %>% 
   select(site, year, rotation, nrate_kgha, pred_yield) 
 
+tst.prds %>% write_csv("00_empirical-n-cont/dat_preds.csv")
 
 #--want gap at rot aonr, then gap at cont aonr
 #--maybe not
@@ -158,14 +159,21 @@ tst.contaonrgap <-
 tst.npct <-
   tst.rotaonrgap %>%
   left_join(tst.contaonrgap) %>%
-  mutate(ngap_frac = (gap_at_rotaonr_kgha - gap_at_contaonr_kgha)/gap_at_rotaonr_kgha,
-         ngap_frac = case_when(
+  mutate(
+    nonngap = gap_at_contaonr_kgha,
+    ngap = gap_at_rotaonr_kgha - gap_at_contaonr_kgha,
+    ngap = case_when(
+      ngap < 0 ~ 0,
+      TRUE ~ ngap),
+    ngap_frac = (gap_at_rotaonr_kgha - gap_at_contaonr_kgha)/gap_at_rotaonr_kgha,
+    ngap_frac = case_when(
            ngap_frac < 0 ~ 0,
            (gap_at_contaonr_kgha == 0)&(gap_at_rotaonr_kgha==0) ~ 1,
            TRUE ~ ngap_frac
-         ))
+         )
+    )
 
-tst.npct %>% write_csv("00_empirical-n-cont/dat_npct.csv")
+tst.npct %>% write_csv("00_empirical-n-cont/dat_gap-components.csv")
 
 
 # npct calcs, simulated data ----------------------------------------------------
