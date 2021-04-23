@@ -15,9 +15,8 @@ library(patchwork)
 library(scales)
 
 theme_set(theme_bw())
-sc_color <- "#2a89c3" 
-cc_color <- "#fdb462"
 
+source("05_manu-figs/palettes.R")
 
 # data --------------------------------------------------------------------
 
@@ -98,9 +97,9 @@ f1 <-
   ggplot(aes(year, yield_kgha/1000)) + 
   geom_jitter(aes(shape = rot_nice, color = rot_nice)) + 
   geom_smooth(method = "lm", se = F, aes(color = rot_nice), size = 2) +
-  scale_color_manual(values = c("Continuous maize" = cc_color, 
-                                "Rotated maize" = sc_color,
-                                "Continuous maize penalty" = "red")) +
+  scale_color_manual(values = c("Continuous maize" = ylw1, 
+                                "Rotated maize" = dkbl1,
+                                "Continuous maize penalty" = pnk1)) +
   scale_shape_manual(values = c("Continuous maize" = 24, 
                                 "Rotated maize" = 21,
                                 "Continuous maize penalty" = 22)) +
@@ -115,13 +114,15 @@ f1 <-
         axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 
+
 f1
+ggsave("05_manu-figs/fig_gap-over-time.png")
 
 # windmill of gaps --------------------------------------------------------
 #--are percent and actual gap reasonably related? yes
-fig_gap_only %>% 
-  ggplot(aes(ogap_kgha, ogap_pct)) + 
-  geom_point()
+# fig_gap_only %>% 
+#   ggplot(aes(ogap_kgha, ogap_pct)) + 
+#   geom_point()
 
 fig_gap_only <- 
   fig_gap %>%
@@ -154,15 +155,17 @@ f2 <-
   mutate(n = 1:n()) %>% 
   ggplot(aes(n, ogap_pct)) +
   geom_hline(yintercept = mn_ogap, linetype = "dashed") +
-  geom_segment(aes(color = state, x = n, xend = n, y = 0, yend = ogap_pct)) +
-  geom_point(aes(color = state), size = 3) +
-  geom_text(x = 300, y = 0.17, label = "Mean yield reduction of 14%", check_overlap = T, hjust = 1, fontface = "italic") +
+  geom_col(aes(fill = state)) +
+  #geom_segment(aes(color = state, x = n, xend = n, y = 0, yend = ogap_pct)) +
+  #geom_point(aes(color = state), size = 3) +
+  geom_text(x = 350, y = 0.18, label = "Mean yield reduction of 14%", check_overlap = T, hjust = 1, fontface = "italic") +
   scale_y_continuous(labels = label_percent()) +
   labs(x = NULL,
        y = "Continuous maize\nyield penalty\n(% rotated maize\ngrain yield)",
-       color = NULL) +
-  scale_color_manual(values = c("Iowa" = "gray80",
-                                "Illinois" = "gray20")) +
+       color = NULL,
+       fill = NULL) +
+  scale_fill_manual(values = c("Iowa" = pnk1,
+                                "Illinois" = dkpnk1)) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
         axis.text.x = element_blank(),
         legend.justification = c(1, 1),
@@ -170,48 +173,12 @@ f2 <-
         legend.direction = "horizontal",
         legend.background = element_rect(color = "black"))
 
-
-f2flip <- 
-  fig_gap_only %>% 
-  arrange(ogap_pct) %>% 
-  mutate(n = 1:n()) %>% 
-    ggplot(aes(n, ogap_pct)) +
-    #geom_col(aes(fill = state), size = 5) +
-    geom_hline(yintercept = mn_ogap, linetype = "dashed") +
-    geom_segment(aes(color = state, x = n, xend = n, y = 0, yend = ogap_pct)) +
-    geom_point(aes(color = state), size = 3) +
-    geom_text(x = 100, y = 0.2, label = "Mean yield reduction of 14%", check_overlap = T, hjust = 0, fontface = "italic") +
-    scale_y_continuous(labels = label_percent()) +
-    labs(x = NULL,
-         y = "Continuous maize yield reduction as percentage of rotated maize grain yield",
-         color = NULL) + 
-    scale_color_manual(values = c("Iowa" = "gray80", 
-                                  "Illinois" = "gray20")) +
-    theme(#axis.title.y = element_text(angle = 0, vjust = 0.5),
-          axis.text.y = element_blank(),
-          legend.direction = "horizontal",
-          legend.justification = c(0, 1),
-          legend.position = c(0.05, 0.95),
-          legend.background = element_rect(color = "black"), 
-          axis.ticks.y = element_blank()) + 
-    coord_flip()
-  
-f2flip
-
-# combine -----------------------------------------------------------------
-
-#f1+f2 + plot_layout(widths = c(3, 1))
-
-#f1/f2 + plot_layout(heights = c(2, 1.25))
-
-f1
-
-ggsave("05_manu-figs/fig_gap-over-time.png")
+f2
 
 
-# alternative -------------------------------------------------------------
 
-#cont corn yields driving gap
+
+# cont maize driving yield gap --------------------------------------------
 
 f3 <- 
   gaps_alln  %>%
@@ -230,14 +197,18 @@ f3 <-
          color = F) +
   labs(y = "Continuous maize\nyield penalty\n(dry Mg ha-1)",
          x = "Maize grain yield\n(dry Mg ha-1)") +
-  scale_color_manual(values = c("Continuous maize" = cc_color, 
-                                "Rotated maize" = sc_color)) +
+  scale_color_manual(values = c("Continuous maize" = ylw1, 
+                                "Rotated maize" = dkbl1)) +
   scale_shape_manual(values = c("Continuous maize" = 24, 
                                 "Rotated maize" = 21)) +
   facet_grid(. ~ rot_nice) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5), 
         strip.background = element_blank(),
         strip.text = element_text(size = rel(1.2)))
+
+
+
+# gaps and cc driving them ------------------------------------------------
 
 
 f2 / f3 + plot_layout(heights = c(1.2, 1))
