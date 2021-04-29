@@ -512,3 +512,6 @@ ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg-errors.png")
 
 
 
+# fert rates --------------------------------------------------------------
+
+
