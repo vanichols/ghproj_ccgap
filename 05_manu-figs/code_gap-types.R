@@ -110,13 +110,13 @@ fig_comp_horiz <-
   geom_vline(xintercept = 36.5, linetype = "dashed", color = "gray50") +
   geom_vline(xintercept = 42.5, linetype = "dashed", color = "gray50") +
   geom_vline(xintercept = 48.5, linetype = "dashed", color = "gray50") +
-  geom_text(x = 18, y = 4, label = "36 site-years, undetermined components",
+  geom_text(x = 18, y = 3.8, label = "36 site-years, undetermined components",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray10") +
-  geom_text(x = 39, y = 4.400, label = "6 site-years, no yield gap",
+  geom_text(x = 39, y = 4.200, label = "6 site-years, no yield gap",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray10") +
-  geom_text(x = 45, y = 4.800, label = "6 site-years, yield gap from N factors only",
+  geom_text(x = 45, y = 4.600, label = "6 site-years, yield gap from N factors only",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray10") +
-  geom_text(x = 65, y = 5.300, label = "109 site-years, yield gap from mixture of factors",
+  geom_text(x = 65, y = 5.00, label = "109 site-years, yield gap from mixture of factors",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray10") +
   scale_fill_manual(values = c(ylw1, ltbl1)) +
   scale_y_continuous(limits = c(0, 6.200)) +
@@ -320,6 +320,6 @@ ggsave("05_manu-figs/fig_conceptual-and-components.png", height = 12, width = 6.
 fig_conc_horiz + fig_comp_horiz + plot_layout(widths =  c(1, 2))
 
 ggsave("05_manu-figs/fig_conceptual-and-components-horiz.png", height = 5, width = 15)
-
+ggsave("05_manu-figs/fig_conceptual-and-components-horiz.png", height = 4.5, width = 13)
 
 

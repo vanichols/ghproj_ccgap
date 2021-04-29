@@ -1,0 +1,7 @@
+grp,vcov,icc,specr_pct,resp,rptr_pct
+year,132894.2,0.13,13.25,nonngap,0.133
+site,143125.99,0.14,14.28,nonngap,0.143
+Residual,726578.2,0.72,72.47,nonngap,0.724
+year,41864.22,0.11,10.62,ngap,0.106
+site,43888.03,0.11,11.13,ngap,0.111
+Residual,308551.81,0.78,78.25,ngap,0.783

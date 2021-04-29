@@ -955,8 +955,3 @@ gaps_aonrs %>%
   geom_smooth(method = "lm", se = F) +
   facet_grid(nrateF~aonr_rot)
 
-
-# 9. site vs year variation --------------------------------------------------
-
-
-

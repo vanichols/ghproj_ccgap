@@ -1,0 +1,5 @@
+grp,vcov,icc,specr_pct,resp
+site,111143.56,0.11,11.29,nonngap
+Residual,873109.25,0.89,88.71,nonngap
+site,37375.25,0.1,9.59,ngap
+Residual,352414.81,0.9,90.41,ngap
