@@ -135,7 +135,7 @@ f_pie2
 dat_comps <- read_csv("00_empirical-n-cont/dat_gap-components.csv")
 
 
-f_corr <- 
+#f_corr <- 
   dat_comps %>% 
   ggplot(aes(ngap/1000, nonngap/1000)) + 
   geom_hex(bins = 5, color = "black") +
@@ -155,6 +155,25 @@ f_corr <-
     scale_x_continuous(expand = c(0, 0)) + 
     scale_y_continuous(expand = c(0, 0)) 
 
+f_corr <- 
+  dat_comps %>% 
+    ggplot(aes(ngap/1000, nonngap/1000)) + 
+    geom_point(color = dkbl1, size = 3) +
+    geom_abline() +
+    labs(x = "Yield gap from N factors\n(Mg ha-1)",
+         y = "Yield gap from other factors\n(Mg ha-1)", 
+         fill = NULL) + 
+    coord_cartesian(xlim = c(0, 5),
+                    ylim = c(0, 5)) +
+    theme(axis.title = element_text(size = rel(1.2)),
+          legend.position = c(0.95, 0.95),
+          legend.justification = c(1, 1),
+          # = "horizontal",
+          legend.background = element_rect(color = "black")) + 
+    scale_fill_viridis_c(option = "magma") + 
+    scale_x_continuous(expand = c(0, 0)) + 
+    scale_y_continuous(expand = c(0, 0)) 
+  
 
 # together ----------------------------------------------------------------
 

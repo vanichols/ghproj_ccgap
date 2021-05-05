@@ -28,13 +28,17 @@ nsims <-
   read_csv("00_empirical-n-cont/dat_npct-sims.csv") %>% 
   left_join(tst.tib %>% select(state, site) %>% distinct())
 
-
 #--gap components
-gapc <- read_csv("00_empirical-n-cont/dat_npct.csv") %>% 
-  rename("gap" = 3,
-         "gap_nonn" = 4) %>% 
-  mutate(gap_n = gap - gap_nonn) %>% 
-  select(site, year, gap, gap_n, gap_nonn)
+gapc <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>%
+  mutate(gap = nonngap + ngap) %>% 
+  select(site, year, gap, nonngap, ngap)
+
+library(lme4)
+summary(lmer(gap ~ (1|site) + (1|year), data = gapc))
+summary(lmer(nonngap ~ (1|site) + (1|year), data = gapc))
+summary(lmer(ngap ~ (1|site) + (1|year), data = gapc))
+
+
 
 npct_mean <- 
   npct %>% 

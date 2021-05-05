@@ -955,3 +955,50 @@ gaps_aonrs %>%
   geom_smooth(method = "lm", se = F) +
   facet_grid(nrateF~aonr_rot)
 
+
+# pct N vs total gap size -------------------------------------------------
+
+
+gcomp <- 
+  read_csv("00_empirical-n-cont/dat_gap-components.csv") %>% 
+  mutate(tot_gap= nonngap + ngap) 
+
+#--pts
+gcomp %>% 
+  ggplot(aes(tot_gap, ngap_frac)) + 
+  geom_point()
+
+#--histo
+gcomp %>% 
+  select(site, year, nonngap, ngap) %>% 
+  pivot_longer(nonngap:ngap) %>% 
+  ggplot(aes(value)) + 
+  geom_histogram() + 
+  facet_grid(.~name)
+
+gcomp %>% 
+  select(site, year, nonngap, ngap) %>% 
+  pivot_longer(nonngap:ngap) %>% 
+  ggplot(aes(value)) +
+  geom_density(aes(fill = name), alpha = 0.5)
+  
+
+gcomp %>% 
+  ggplot(aes(nonngap)) + 
+  geom_histogram()
+
+
+gcomp %>% 
+  ggplot(aes(ngap_frac)) +
+  geom_histogram()
+
+gcomp %>% 
+  summarise(ngap_frac = mean(ngap_frac, na.rm = T))
+
+gcomp %>% 
+  summarise(tot_gap = mean(tot_gap, na.rm = T))
+
+#41% for <1500, 32 for >1500
+m1 <- lmer(ngap_frac ~ (1|site) + (1|year), data = gcomp %>% filter(tot_gap < 2000))
+m1
+anova(m1)

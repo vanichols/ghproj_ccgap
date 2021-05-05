@@ -257,3 +257,32 @@ gaps %>%
   scale_fill_viridis_c() + 
   coord_cartesian(ylim = c(0, 6000),
                   xlim = c(0, 6000))
+
+
+#--%N vs tot gap colored by weather
+
+gaps %>% 
+  left_join(tgs_sc) %>% 
+  left_join(pgs_sc) %>% 
+  mutate(tot_gap = ngap + nonngap) %>% 
+  ggplot(aes(tot_gap, ngap_frac)) + 
+  geom_point(aes(color = precip_sc), size = 4) + 
+  scale_color_viridis_c()
+
+gaps %>% 
+  left_join(tgs_sc) %>% 
+  left_join(pgs_sc) %>% 
+  mutate(tot_gap = ngap + nonngap) %>% 
+  ggplot(aes(tot_gap, ngap_frac)) + 
+  geom_point(aes(color = avgt_sc), size = 4) + 
+  scale_color_gradient2(midpoint = 0)
+    
+    scale_colour_brewer(
+      ...,
+      type = "seq",
+      palette = 1,
+      direction = 1,
+      aesthetics = "colour"
+    )
+  )
+  scale_color_viridis_c()
