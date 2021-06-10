@@ -11,15 +11,17 @@ library(tidysawyer2)
 library(saapsim)
 library(apsimx)
 
-ames <- read_csv("sw_ames.csv")
-deka <- read_csv("sw_deka.csv")
-monm <- read_csv("sw_monm.csv")
+ames <- read_csv("00_soil-water-reset-Qs/sw_ames.csv")
+deka <- read_csv("00_soil-water-reset-Qs/sw_deka.csv")
+monm <- read_csv("00_soil-water-reset-Qs/sw_monm.csv")
+lewi <- read_csv("00_soil-water-reset-Qs/sw_lewi.csv")
 
 
 dat <- 
   ames %>% 
   bind_rows(deka) %>% 
   bind_rows(monm) %>% 
+  bind_rows(lewi) %>% 
   separate(depth_cm, into = c("num", "xx"), sep = " ", remove = F) %>% 
   mutate(num = as.numeric(num)) %>% 
   arrange(num) %>% 
@@ -116,5 +118,5 @@ plots <-
 
 paths <- stringr::str_c(names(plots), ".png")
 
-pwalk(list(paths, plots), ggsave, path = "figs/", width = 9) 
+pwalk(list(paths, plots), ggsave, path = "00_soil-water-reset-Qs/figs/", width = 9) 
 

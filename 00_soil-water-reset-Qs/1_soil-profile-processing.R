@@ -12,7 +12,7 @@ library(saapsim)
 library(apsimx)
 
 
-data(package = "tidysawyer2")
+#data(package = "tidysawyer2")
 
 # helper functions --------------------------------------------------------
 
@@ -33,7 +33,7 @@ helper_readrawoutfile <- function(path) {
 
 #--simulation soil profile
 ames_soi <- 
-  readxl::read_excel("ames-soil-prof.xlsx") %>% 
+  readxl::read_excel("00_soil-water-reset-Qs/ames-soil-prof.xlsx") %>% 
   as_tibble() %>% 
   select(depth_cm, dul_mm) %>% 
   separate(depth_cm, into = c("di", "df"), sep = "-") %>% 
@@ -41,15 +41,15 @@ ames_soi <-
 
 #--results at certain depths
 ames_cc <- 
-  helper_readrawoutfile("sims/A_CC_203_daily.out") %>% 
+  helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_CC_203_daily.out") %>% 
   mutate(rot = "cc",
          site = "ames")
 
-ames_cs <- helper_readrawoutfile("sims/A_CS_203_daily.out") %>% 
+ames_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_CS_203_daily.out") %>% 
   mutate(rot = "cs",
          site = "ames")
 
-ames_sc <- helper_readrawoutfile("sims/A_SC_203_daily.out") %>% 
+ames_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_SC_203_daily.out") %>% 
   mutate(rot = "sc",
          site = "ames")
 
@@ -107,7 +107,7 @@ ames_dat <-
 
 ames_dat %>% 
   mutate(site = "ames") %>% 
-  write_csv("sw_ames.csv")
+  write_csv("00_soil-water-reset-Qs/sw_ames.csv")
 
 
 
@@ -115,7 +115,7 @@ ames_dat %>%
 
 #--simulation soil profile
 deka_soi <- 
-  readxl::read_excel("deka-soil-prof.xlsx") %>% 
+  readxl::read_excel("00_soil-water-reset-Qs/deka-soil-prof.xlsx") %>% 
   as_tibble() %>% 
   select(depth_cm, dul_mm) %>% 
   separate(depth_cm, into = c("di", "df"), sep = "-") %>% 
@@ -123,15 +123,15 @@ deka_soi <-
 
 #--results at certain depths
 deka_cc <- 
-  helper_readrawoutfile("sims/Dekalb_CC_202.out") %>% 
+  helper_readrawoutfile("00_soil-water-reset-Qs/sims/Dekalb_CC_202.out") %>% 
   mutate(rot = "cc",
          site = "deka")
 
-deka_cs <- helper_readrawoutfile("sims/Dekalb_CS_202.out") %>% 
+deka_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Dekalb_CS_202.out") %>% 
   mutate(rot = "cs",
          site = "deka")
 
-deka_sc <- helper_readrawoutfile("sims/Dekalb_SC_202.out") %>% 
+deka_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Dekalb_SC_202.out") %>% 
   mutate(rot = "sc",
          site = "deka")
 
@@ -189,7 +189,7 @@ deka_dat <-
 
 deka_dat %>% 
   mutate(site = "deka") %>% 
-  write_csv("sw_deka.csv")
+  write_csv("00_soil-water-reset-Qs/sw_deka.csv")
 
 
 
@@ -197,7 +197,7 @@ deka_dat %>%
 
 #--simulation soil profile
 monm_soi <- 
-  readxl::read_excel("monm-soil-prof.xlsx") %>% 
+  readxl::read_excel("00_soil-water-reset-Qs/monm-soil-prof.xlsx") %>% 
   as_tibble() %>% 
   select(depth_cm, dul_mm) %>% 
   separate(depth_cm, into = c("di", "df"), sep = "-") %>% 
@@ -205,15 +205,15 @@ monm_soi <-
 
 #--results at certain depths
 monm_cc <- 
-  helper_readrawoutfile("sims/Mon_CC_202.out") %>% 
+  helper_readrawoutfile("00_soil-water-reset-Qs/sims/Mon_CC_202.out") %>% 
   mutate(rot = "cc",
          site = "monm")
 
-monm_cs <- helper_readrawoutfile("sims/Mon_CS_202.out") %>% 
+monm_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Mon_CS_202.out") %>% 
   mutate(rot = "cs",
          site = "monm")
 
-monm_sc <- helper_readrawoutfile("sims/Mon_SC_202.out") %>% 
+monm_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Mon_SC_202.out") %>% 
   mutate(rot = "sc",
          site = "monm")
 
@@ -271,4 +271,86 @@ monm_dat <-
 
 monm_dat %>% 
   mutate(site = "monm") %>% 
-  write_csv("sw_monm.csv")
+  write_csv("00_soil-water-reset-Qs/sw_monm.csv")
+
+# lewi --------------------------------------------------------------------
+
+#--simulation soil profile
+lewi_soi <- 
+  readxl::read_excel("00_soil-water-reset-Qs/lewi-soil-prof.xlsx") %>% 
+  as_tibble() %>% 
+  select(depth_cm, dul_mm) %>% 
+  separate(depth_cm, into = c("di", "df"), sep = "-") %>% 
+  mutate(davg = (as.numeric(di) + as.numeric(df))/2) 
+
+#--results at certain depths
+lewi_cc <- 
+  helper_readrawoutfile("00_soil-water-reset-Qs/sims/L_CC_200.out") %>% 
+  mutate(rot = "cc",
+         site = "lewi")
+
+lewi_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/L_CS_200.out") %>% 
+  mutate(rot = "cs",
+         site = "lewi")
+
+lewi_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/L_SC_200.out") %>% 
+  mutate(rot = "sc",
+         site = "lewi")
+
+lewi_sw <- 
+  lewi_cc %>% 
+  bind_rows(lewi_cs) %>% 
+  bind_rows(lewi_sc) %>% 
+  select(rot, Date, day, contains("sw")) %>% 
+  pivot_longer(4:ncol(.)) %>% 
+  mutate(name = parse_number(name)) %>% 
+  rename("depth_cm" = name)
+
+#--reconcile depths
+
+lewi_depthcats <- 
+  lewi_sw %>% 
+  select(depth_cm) %>% 
+  distinct() %>% 
+  arrange(depth_cm) %>% 
+  mutate(
+    n = 1:n(),
+    dcat = paste0("d", n)) %>%
+  select(-n) %>% 
+  pivot_wider(names_from = dcat, values_from = depth_cm)
+
+
+lewi_dul <- 
+  expand_grid(lewi_soi, lewi_depthcats) %>% 
+  mutate(
+    dcat = case_when(
+      (davg <= d1+1) ~ d1,
+      (davg >= d1+1 & davg <= d2) ~ d2,
+      (davg >= d2 & davg <= d3) ~ d3,
+      (davg >= d3 & davg <= d4) ~ d4,
+      (davg >= d4 & davg <= d5) ~ d5,
+      #davg >= depthcats[1] & davg < depthcats[2] ~ depthcats[2],
+      TRUE ~ 999)
+  ) %>% 
+  filter(dcat != 999) %>% 
+  group_by(dcat) %>% 
+  summarise(dul_mm = mean(dul_mm)) %>% 
+  rename("depth_cm" = dcat)
+
+
+
+#--combine
+
+lewi_dat <- 
+  lewi_sw %>% 
+  left_join(lewi_dul) %>% 
+  mutate(year = lubridate::year(Date), 
+         depth_cm = paste(depth_cm, "cm depth"),
+         depth_cm = fct_inorder(depth_cm)) %>% 
+  filter(year %in% c(ilia_yields %>% filter(site == "lewi") %>% pull(year) %>% unique())) 
+
+lewi_dat %>% 
+  mutate(site = "lewi") %>% 
+  write_csv("00_soil-water-reset-Qs/sw_lewi.csv")
+
+
