@@ -3,7 +3,7 @@
 # purpose: answer literature questions
 #
 # notes: 
-# last edited:   2/5/2021, added gap versus res at diff nrates
+# last edited:   2/5/2021, added gap versus res at diff nrates (updated many times since then...)
 
 
 rm(list = ls())
@@ -956,7 +956,7 @@ gaps_aonrs %>%
   facet_grid(nrateF~aonr_rot)
 
 
-# pct N vs total gap size -------------------------------------------------
+# 9. pct N vs total gap size -------------------------------------------------
 
 
 gcomp <- 
@@ -1002,3 +1002,19 @@ gcomp %>%
 m1 <- lmer(ngap_frac ~ (1|site) + (1|year), data = gcomp %>% filter(tot_gap < 2000))
 m1
 anova(m1)
+
+
+# 10. 0SC vs gap size -------------------------------------------------
+
+
+# is the yield at 0SC related to the gap size?
+
+ngap <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>% 
+  select(site, year, nonngap, ngap)
+
+ilia_yields %>% 
+  filter(nrate_kgha == 0,
+         rotation == "sc") %>% 
+  left_join(ngap) %>% 
+  ggplot(aes(yield_kgha, ngap)) + 
+  geom_point()

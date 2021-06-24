@@ -11,23 +11,7 @@ library(tidysawyer2)
 library(saapsim)
 library(apsimx)
 
-ames <- read_csv("00_soil-water-reset-Qs/sw_ames.csv")
-deka <- read_csv("00_soil-water-reset-Qs/sw_deka.csv")
-monm <- read_csv("00_soil-water-reset-Qs/sw_monm.csv")
-lewi <- read_csv("00_soil-water-reset-Qs/sw_lewi.csv")
-
-
-dat <- 
-  ames %>% 
-  bind_rows(deka) %>% 
-  bind_rows(monm) %>% 
-  bind_rows(lewi) %>% 
-  separate(depth_cm, into = c("num", "xx"), sep = " ", remove = F) %>% 
-  mutate(num = as.numeric(num)) %>% 
-  arrange(num) %>% 
-  mutate(depth_cm = fct_inorder(depth_cm)) %>% 
-  select(-num, - xx)
-
+dat <- read_csv("00_soil-water-reset-Qs/sw_all.csv")
 
 # viz ---------------------------------------------------------------------
 
@@ -51,7 +35,7 @@ dat %>%
 #--7 cm depth
 dat %>% 
   filter(site == "ames") %>% 
-    filter(depth_cm == "7 cm depth",
+    filter(depth_cm == 7,
          day < 105) %>% 
   ggplot(aes(day, value, group = year)) + 
   geom_line(aes(color = as.factor(year))) + 

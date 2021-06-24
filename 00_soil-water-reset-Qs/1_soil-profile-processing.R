@@ -45,13 +45,26 @@ ames_cc <-
   mutate(rot = "cc",
          site = "ames")
 
-ames_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_CS_203_daily.out") %>% 
+#--how do I know which years are corn? I'll assume it starts with corn?
+#--even years are soybean
+ames_cs <- 
+  helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_CS_203_daily.out") %>% 
   mutate(rot = "cs",
-         site = "ames")
+         site = "ames") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 1) %>% 
+  select(-year2)
 
-ames_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_SC_203_daily.out") %>% 
+ames_sc <- 
+  helper_readrawoutfile("00_soil-water-reset-Qs/sims/A_SC_203_daily.out") %>% 
   mutate(rot = "sc",
-         site = "ames")
+         site = "ames") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 0) %>% 
+  select(-year2)
+
 
 ames_sw <- 
   ames_cc %>% 
@@ -129,11 +142,19 @@ deka_cc <-
 
 deka_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Dekalb_CS_202.out") %>% 
   mutate(rot = "cs",
-         site = "deka")
+         site = "deka") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 1) %>% 
+  select(-year2)
 
 deka_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Dekalb_SC_202.out") %>% 
   mutate(rot = "sc",
-         site = "deka")
+         site = "deka") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 0) %>% 
+  select(-year2)
 
 deka_sw <- 
   deka_cc %>% 
@@ -211,11 +232,20 @@ monm_cc <-
 
 monm_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Mon_CS_202.out") %>% 
   mutate(rot = "cs",
-         site = "monm")
+         site = "monm") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 1) %>% 
+  select(-year2)
+
 
 monm_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/Mon_SC_202.out") %>% 
   mutate(rot = "sc",
-         site = "monm")
+         site = "monm") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 0) %>% 
+  select(-year2)
 
 monm_sw <- 
   monm_cc %>% 
@@ -291,11 +321,20 @@ lewi_cc <-
 
 lewi_cs <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/L_CS_200.out") %>% 
   mutate(rot = "cs",
-         site = "lewi")
+         site = "lewi") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 1) %>% 
+  select(-year2)
 
 lewi_sc <- helper_readrawoutfile("00_soil-water-reset-Qs/sims/L_SC_200.out") %>% 
   mutate(rot = "sc",
-         site = "lewi")
+         site = "lewi") %>% 
+  mutate(year = lubridate::year(Date),
+         year2 = year %% 2) %>% 
+  filter(year2 == 0) %>% 
+  select(-year2)
+
 
 lewi_sw <- 
   lewi_cc %>% 
@@ -354,3 +393,24 @@ lewi_dat %>%
   write_csv("00_soil-water-reset-Qs/sw_lewi.csv")
 
 
+
+# all ---------------------------------------------------------------------
+
+ames <- read_csv("00_soil-water-reset-Qs/sw_ames.csv")
+deka <- read_csv("00_soil-water-reset-Qs/sw_deka.csv")
+monm <- read_csv("00_soil-water-reset-Qs/sw_monm.csv")
+lewi <- read_csv("00_soil-water-reset-Qs/sw_lewi.csv")
+
+
+dat <- 
+  ames %>% 
+  bind_rows(deka) %>% 
+  bind_rows(monm) %>% 
+  bind_rows(lewi) %>% 
+  separate(depth_cm, into = c("num", "xx"), sep = " ", remove = F) %>% 
+  mutate(depth_cm = as.numeric(num)) %>% 
+  arrange(num) %>%   
+  select(-xx, -num)
+
+
+dat %>% write_csv("00_soil-water-reset-Qs/sw_all.csv")
