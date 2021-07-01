@@ -89,6 +89,60 @@ fig_comp
 ggsave("05_manu-figs/fig_gap-components-windmill.png", height = 7)
 
 
+# vertical, pyramid--------------------------------------------------------------
+
+
+fig_comp2 <- 
+  dat %>%
+  arrange(nonngap, ngap) %>% 
+  filter(is.na(nonngap)) %>% 
+  bind_rows(
+    dat %>%
+      arrange(nonngap, ngap) %>% 
+      filter(!is.na(nonngap))
+  ) %>% 
+  mutate(id = 1:n(),
+         nonngap = ifelse(nonngap == 0 & ngap == 0, 10, nonngap),
+         ngap = ifelse(is.na(nonngap), 0, ngap),
+         nonngap = ifelse(is.na(nonngap), 10, nonngap),
+         ngap = -ngap) %>% 
+  pivot_longer(nonngap:ngap) %>%
+  mutate(name = ifelse(name == "ngap", "Gap closed through N fert", "Remaining gap")) %>% 
+  ggplot(aes(id, value/1000)) + 
+  geom_col(aes(fill = name), width = 1, color = "black") + 
+  geom_vline(xintercept = 0, color = "gray50") +
+  geom_vline(xintercept = 36.5, linetype = "dashed", color = "gray50") +
+  geom_vline(xintercept = 42.5, linetype = "dashed", color = "gray50") +
+  geom_vline(xintercept = 48.5, linetype = "dashed", color = "gray50") +
+  geom_text(x = 18, y = 1.5, label = "36 site-years, undetermined components",
+            hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
+  geom_text(x = 40, y = 1.5, label = "6 site-years, no yield gap",
+            hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
+  geom_text(x = 46, y = 1.5, label = "6 site-years, yield gap closed through N fert",
+            hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
+  geom_text(x = 90, y = 1.5, label = "109 site-years, yield gap\n  not closed with N fert",
+            hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
+  scale_fill_manual(values = c(ylw1, ltbl1)) +
+  #scale_y_continuous(limits = c(0, 6)) +
+  theme(
+    #legend.justification = c(0,0),
+    #   legend.position = c(0.05, 0.05),
+    legend.position = "bottom",
+    legend.background = element_blank(),
+    axis.title.y = element_text(angle = 90, vjust = 0.5)) +
+  #  theme(legend.position = "top") +
+  # guides(fill = F) +
+  labs(fill = NULL,
+       y = "Yield gap between\ncontinuous- and rotated-maize (Mg ha-1)",
+       x = "Site-year") +
+  coord_flip()
+
+
+fig_comp2
+
+ggsave("05_manu-figs/fig_gap-components-windmill.png", height = 7)
+
+
 # horizontal--------------------------------------------------------------
 
 
@@ -257,6 +311,57 @@ fig_conc <-
 fig_conc
 ggsave("05_manu-figs/fig_conceptual-calc-ames03.png")
 
+fig_conc2 <- 
+  ggplot() + 
+  geom_point(data = viz.obs, aes(x = nrate_kgha, y = yield_kgha/1000, color = rot)) + 
+  geom_line(data = viz.obs, aes(x = nrate_kgha, y = yield_kgha/1000, color = rot), linetype = "dashed") + 
+  geom_line(data = viz.prds, aes(x = nrate_kgha, y = pred_yield/1000, color = rot), size = 2) + 
+  geom_point(data = viz.aonr, aes(x = nrate_kgha, y = pred_yield/1000, fill = rot), pch = 23, size = 4, stroke = 2) + 
+  #--vertical dashes
+  geom_segment(aes(yend = sc_1/1000, y = cc_1/1000, x = n_1, xend = n_1), 
+               size = 1.2, linetype = "dashed", color = "gray80") +
+  # geom_segment(aes(yend = sc_2/1000, y = cc_2/1000, x = n_2, xend = n_2),
+  #              size = 1.2, linetype = "dashed", color = "gray80") +
+  #--arrows
+  geom_segment(aes(x = 310, xend = 330, 
+                   y = sc_1/1000, yend = sc_1/1000), 
+               size = 1, arrow = arrow(length = unit(0.2,"cm")), color = "gray80") +
+  geom_segment(aes(x = n_1, xend = 330, 
+                   y = cc_1/1000, yend = cc_1/1000), 
+               size = 1, arrow = arrow(length = unit(0.2,"cm")), color = "gray80") +
+  geom_segment(aes(x = 310, xend = 330, 
+                   y = cc_2/1000, yend = cc_2/1000), 
+               size = 1, arrow = arrow(length = unit(0.2,"cm")), color = "gray80") +
+  #--rectangles
+  geom_rect(aes(xmin = 340, xmax = 360,
+                ymin = cc_1/1000, ymax = cc_2/1000),
+            fill = ylw1, color = "black") +
+  geom_rect(aes(xmin = 340, xmax = 360,
+                ymin = cc_2/1000, ymax = sc_2/1000),
+            fill = ltbl1, color = "black") +
+  geom_text(aes(x = 350, y = ((cc_2 + cc_1)/2)/1000, label = "Yield gap closed through N fert"),
+            hjust = 1, fontface = "italic") +
+  geom_text(aes(x = 350, y = ((sc_2 + cc_2)/2)/1000, label = "Yield gap remaining"),
+            hjust = 1, fontface = "italic") +
+  scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
+                                "Rotated maize AONR" = dkbl1)) +
+  scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
+                               "Rotated maize AONR" = dkbl1)) +
+  labs(x = "Nitrogen fertilization rate\n(kg N ha-1)",
+       y = "Maize grain yield\n(dry Mg ha-1)",
+       color = NULL,
+       fill = NULL) +
+  theme_bw() + 
+  theme(legend.position = c(0.95, 0.05),
+        legend.justification = c(1, 0),
+        legend.background = element_rect(color= "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5))
+
+
+
+fig_conc2
+ggsave("05_manu-figs/fig_conceptual-calc-ames03.png")
+
 
 #--horizontal (y axis not rotated)
 
@@ -410,4 +515,10 @@ ggsave("05_manu-figs/fig_conceptual-and-components.png", height = 12, width = 6.
 ggsave("05_manu-figs/fig_conceptual-and-components-horiz.png", height = 5, width = 15)
 ggsave("05_manu-figs/fig_conceptual-and-components-horiz.png", height = 4.5, width = 13)
 
+
+#--just concept and pyramid
+fig_conc2 + fig_comp2 + plot_layout(widths = c(1.5, 1))
+
+ggsave("05_manu-figs/fig_conceptual-and-components-horiz.png", height = 5, width = 15)
+ggsave("05_manu-figs/fig_conceptual-and-components-horiz.png", height = 4.5, width = 13)
 
