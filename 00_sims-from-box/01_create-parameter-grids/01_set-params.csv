@@ -1,0 +1,869 @@
+param_id,param_apsim,value,group_id,set_id,set_desc,set_desc2,do_manually
+1,startStage,1,kill,1,no scripts,no scripts,Y
+2,endStage,3.5,kill,1,no scripts,no scripts,Y
+3,maxLayer,3,kill,1,no scripts,no scripts,Y
+4,moistLim,2,kill,1,no scripts,no scripts,Y
+5,tempLim,2,kill,1,no scripts,no scripts,Y
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,1,no scripts,no scripts,Y
+7,yMoistString,"0, 0, 0, 0, 0",kill,1,no scripts,no scripts,Y
+8,xTempString,"-3.5, 0",kill,1,no scripts,no scripts,Y
+9,yTempString,"0, 0",kill,1,no scripts,no scripts,Y
+10,moistDaysBefore,14,rue,1,no scripts,no scripts,Y
+11,moistDaysAfter,1,rue,1,no scripts,no scripts,Y
+12,moistMaxLayers,2,rue,1,no scripts,no scripts,Y
+13,coldStage,4,rue,1,no scripts,no scripts,Y
+14,coldTT,4,rue,1,no scripts,no scripts,Y
+15,xSurfaceOMString,"0,2500,10000",rue,1,no scripts,no scripts,Y
+16,ySurfaceOMString,"1, 1, 1",rue,1,no scripts,no scripts,Y
+17,xMoistureString,"0,1,2",rue,1,no scripts,no scripts,Y
+18,yMoistureString,"1, 1, 1",rue,1,no scripts,no scripts,Y
+19,xTTString,"0,15,100",rue,1,no scripts,no scripts,Y
+20,yTTString,"1, 1, 1",rue,1,no scripts,no scripts,Y
+21,moistDaysBefore,14,xf,1,no scripts,no scripts,Y
+22,moistDaysAfter,1,xf,1,no scripts,no scripts,Y
+23,moistMaxLayers,2,xf,1,no scripts,no scripts,Y
+24,coldStage,4,xf,1,no scripts,no scripts,Y
+25,coldTT,4,xf,1,no scripts,no scripts,Y
+26,xSurfaceOMString,"0,2500,10000",xf,1,no scripts,no scripts,Y
+27,ySurfaceOMString,"1, 1, 1",xf,1,no scripts,no scripts,Y
+28,xMoistureString,"0,1,2",xf,1,no scripts,no scripts,Y
+29,yMoistureString,"1, 1, 1",xf,1,no scripts,no scripts,Y
+30,xTTString,"0,15,100",xf,1,no scripts,no scripts,Y
+31,yTTString,"1, 1, 1",xf,1,no scripts,no scripts,Y
+1,startStage,1,kill,2,kill,kill defaults,N
+2,endStage,3.5,kill,2,kill,kill defaults,N
+3,maxLayer,3,kill,2,kill,kill defaults,N
+4,moistLim,2,kill,2,kill,kill defaults,N
+5,tempLim,2,kill,2,kill,kill defaults,N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,2,kill,kill defaults,N
+7,yMoistString,"0.01, 0, 0, 0, 0.03",kill,2,kill,kill defaults,N
+8,xTempString,"-3.5, 0",kill,2,kill,kill defaults,N
+9,yTempString,"0.1, 0",kill,2,kill,kill defaults,N
+10,moistDaysBefore,14,rue,2,kill,kill defaults,N
+11,moistDaysAfter,1,rue,2,kill,kill defaults,N
+12,moistMaxLayers,2,rue,2,kill,kill defaults,N
+13,coldStage,4,rue,2,kill,kill defaults,N
+14,coldTT,4,rue,2,kill,kill defaults,N
+15,xSurfaceOMString,"0,2500,10000",rue,2,kill,kill defaults,N
+16,ySurfaceOMString,"1, 1, 1",rue,2,kill,kill defaults,N
+17,xMoistureString,"0,1,2",rue,2,kill,kill defaults,N
+18,yMoistureString,"1, 1, 1",rue,2,kill,kill defaults,N
+19,xTTString,"0,15,100",rue,2,kill,kill defaults,N
+20,yTTString,"1, 1, 1",rue,2,kill,kill defaults,N
+21,moistDaysBefore,14,xf,2,kill,kill defaults,N
+22,moistDaysAfter,1,xf,2,kill,kill defaults,N
+23,moistMaxLayers,2,xf,2,kill,kill defaults,N
+24,coldStage,4,xf,2,kill,kill defaults,N
+25,coldTT,4,xf,2,kill,kill defaults,N
+26,xSurfaceOMString,"0,2500,10000",xf,2,kill,kill defaults,N
+27,ySurfaceOMString,"1, 1, 1",xf,2,kill,kill defaults,N
+28,xMoistureString,"0,1,2",xf,2,kill,kill defaults,N
+29,yMoistureString,"1, 1, 1",xf,2,kill,kill defaults,N
+30,xTTString,"0,15,100",xf,2,kill,kill defaults,N
+31,yTTString,"1, 1, 1",xf,2,kill,kill defaults,N
+1,startStage,1,kill,3,kill,"no dry kill, 30% wet 1% cold",N
+2,endStage,3.5,kill,3,kill,"no dry kill, 30% wet 1% cold",N
+3,maxLayer,3,kill,3,kill,"no dry kill, 30% wet 1% cold",N
+4,moistLim,2,kill,3,kill,"no dry kill, 30% wet 1% cold",N
+5,tempLim,2,kill,3,kill,"no dry kill, 30% wet 1% cold",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,3,kill,"no dry kill, 30% wet 1% cold",N
+7,yMoistString,"0, 0, 0, 0, 0.3",kill,3,kill,"no dry kill, 30% wet 1% cold",N
+8,xTempString,"-3.5, 0",kill,3,kill,"no dry kill, 30% wet 1% cold",N
+9,yTempString,"0.1, 0",kill,3,kill,"no dry kill, 30% wet 1% cold",N
+10,moistDaysBefore,14,rue,3,kill,"no dry kill, 30% wet 1% cold",N
+11,moistDaysAfter,1,rue,3,kill,"no dry kill, 30% wet 1% cold",N
+12,moistMaxLayers,2,rue,3,kill,"no dry kill, 30% wet 1% cold",N
+13,coldStage,4,rue,3,kill,"no dry kill, 30% wet 1% cold",N
+14,coldTT,4,rue,3,kill,"no dry kill, 30% wet 1% cold",N
+15,xSurfaceOMString,"0,2500,10000",rue,3,kill,"no dry kill, 30% wet 1% cold",N
+16,ySurfaceOMString,"1, 1, 1",rue,3,kill,"no dry kill, 30% wet 1% cold",N
+17,xMoistureString,"0,1,2",rue,3,kill,"no dry kill, 30% wet 1% cold",N
+18,yMoistureString,"1, 1, 1",rue,3,kill,"no dry kill, 30% wet 1% cold",N
+19,xTTString,"0,15,100",rue,3,kill,"no dry kill, 30% wet 1% cold",N
+20,yTTString,"1, 1, 1",rue,3,kill,"no dry kill, 30% wet 1% cold",N
+21,moistDaysBefore,14,xf,3,kill,"no dry kill, 30% wet 1% cold",N
+22,moistDaysAfter,1,xf,3,kill,"no dry kill, 30% wet 1% cold",N
+23,moistMaxLayers,2,xf,3,kill,"no dry kill, 30% wet 1% cold",N
+24,coldStage,4,xf,3,kill,"no dry kill, 30% wet 1% cold",N
+25,coldTT,4,xf,3,kill,"no dry kill, 30% wet 1% cold",N
+26,xSurfaceOMString,"0,2500,10000",xf,3,kill,"no dry kill, 30% wet 1% cold",N
+27,ySurfaceOMString,"1, 1, 1",xf,3,kill,"no dry kill, 30% wet 1% cold",N
+28,xMoistureString,"0,1,2",xf,3,kill,"no dry kill, 30% wet 1% cold",N
+29,yMoistureString,"1, 1, 1",xf,3,kill,"no dry kill, 30% wet 1% cold",N
+30,xTTString,"0,15,100",xf,3,kill,"no dry kill, 30% wet 1% cold",N
+31,yTTString,"1, 1, 1",xf,3,kill,"no dry kill, 30% wet 1% cold",N
+1,startStage,1,kill,4,kill,"no dry kill, 3% wet 1% cold",N
+2,endStage,3.5,kill,4,kill,"no dry kill, 3% wet 1% cold",N
+3,maxLayer,3,kill,4,kill,"no dry kill, 3% wet 1% cold",N
+4,moistLim,2,kill,4,kill,"no dry kill, 3% wet 1% cold",N
+5,tempLim,2,kill,4,kill,"no dry kill, 3% wet 1% cold",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,4,kill,"no dry kill, 3% wet 1% cold",N
+7,yMoistString,"0, 0, 0, 0, 0.03",kill,4,kill,"no dry kill, 3% wet 1% cold",N
+8,xTempString,"-3.5, 0",kill,4,kill,"no dry kill, 3% wet 1% cold",N
+9,yTempString,"0.1, 0",kill,4,kill,"no dry kill, 3% wet 1% cold",N
+10,moistDaysBefore,14,rue,4,kill,"no dry kill, 3% wet 1% cold",N
+11,moistDaysAfter,1,rue,4,kill,"no dry kill, 3% wet 1% cold",N
+12,moistMaxLayers,2,rue,4,kill,"no dry kill, 3% wet 1% cold",N
+13,coldStage,4,rue,4,kill,"no dry kill, 3% wet 1% cold",N
+14,coldTT,4,rue,4,kill,"no dry kill, 3% wet 1% cold",N
+15,xSurfaceOMString,"0,2500,10000",rue,4,kill,"no dry kill, 3% wet 1% cold",N
+16,ySurfaceOMString,"1, 1, 1",rue,4,kill,"no dry kill, 3% wet 1% cold",N
+17,xMoistureString,"0,1,2",rue,4,kill,"no dry kill, 3% wet 1% cold",N
+18,yMoistureString,"1, 1, 1",rue,4,kill,"no dry kill, 3% wet 1% cold",N
+19,xTTString,"0,15,100",rue,4,kill,"no dry kill, 3% wet 1% cold",N
+20,yTTString,"1, 1, 1",rue,4,kill,"no dry kill, 3% wet 1% cold",N
+21,moistDaysBefore,14,xf,4,kill,"no dry kill, 3% wet 1% cold",N
+22,moistDaysAfter,1,xf,4,kill,"no dry kill, 3% wet 1% cold",N
+23,moistMaxLayers,2,xf,4,kill,"no dry kill, 3% wet 1% cold",N
+24,coldStage,4,xf,4,kill,"no dry kill, 3% wet 1% cold",N
+25,coldTT,4,xf,4,kill,"no dry kill, 3% wet 1% cold",N
+26,xSurfaceOMString,"0,2500,10000",xf,4,kill,"no dry kill, 3% wet 1% cold",N
+27,ySurfaceOMString,"1, 1, 1",xf,4,kill,"no dry kill, 3% wet 1% cold",N
+28,xMoistureString,"0,1,2",xf,4,kill,"no dry kill, 3% wet 1% cold",N
+29,yMoistureString,"1, 1, 1",xf,4,kill,"no dry kill, 3% wet 1% cold",N
+30,xTTString,"0,15,100",xf,4,kill,"no dry kill, 3% wet 1% cold",N
+31,yTTString,"1, 1, 1",xf,4,kill,"no dry kill, 3% wet 1% cold",N
+1,startStage,1,kill,5,kill,"no dry kill, 10% wet 1% cold",N
+2,endStage,3.5,kill,5,kill,"no dry kill, 10% wet 1% cold",N
+3,maxLayer,3,kill,5,kill,"no dry kill, 10% wet 1% cold",N
+4,moistLim,2,kill,5,kill,"no dry kill, 10% wet 1% cold",N
+5,tempLim,2,kill,5,kill,"no dry kill, 10% wet 1% cold",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,5,kill,"no dry kill, 10% wet 1% cold",N
+7,yMoistString,"0, 0, 0, 0, 0.1",kill,5,kill,"no dry kill, 10% wet 1% cold",N
+8,xTempString,"-3.5, 0",kill,5,kill,"no dry kill, 10% wet 1% cold",N
+9,yTempString,"0.1, 0",kill,5,kill,"no dry kill, 10% wet 1% cold",N
+10,moistDaysBefore,14,rue,5,kill,"no dry kill, 10% wet 1% cold",N
+11,moistDaysAfter,1,rue,5,kill,"no dry kill, 10% wet 1% cold",N
+12,moistMaxLayers,2,rue,5,kill,"no dry kill, 10% wet 1% cold",N
+13,coldStage,4,rue,5,kill,"no dry kill, 10% wet 1% cold",N
+14,coldTT,4,rue,5,kill,"no dry kill, 10% wet 1% cold",N
+15,xSurfaceOMString,"0,2500,10000",rue,5,kill,"no dry kill, 10% wet 1% cold",N
+16,ySurfaceOMString,"1, 1, 1",rue,5,kill,"no dry kill, 10% wet 1% cold",N
+17,xMoistureString,"0,1,2",rue,5,kill,"no dry kill, 10% wet 1% cold",N
+18,yMoistureString,"1, 1, 1",rue,5,kill,"no dry kill, 10% wet 1% cold",N
+19,xTTString,"0,15,100",rue,5,kill,"no dry kill, 10% wet 1% cold",N
+20,yTTString,"1, 1, 1",rue,5,kill,"no dry kill, 10% wet 1% cold",N
+21,moistDaysBefore,14,xf,5,kill,"no dry kill, 10% wet 1% cold",N
+22,moistDaysAfter,1,xf,5,kill,"no dry kill, 10% wet 1% cold",N
+23,moistMaxLayers,2,xf,5,kill,"no dry kill, 10% wet 1% cold",N
+24,coldStage,4,xf,5,kill,"no dry kill, 10% wet 1% cold",N
+25,coldTT,4,xf,5,kill,"no dry kill, 10% wet 1% cold",N
+26,xSurfaceOMString,"0,2500,10000",xf,5,kill,"no dry kill, 10% wet 1% cold",N
+27,ySurfaceOMString,"1, 1, 1",xf,5,kill,"no dry kill, 10% wet 1% cold",N
+28,xMoistureString,"0,1,2",xf,5,kill,"no dry kill, 10% wet 1% cold",N
+29,yMoistureString,"1, 1, 1",xf,5,kill,"no dry kill, 10% wet 1% cold",N
+30,xTTString,"0,15,100",xf,5,kill,"no dry kill, 10% wet 1% cold",N
+31,yTTString,"1, 1, 1",xf,5,kill,"no dry kill, 10% wet 1% cold",N
+1,startStage,1,kill,6,kill,only mois kill (dry+wet),N
+2,endStage,3.5,kill,6,kill,only mois kill (dry+wet),N
+3,maxLayer,3,kill,6,kill,only mois kill (dry+wet),N
+4,moistLim,2,kill,6,kill,only mois kill (dry+wet),N
+5,tempLim,2,kill,6,kill,only mois kill (dry+wet),N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,6,kill,only mois kill (dry+wet),N
+7,yMoistString,"0.01, 0, 0, 0, 0.03",kill,6,kill,only mois kill (dry+wet),N
+8,xTempString,"-3.5, 0",kill,6,kill,only mois kill (dry+wet),N
+9,yTempString,"0, 0",kill,6,kill,only mois kill (dry+wet),N
+10,moistDaysBefore,14,rue,6,kill,only mois kill (dry+wet),N
+11,moistDaysAfter,1,rue,6,kill,only mois kill (dry+wet),N
+12,moistMaxLayers,2,rue,6,kill,only mois kill (dry+wet),N
+13,coldStage,4,rue,6,kill,only mois kill (dry+wet),N
+14,coldTT,4,rue,6,kill,only mois kill (dry+wet),N
+15,xSurfaceOMString,"0,2500,10000",rue,6,kill,only mois kill (dry+wet),N
+16,ySurfaceOMString,"1, 1, 1",rue,6,kill,only mois kill (dry+wet),N
+17,xMoistureString,"0,1,2",rue,6,kill,only mois kill (dry+wet),N
+18,yMoistureString,"1, 1, 1",rue,6,kill,only mois kill (dry+wet),N
+19,xTTString,"0,15,100",rue,6,kill,only mois kill (dry+wet),N
+20,yTTString,"1, 1, 1",rue,6,kill,only mois kill (dry+wet),N
+21,moistDaysBefore,14,xf,6,kill,only mois kill (dry+wet),N
+22,moistDaysAfter,1,xf,6,kill,only mois kill (dry+wet),N
+23,moistMaxLayers,2,xf,6,kill,only mois kill (dry+wet),N
+24,coldStage,4,xf,6,kill,only mois kill (dry+wet),N
+25,coldTT,4,xf,6,kill,only mois kill (dry+wet),N
+26,xSurfaceOMString,"0,2500,10000",xf,6,kill,only mois kill (dry+wet),N
+27,ySurfaceOMString,"1, 1, 1",xf,6,kill,only mois kill (dry+wet),N
+28,xMoistureString,"0,1,2",xf,6,kill,only mois kill (dry+wet),N
+29,yMoistureString,"1, 1, 1",xf,6,kill,only mois kill (dry+wet),N
+30,xTTString,"0,15,100",xf,6,kill,only mois kill (dry+wet),N
+31,yTTString,"1, 1, 1",xf,6,kill,only mois kill (dry+wet),N
+1,startStage,1,kill,7,kill,"only wet kill, 3%",N
+2,endStage,3.5,kill,7,kill,"only wet kill, 3%",N
+3,maxLayer,3,kill,7,kill,"only wet kill, 3%",N
+4,moistLim,2,kill,7,kill,"only wet kill, 3%",N
+5,tempLim,2,kill,7,kill,"only wet kill, 3%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,7,kill,"only wet kill, 3%",N
+7,yMoistString,"0, 0, 0, 0, 0.03",kill,7,kill,"only wet kill, 3%",N
+8,xTempString,"-3.5, 0",kill,7,kill,"only wet kill, 3%",N
+9,yTempString,"0, 0",kill,7,kill,"only wet kill, 3%",N
+10,moistDaysBefore,14,rue,7,kill,"only wet kill, 3%",N
+11,moistDaysAfter,1,rue,7,kill,"only wet kill, 3%",N
+12,moistMaxLayers,2,rue,7,kill,"only wet kill, 3%",N
+13,coldStage,4,rue,7,kill,"only wet kill, 3%",N
+14,coldTT,4,rue,7,kill,"only wet kill, 3%",N
+15,xSurfaceOMString,"0,2500,10000",rue,7,kill,"only wet kill, 3%",N
+16,ySurfaceOMString,"1, 1, 1",rue,7,kill,"only wet kill, 3%",N
+17,xMoistureString,"0,1,2",rue,7,kill,"only wet kill, 3%",N
+18,yMoistureString,"1, 1, 1",rue,7,kill,"only wet kill, 3%",N
+19,xTTString,"0,15,100",rue,7,kill,"only wet kill, 3%",N
+20,yTTString,"1, 1, 1",rue,7,kill,"only wet kill, 3%",N
+21,moistDaysBefore,14,xf,7,kill,"only wet kill, 3%",N
+22,moistDaysAfter,1,xf,7,kill,"only wet kill, 3%",N
+23,moistMaxLayers,2,xf,7,kill,"only wet kill, 3%",N
+24,coldStage,4,xf,7,kill,"only wet kill, 3%",N
+25,coldTT,4,xf,7,kill,"only wet kill, 3%",N
+26,xSurfaceOMString,"0,2500,10000",xf,7,kill,"only wet kill, 3%",N
+27,ySurfaceOMString,"1, 1, 1",xf,7,kill,"only wet kill, 3%",N
+28,xMoistureString,"0,1,2",xf,7,kill,"only wet kill, 3%",N
+29,yMoistureString,"1, 1, 1",xf,7,kill,"only wet kill, 3%",N
+30,xTTString,"0,15,100",xf,7,kill,"only wet kill, 3%",N
+31,yTTString,"1, 1, 1",xf,7,kill,"only wet kill, 3%",N
+1,startStage,1,kill,8,kill,"only cold kill, 10%",N
+2,endStage,3.5,kill,8,kill,"only cold kill, 10%",N
+3,maxLayer,3,kill,8,kill,"only cold kill, 10%",N
+4,moistLim,2,kill,8,kill,"only cold kill, 10%",N
+5,tempLim,2,kill,8,kill,"only cold kill, 10%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,8,kill,"only cold kill, 10%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,8,kill,"only cold kill, 10%",N
+8,xTempString,"-3.5, 0",kill,8,kill,"only cold kill, 10%",N
+9,yTempString,"0.1, 0",kill,8,kill,"only cold kill, 10%",N
+10,moistDaysBefore,14,rue,8,kill,"only cold kill, 10%",N
+11,moistDaysAfter,1,rue,8,kill,"only cold kill, 10%",N
+12,moistMaxLayers,2,rue,8,kill,"only cold kill, 10%",N
+13,coldStage,4,rue,8,kill,"only cold kill, 10%",N
+14,coldTT,4,rue,8,kill,"only cold kill, 10%",N
+15,xSurfaceOMString,"0,2500,10000",rue,8,kill,"only cold kill, 10%",N
+16,ySurfaceOMString,"1, 1, 1",rue,8,kill,"only cold kill, 10%",N
+17,xMoistureString,"0,1,2",rue,8,kill,"only cold kill, 10%",N
+18,yMoistureString,"1, 1, 1",rue,8,kill,"only cold kill, 10%",N
+19,xTTString,"0,15,100",rue,8,kill,"only cold kill, 10%",N
+20,yTTString,"1, 1, 1",rue,8,kill,"only cold kill, 10%",N
+21,moistDaysBefore,14,xf,8,kill,"only cold kill, 10%",N
+22,moistDaysAfter,1,xf,8,kill,"only cold kill, 10%",N
+23,moistMaxLayers,2,xf,8,kill,"only cold kill, 10%",N
+24,coldStage,4,xf,8,kill,"only cold kill, 10%",N
+25,coldTT,4,xf,8,kill,"only cold kill, 10%",N
+26,xSurfaceOMString,"0,2500,10000",xf,8,kill,"only cold kill, 10%",N
+27,ySurfaceOMString,"1, 1, 1",xf,8,kill,"only cold kill, 10%",N
+28,xMoistureString,"0,1,2",xf,8,kill,"only cold kill, 10%",N
+29,yMoistureString,"1, 1, 1",xf,8,kill,"only cold kill, 10%",N
+30,xTTString,"0,15,100",xf,8,kill,"only cold kill, 10%",N
+31,yTTString,"1, 1, 1",xf,8,kill,"only cold kill, 10%",N
+1,startStage,1,kill,9,kill,"only cold kill, 30%",N
+2,endStage,3.5,kill,9,kill,"only cold kill, 30%",N
+3,maxLayer,3,kill,9,kill,"only cold kill, 30%",N
+4,moistLim,2,kill,9,kill,"only cold kill, 30%",N
+5,tempLim,2,kill,9,kill,"only cold kill, 30%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,9,kill,"only cold kill, 30%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,9,kill,"only cold kill, 30%",N
+8,xTempString,"-3.5, 0",kill,9,kill,"only cold kill, 30%",N
+9,yTempString,"0.3, 0",kill,9,kill,"only cold kill, 30%",N
+10,moistDaysBefore,14,rue,9,kill,"only cold kill, 30%",N
+11,moistDaysAfter,1,rue,9,kill,"only cold kill, 30%",N
+12,moistMaxLayers,2,rue,9,kill,"only cold kill, 30%",N
+13,coldStage,4,rue,9,kill,"only cold kill, 30%",N
+14,coldTT,4,rue,9,kill,"only cold kill, 30%",N
+15,xSurfaceOMString,"0,2500,10000",rue,9,kill,"only cold kill, 30%",N
+16,ySurfaceOMString,"1, 1, 1",rue,9,kill,"only cold kill, 30%",N
+17,xMoistureString,"0,1,2",rue,9,kill,"only cold kill, 30%",N
+18,yMoistureString,"1, 1, 1",rue,9,kill,"only cold kill, 30%",N
+19,xTTString,"0,15,100",rue,9,kill,"only cold kill, 30%",N
+20,yTTString,"1, 1, 1",rue,9,kill,"only cold kill, 30%",N
+21,moistDaysBefore,14,xf,9,kill,"only cold kill, 30%",N
+22,moistDaysAfter,1,xf,9,kill,"only cold kill, 30%",N
+23,moistMaxLayers,2,xf,9,kill,"only cold kill, 30%",N
+24,coldStage,4,xf,9,kill,"only cold kill, 30%",N
+25,coldTT,4,xf,9,kill,"only cold kill, 30%",N
+26,xSurfaceOMString,"0,2500,10000",xf,9,kill,"only cold kill, 30%",N
+27,ySurfaceOMString,"1, 1, 1",xf,9,kill,"only cold kill, 30%",N
+28,xMoistureString,"0,1,2",xf,9,kill,"only cold kill, 30%",N
+29,yMoistureString,"1, 1, 1",xf,9,kill,"only cold kill, 30%",N
+30,xTTString,"0,15,100",xf,9,kill,"only cold kill, 30%",N
+31,yTTString,"1, 1, 1",xf,9,kill,"only cold kill, 30%",N
+1,startStage,1,kill,10,kill,"only dry kill, 1%",N
+2,endStage,3.5,kill,10,kill,"only dry kill, 1%",N
+3,maxLayer,3,kill,10,kill,"only dry kill, 1%",N
+4,moistLim,2,kill,10,kill,"only dry kill, 1%",N
+5,tempLim,2,kill,10,kill,"only dry kill, 1%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,10,kill,"only dry kill, 1%",N
+7,yMoistString,"0.01, 0, 0, 0, 0",kill,10,kill,"only dry kill, 1%",N
+8,xTempString,"-3.5, 0",kill,10,kill,"only dry kill, 1%",N
+9,yTempString,"0, 0",kill,10,kill,"only dry kill, 1%",N
+10,moistDaysBefore,14,rue,10,kill,"only dry kill, 1%",N
+11,moistDaysAfter,1,rue,10,kill,"only dry kill, 1%",N
+12,moistMaxLayers,2,rue,10,kill,"only dry kill, 1%",N
+13,coldStage,4,rue,10,kill,"only dry kill, 1%",N
+14,coldTT,4,rue,10,kill,"only dry kill, 1%",N
+15,xSurfaceOMString,"0,2500,10000",rue,10,kill,"only dry kill, 1%",N
+16,ySurfaceOMString,"1, 1, 1",rue,10,kill,"only dry kill, 1%",N
+17,xMoistureString,"0,1,2",rue,10,kill,"only dry kill, 1%",N
+18,yMoistureString,"1, 1, 1",rue,10,kill,"only dry kill, 1%",N
+19,xTTString,"0,15,100",rue,10,kill,"only dry kill, 1%",N
+20,yTTString,"1, 1, 1",rue,10,kill,"only dry kill, 1%",N
+21,moistDaysBefore,14,xf,10,kill,"only dry kill, 1%",N
+22,moistDaysAfter,1,xf,10,kill,"only dry kill, 1%",N
+23,moistMaxLayers,2,xf,10,kill,"only dry kill, 1%",N
+24,coldStage,4,xf,10,kill,"only dry kill, 1%",N
+25,coldTT,4,xf,10,kill,"only dry kill, 1%",N
+26,xSurfaceOMString,"0,2500,10000",xf,10,kill,"only dry kill, 1%",N
+27,ySurfaceOMString,"1, 1, 1",xf,10,kill,"only dry kill, 1%",N
+28,xMoistureString,"0,1,2",xf,10,kill,"only dry kill, 1%",N
+29,yMoistureString,"1, 1, 1",xf,10,kill,"only dry kill, 1%",N
+30,xTTString,"0,15,100",xf,10,kill,"only dry kill, 1%",N
+31,yTTString,"1, 1, 1",xf,10,kill,"only dry kill, 1%",N
+1,startStage,1,kill,11,kill,"only dry kill, 10%",N
+2,endStage,3.5,kill,11,kill,"only dry kill, 10%",N
+3,maxLayer,3,kill,11,kill,"only dry kill, 10%",N
+4,moistLim,2,kill,11,kill,"only dry kill, 10%",N
+5,tempLim,2,kill,11,kill,"only dry kill, 10%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,11,kill,"only dry kill, 10%",N
+7,yMoistString,"0.1, 0, 0, 0, 0",kill,11,kill,"only dry kill, 10%",N
+8,xTempString,"-3.5, 0",kill,11,kill,"only dry kill, 10%",N
+9,yTempString,"0, 0",kill,11,kill,"only dry kill, 10%",N
+10,moistDaysBefore,14,rue,11,kill,"only dry kill, 10%",N
+11,moistDaysAfter,1,rue,11,kill,"only dry kill, 10%",N
+12,moistMaxLayers,2,rue,11,kill,"only dry kill, 10%",N
+13,coldStage,4,rue,11,kill,"only dry kill, 10%",N
+14,coldTT,4,rue,11,kill,"only dry kill, 10%",N
+15,xSurfaceOMString,"0,2500,10000",rue,11,kill,"only dry kill, 10%",N
+16,ySurfaceOMString,"1, 1, 1",rue,11,kill,"only dry kill, 10%",N
+17,xMoistureString,"0,1,2",rue,11,kill,"only dry kill, 10%",N
+18,yMoistureString,"1, 1, 1",rue,11,kill,"only dry kill, 10%",N
+19,xTTString,"0,15,100",rue,11,kill,"only dry kill, 10%",N
+20,yTTString,"1, 1, 1",rue,11,kill,"only dry kill, 10%",N
+21,moistDaysBefore,14,xf,11,kill,"only dry kill, 10%",N
+22,moistDaysAfter,1,xf,11,kill,"only dry kill, 10%",N
+23,moistMaxLayers,2,xf,11,kill,"only dry kill, 10%",N
+24,coldStage,4,xf,11,kill,"only dry kill, 10%",N
+25,coldTT,4,xf,11,kill,"only dry kill, 10%",N
+26,xSurfaceOMString,"0,2500,10000",xf,11,kill,"only dry kill, 10%",N
+27,ySurfaceOMString,"1, 1, 1",xf,11,kill,"only dry kill, 10%",N
+28,xMoistureString,"0,1,2",xf,11,kill,"only dry kill, 10%",N
+29,yMoistureString,"1, 1, 1",xf,11,kill,"only dry kill, 10%",N
+30,xTTString,"0,15,100",xf,11,kill,"only dry kill, 10%",N
+31,yTTString,"1, 1, 1",xf,11,kill,"only dry kill, 10%",N
+1,startStage,1,kill,100,rue,rue defaults,N
+2,endStage,3.5,kill,100,rue,rue defaults,N
+3,maxLayer,3,kill,100,rue,rue defaults,N
+4,moistLim,2,kill,100,rue,rue defaults,N
+5,tempLim,2,kill,100,rue,rue defaults,N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,100,rue,rue defaults,N
+7,yMoistString,"0, 0, 0, 0, 0",kill,100,rue,rue defaults,N
+8,xTempString,"-3.5, 0",kill,100,rue,rue defaults,N
+9,yTempString,"0, 0",kill,100,rue,rue defaults,N
+10,moistDaysBefore,14,rue,100,rue,rue defaults,N
+11,moistDaysAfter,1,rue,100,rue,rue defaults,N
+12,moistMaxLayers,2,rue,100,rue,rue defaults,N
+13,coldStage,4,rue,100,rue,rue defaults,N
+14,coldTT,4,rue,100,rue,rue defaults,N
+15,xSurfaceOMString,"0,2500,10000",rue,100,rue,rue defaults,N
+16,ySurfaceOMString,"1,1,0.96",rue,100,rue,rue defaults,N
+17,xMoistureString,"0,1,2",rue,100,rue,rue defaults,N
+18,yMoistureString,"0.97,1.0,0.94",rue,100,rue,rue defaults,N
+19,xTTString,"0,15,100",rue,100,rue,rue defaults,N
+20,yTTString,"1,0.96,0.92",rue,100,rue,rue defaults,N
+21,moistDaysBefore,14,xf,100,rue,rue defaults,N
+22,moistDaysAfter,1,xf,100,rue,rue defaults,N
+23,moistMaxLayers,2,xf,100,rue,rue defaults,N
+24,coldStage,4,xf,100,rue,rue defaults,N
+25,coldTT,4,xf,100,rue,rue defaults,N
+26,xSurfaceOMString,"0,2500,10000",xf,100,rue,rue defaults,N
+27,ySurfaceOMString,"1, 1, 1",xf,100,rue,rue defaults,N
+28,xMoistureString,"0,1,2",xf,100,rue,rue defaults,N
+29,yMoistureString,"1, 1, 1",xf,100,rue,rue defaults,N
+30,xTTString,"0,15,100",xf,100,rue,rue defaults,N
+31,yTTString,"1, 1, 1",xf,100,rue,rue defaults,N
+1,startStage,1,kill,101,rue,"res pen only, 4%",N
+2,endStage,3.5,kill,101,rue,"res pen only, 4%",N
+3,maxLayer,3,kill,101,rue,"res pen only, 4%",N
+4,moistLim,2,kill,101,rue,"res pen only, 4%",N
+5,tempLim,2,kill,101,rue,"res pen only, 4%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,101,rue,"res pen only, 4%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,101,rue,"res pen only, 4%",N
+8,xTempString,"-3.5, 0",kill,101,rue,"res pen only, 4%",N
+9,yTempString,"0, 0",kill,101,rue,"res pen only, 4%",N
+10,moistDaysBefore,14,rue,101,rue,"res pen only, 4%",N
+11,moistDaysAfter,1,rue,101,rue,"res pen only, 4%",N
+12,moistMaxLayers,2,rue,101,rue,"res pen only, 4%",N
+13,coldStage,4,rue,101,rue,"res pen only, 4%",N
+14,coldTT,4,rue,101,rue,"res pen only, 4%",N
+15,xSurfaceOMString,"0,2500,10000",rue,101,rue,"res pen only, 4%",N
+16,ySurfaceOMString,"1,1,0.96",rue,101,rue,"res pen only, 4%",N
+17,xMoistureString,"0,1,2",rue,101,rue,"res pen only, 4%",N
+18,yMoistureString,"1, 1, 1",rue,101,rue,"res pen only, 4%",N
+19,xTTString,"0,15,100",rue,101,rue,"res pen only, 4%",N
+20,yTTString,"1, 1, 1",rue,101,rue,"res pen only, 4%",N
+21,moistDaysBefore,14,xf,101,rue,"res pen only, 4%",N
+22,moistDaysAfter,1,xf,101,rue,"res pen only, 4%",N
+23,moistMaxLayers,2,xf,101,rue,"res pen only, 4%",N
+24,coldStage,4,xf,101,rue,"res pen only, 4%",N
+25,coldTT,4,xf,101,rue,"res pen only, 4%",N
+26,xSurfaceOMString,"0,2500,10000",xf,101,rue,"res pen only, 4%",N
+27,ySurfaceOMString,"1, 1, 1",xf,101,rue,"res pen only, 4%",N
+28,xMoistureString,"0,1,2",xf,101,rue,"res pen only, 4%",N
+29,yMoistureString,"1, 1, 1",xf,101,rue,"res pen only, 4%",N
+30,xTTString,"0,15,100",xf,101,rue,"res pen only, 4%",N
+31,yTTString,"1, 1, 1",xf,101,rue,"res pen only, 4%",N
+1,startStage,1,kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+2,endStage,3.5,kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+3,maxLayer,3,kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+4,moistLim,2,kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+5,tempLim,2,kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+8,xTempString,"-3.5, 0",kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+9,yTempString,"0, 0",kill,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+10,moistDaysBefore,14,rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+11,moistDaysAfter,1,rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+12,moistMaxLayers,2,rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+13,coldStage,4,rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+14,coldTT,4,rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+15,xSurfaceOMString,"0,2500,10000",rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+16,ySurfaceOMString,"1, 1, 1",rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+17,xMoistureString,"0,1,2",rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+18,yMoistureString,"0.97, 1, 0.94",rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+19,xTTString,"0,15,100",rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+20,yTTString,"1, 1, 1",rue,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+21,moistDaysBefore,14,xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+22,moistDaysAfter,1,xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+23,moistMaxLayers,2,xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+24,coldStage,4,xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+25,coldTT,4,xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+26,xSurfaceOMString,"0,2500,10000",xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+27,ySurfaceOMString,"1, 1, 1",xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+28,xMoistureString,"0,1,2",xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+29,yMoistureString,"1, 1, 1",xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+30,xTTString,"0,15,100",xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+31,yTTString,"1, 1, 1",xf,102,rue,"mois pen only, 3(dry)% 6(wet)%",N
+1,startStage,1,kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+2,endStage,3.5,kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+3,maxLayer,3,kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+4,moistLim,2,kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+5,tempLim,2,kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+8,xTempString,"-3.5, 0",kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+9,yTempString,"0, 0",kill,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+10,moistDaysBefore,14,rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+11,moistDaysAfter,1,rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+12,moistMaxLayers,2,rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+13,coldStage,4,rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+14,coldTT,4,rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+15,xSurfaceOMString,"0,2500,10000",rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+16,ySurfaceOMString,"1, 1, 1",rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+17,xMoistureString,"0,1,2",rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+18,yMoistureString,"1, 1, 1",rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+19,xTTString,"0,15,100",rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+20,yTTString,"1, 0.96, 0.92",rue,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+21,moistDaysBefore,14,xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+22,moistDaysAfter,1,xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+23,moistMaxLayers,2,xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+24,coldStage,4,xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+25,coldTT,4,xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+26,xSurfaceOMString,"0,2500,10000",xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+27,ySurfaceOMString,"1, 1, 1",xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+28,xMoistureString,"0,1,2",xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+29,yMoistureString,"1, 1, 1",xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+30,xTTString,"0,15,100",xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+31,yTTString,"1, 1, 1",xf,103,rue,"cold pen only, 4(mod)% 8(sev)%",N
+1,startStage,1,kill,104,rue,"res pen only, 1000-4000, 4%max",N
+2,endStage,3.5,kill,104,rue,"res pen only, 1000-4000, 4%max",N
+3,maxLayer,3,kill,104,rue,"res pen only, 1000-4000, 4%max",N
+4,moistLim,2,kill,104,rue,"res pen only, 1000-4000, 4%max",N
+5,tempLim,2,kill,104,rue,"res pen only, 1000-4000, 4%max",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,104,rue,"res pen only, 1000-4000, 4%max",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,104,rue,"res pen only, 1000-4000, 4%max",N
+8,xTempString,"-3.5, 0",kill,104,rue,"res pen only, 1000-4000, 4%max",N
+9,yTempString,"0, 0",kill,104,rue,"res pen only, 1000-4000, 4%max",N
+10,moistDaysBefore,14,rue,104,rue,"res pen only, 1000-4000, 4%max",N
+11,moistDaysAfter,1,rue,104,rue,"res pen only, 1000-4000, 4%max",N
+12,moistMaxLayers,2,rue,104,rue,"res pen only, 1000-4000, 4%max",N
+13,coldStage,4,rue,104,rue,"res pen only, 1000-4000, 4%max",N
+14,coldTT,4,rue,104,rue,"res pen only, 1000-4000, 4%max",N
+15,xSurfaceOMString,"1, 1000, 4000",rue,104,rue,"res pen only, 1000-4000, 4%max",N
+16,ySurfaceOMString,"1, 1, 0.96",rue,104,rue,"res pen only, 1000-4000, 4%max",N
+17,xMoistureString,"0,1,2",rue,104,rue,"res pen only, 1000-4000, 4%max",N
+18,yMoistureString,"1, 1, 1",rue,104,rue,"res pen only, 1000-4000, 4%max",N
+19,xTTString,"0,15,100",rue,104,rue,"res pen only, 1000-4000, 4%max",N
+20,yTTString,"1, 1, 1",rue,104,rue,"res pen only, 1000-4000, 4%max",N
+21,moistDaysBefore,14,xf,104,rue,"res pen only, 1000-4000, 4%max",N
+22,moistDaysAfter,1,xf,104,rue,"res pen only, 1000-4000, 4%max",N
+23,moistMaxLayers,2,xf,104,rue,"res pen only, 1000-4000, 4%max",N
+24,coldStage,4,xf,104,rue,"res pen only, 1000-4000, 4%max",N
+25,coldTT,4,xf,104,rue,"res pen only, 1000-4000, 4%max",N
+26,xSurfaceOMString,"0,2500,10000",xf,104,rue,"res pen only, 1000-4000, 4%max",N
+27,ySurfaceOMString,"1, 1, 1",xf,104,rue,"res pen only, 1000-4000, 4%max",N
+28,xMoistureString,"0,1,2",xf,104,rue,"res pen only, 1000-4000, 4%max",N
+29,yMoistureString,"1, 1, 1",xf,104,rue,"res pen only, 1000-4000, 4%max",N
+30,xTTString,"0,15,100",xf,104,rue,"res pen only, 1000-4000, 4%max",N
+31,yTTString,"1, 1, 1",xf,104,rue,"res pen only, 1000-4000, 4%max",N
+1,startStage,1,kill,105,rue,"res pen only, 1000-4000, 10%max",N
+2,endStage,3.5,kill,105,rue,"res pen only, 1000-4000, 10%max",N
+3,maxLayer,3,kill,105,rue,"res pen only, 1000-4000, 10%max",N
+4,moistLim,2,kill,105,rue,"res pen only, 1000-4000, 10%max",N
+5,tempLim,2,kill,105,rue,"res pen only, 1000-4000, 10%max",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,105,rue,"res pen only, 1000-4000, 10%max",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,105,rue,"res pen only, 1000-4000, 10%max",N
+8,xTempString,"-3.5, 0",kill,105,rue,"res pen only, 1000-4000, 10%max",N
+9,yTempString,"0, 0",kill,105,rue,"res pen only, 1000-4000, 10%max",N
+10,moistDaysBefore,14,rue,105,rue,"res pen only, 1000-4000, 10%max",N
+11,moistDaysAfter,1,rue,105,rue,"res pen only, 1000-4000, 10%max",N
+12,moistMaxLayers,2,rue,105,rue,"res pen only, 1000-4000, 10%max",N
+13,coldStage,4,rue,105,rue,"res pen only, 1000-4000, 10%max",N
+14,coldTT,4,rue,105,rue,"res pen only, 1000-4000, 10%max",N
+15,xSurfaceOMString,"1, 1000, 4000",rue,105,rue,"res pen only, 1000-4000, 10%max",N
+16,ySurfaceOMString,"1, 1, 0.9",rue,105,rue,"res pen only, 1000-4000, 10%max",N
+17,xMoistureString,"0,1,2",rue,105,rue,"res pen only, 1000-4000, 10%max",N
+18,yMoistureString,"1, 1, 1",rue,105,rue,"res pen only, 1000-4000, 10%max",N
+19,xTTString,"0,15,100",rue,105,rue,"res pen only, 1000-4000, 10%max",N
+20,yTTString,"1, 1, 1",rue,105,rue,"res pen only, 1000-4000, 10%max",N
+21,moistDaysBefore,14,xf,105,rue,"res pen only, 1000-4000, 10%max",N
+22,moistDaysAfter,1,xf,105,rue,"res pen only, 1000-4000, 10%max",N
+23,moistMaxLayers,2,xf,105,rue,"res pen only, 1000-4000, 10%max",N
+24,coldStage,4,xf,105,rue,"res pen only, 1000-4000, 10%max",N
+25,coldTT,4,xf,105,rue,"res pen only, 1000-4000, 10%max",N
+26,xSurfaceOMString,"0,2500,10000",xf,105,rue,"res pen only, 1000-4000, 10%max",N
+27,ySurfaceOMString,"1, 1, 1",xf,105,rue,"res pen only, 1000-4000, 10%max",N
+28,xMoistureString,"0,1,2",xf,105,rue,"res pen only, 1000-4000, 10%max",N
+29,yMoistureString,"1, 1, 1",xf,105,rue,"res pen only, 1000-4000, 10%max",N
+30,xTTString,"0,15,100",xf,105,rue,"res pen only, 1000-4000, 10%max",N
+31,yTTString,"1, 1, 1",xf,105,rue,"res pen only, 1000-4000, 10%max",N
+1,startStage,1,kill,106,rue,inc coldTT base from 4 to 10,N
+2,endStage,3.5,kill,106,rue,inc coldTT base from 4 to 10,N
+3,maxLayer,3,kill,106,rue,inc coldTT base from 4 to 10,N
+4,moistLim,2,kill,106,rue,inc coldTT base from 4 to 10,N
+5,tempLim,2,kill,106,rue,inc coldTT base from 4 to 10,N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,106,rue,inc coldTT base from 4 to 10,N
+7,yMoistString,"0, 0, 0, 0, 0",kill,106,rue,inc coldTT base from 4 to 10,N
+8,xTempString,"-3.5, 0",kill,106,rue,inc coldTT base from 4 to 10,N
+9,yTempString,"0, 0",kill,106,rue,inc coldTT base from 4 to 10,N
+10,moistDaysBefore,14,rue,106,rue,inc coldTT base from 4 to 10,N
+11,moistDaysAfter,1,rue,106,rue,inc coldTT base from 4 to 10,N
+12,moistMaxLayers,2,rue,106,rue,inc coldTT base from 4 to 10,N
+13,coldStage,4,rue,106,rue,inc coldTT base from 4 to 10,N
+14,coldTT,10,rue,106,rue,inc coldTT base from 4 to 10,N
+15,xSurfaceOMString,"1, 1000, 4000",rue,106,rue,inc coldTT base from 4 to 10,N
+16,ySurfaceOMString,"1, 1, 1",rue,106,rue,inc coldTT base from 4 to 10,N
+17,xMoistureString,"0,1,2",rue,106,rue,inc coldTT base from 4 to 10,N
+18,yMoistureString,"1, 1, 1",rue,106,rue,inc coldTT base from 4 to 10,N
+19,xTTString,"0,15,100",rue,106,rue,inc coldTT base from 4 to 10,N
+20,yTTString,"1, 0.96, 0.92",rue,106,rue,inc coldTT base from 4 to 10,N
+21,moistDaysBefore,14,xf,106,rue,inc coldTT base from 4 to 10,N
+22,moistDaysAfter,1,xf,106,rue,inc coldTT base from 4 to 10,N
+23,moistMaxLayers,2,xf,106,rue,inc coldTT base from 4 to 10,N
+24,coldStage,4,xf,106,rue,inc coldTT base from 4 to 10,N
+25,coldTT,4,xf,106,rue,inc coldTT base from 4 to 10,N
+26,xSurfaceOMString,"0,2500,10000",xf,106,rue,inc coldTT base from 4 to 10,N
+27,ySurfaceOMString,"1, 1, 1",xf,106,rue,inc coldTT base from 4 to 10,N
+28,xMoistureString,"0,1,2",xf,106,rue,inc coldTT base from 4 to 10,N
+29,yMoistureString,"1, 1, 1",xf,106,rue,inc coldTT base from 4 to 10,N
+30,xTTString,"0,15,100",xf,106,rue,inc coldTT base from 4 to 10,N
+31,yTTString,"1, 1, 1",xf,106,rue,inc coldTT base from 4 to 10,N
+1,startStage,1,kill,200,xf,xf defaults,N
+2,endStage,3.5,kill,200,xf,xf defaults,N
+3,maxLayer,3,kill,200,xf,xf defaults,N
+4,moistLim,2,kill,200,xf,xf defaults,N
+5,tempLim,2,kill,200,xf,xf defaults,N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,200,xf,xf defaults,N
+7,yMoistString,"0, 0, 0, 0, 0",kill,200,xf,xf defaults,N
+8,xTempString,"-3.5, 0",kill,200,xf,xf defaults,N
+9,yTempString,"0, 0",kill,200,xf,xf defaults,N
+10,moistDaysBefore,14,rue,200,xf,xf defaults,N
+11,moistDaysAfter,1,rue,200,xf,xf defaults,N
+12,moistMaxLayers,2,rue,200,xf,xf defaults,N
+13,coldStage,4,rue,200,xf,xf defaults,N
+14,coldTT,4,rue,200,xf,xf defaults,N
+15,xSurfaceOMString,"0,2500,10000",rue,200,xf,xf defaults,N
+16,ySurfaceOMString,"1, 1, 1",rue,200,xf,xf defaults,N
+17,xMoistureString,"0,1,2",rue,200,xf,xf defaults,N
+18,yMoistureString,"1, 1, 1",rue,200,xf,xf defaults,N
+19,xTTString,"0,15,100",rue,200,xf,xf defaults,N
+20,yTTString,"1, 1, 1",rue,200,xf,xf defaults,N
+21,moistDaysBefore,14,xf,200,xf,xf defaults,N
+22,moistDaysAfter,1,xf,200,xf,xf defaults,N
+23,moistMaxLayers,2,xf,200,xf,xf defaults,N
+24,coldStage,4,xf,200,xf,xf defaults,N
+25,coldTT,4,xf,200,xf,xf defaults,N
+26,xSurfaceOMString,"0,2500,10000",xf,200,xf,xf defaults,N
+27,ySurfaceOMString,"1,1,0.96",xf,200,xf,xf defaults,N
+28,xMoistureString,"0,1,2",xf,200,xf,xf defaults,N
+29,yMoistureString,"0.97,1.0,0.94",xf,200,xf,xf defaults,N
+30,xTTString,"0,15,100",xf,200,xf,xf defaults,N
+31,yTTString,"1,0.96,0.92",xf,200,xf,xf defaults,N
+1,startStage,1,kill,201,xf,"res pen only, 1000-4000 40%",N
+2,endStage,3.5,kill,201,xf,"res pen only, 1000-4000 40%",N
+3,maxLayer,3,kill,201,xf,"res pen only, 1000-4000 40%",N
+4,moistLim,2,kill,201,xf,"res pen only, 1000-4000 40%",N
+5,tempLim,2,kill,201,xf,"res pen only, 1000-4000 40%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,201,xf,"res pen only, 1000-4000 40%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,201,xf,"res pen only, 1000-4000 40%",N
+8,xTempString,"-3.5, 0",kill,201,xf,"res pen only, 1000-4000 40%",N
+9,yTempString,"0, 0",kill,201,xf,"res pen only, 1000-4000 40%",N
+10,moistDaysBefore,14,rue,201,xf,"res pen only, 1000-4000 40%",N
+11,moistDaysAfter,1,rue,201,xf,"res pen only, 1000-4000 40%",N
+12,moistMaxLayers,2,rue,201,xf,"res pen only, 1000-4000 40%",N
+13,coldStage,4,rue,201,xf,"res pen only, 1000-4000 40%",N
+14,coldTT,4,rue,201,xf,"res pen only, 1000-4000 40%",N
+15,xSurfaceOMString,"0,2500,10000",rue,201,xf,"res pen only, 1000-4000 40%",N
+16,ySurfaceOMString,"1, 1, 1",rue,201,xf,"res pen only, 1000-4000 40%",N
+17,xMoistureString,"0,1,2",rue,201,xf,"res pen only, 1000-4000 40%",N
+18,yMoistureString,"1, 1, 1",rue,201,xf,"res pen only, 1000-4000 40%",N
+19,xTTString,"0,15,100",rue,201,xf,"res pen only, 1000-4000 40%",N
+20,yTTString,"1, 1, 1",rue,201,xf,"res pen only, 1000-4000 40%",N
+21,moistDaysBefore,14,xf,201,xf,"res pen only, 1000-4000 40%",N
+22,moistDaysAfter,1,xf,201,xf,"res pen only, 1000-4000 40%",N
+23,moistMaxLayers,2,xf,201,xf,"res pen only, 1000-4000 40%",N
+24,coldStage,4,xf,201,xf,"res pen only, 1000-4000 40%",N
+25,coldTT,4,xf,201,xf,"res pen only, 1000-4000 40%",N
+26,xSurfaceOMString,"0, 1000, 4000",xf,201,xf,"res pen only, 1000-4000 40%",N
+27,ySurfaceOMString,"1, 1, 0.60",xf,201,xf,"res pen only, 1000-4000 40%",N
+28,xMoistureString,"0,1,2",xf,201,xf,"res pen only, 1000-4000 40%",N
+29,yMoistureString,"1, 1, 1",xf,201,xf,"res pen only, 1000-4000 40%",N
+30,xTTString,"0,15,100",xf,201,xf,"res pen only, 1000-4000 40%",N
+31,yTTString,"1, 1, 1",xf,201,xf,"res pen only, 1000-4000 40%",N
+1,startStage,1,kill,202,xf,"wet mois pen only, 40%",N
+2,endStage,3.5,kill,202,xf,"wet mois pen only, 40%",N
+3,maxLayer,3,kill,202,xf,"wet mois pen only, 40%",N
+4,moistLim,2,kill,202,xf,"wet mois pen only, 40%",N
+5,tempLim,2,kill,202,xf,"wet mois pen only, 40%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,202,xf,"wet mois pen only, 40%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,202,xf,"wet mois pen only, 40%",N
+8,xTempString,"-3.5, 0",kill,202,xf,"wet mois pen only, 40%",N
+9,yTempString,"0, 0",kill,202,xf,"wet mois pen only, 40%",N
+10,moistDaysBefore,14,rue,202,xf,"wet mois pen only, 40%",N
+11,moistDaysAfter,1,rue,202,xf,"wet mois pen only, 40%",N
+12,moistMaxLayers,2,rue,202,xf,"wet mois pen only, 40%",N
+13,coldStage,4,rue,202,xf,"wet mois pen only, 40%",N
+14,coldTT,4,rue,202,xf,"wet mois pen only, 40%",N
+15,xSurfaceOMString,"0,2500,10000",rue,202,xf,"wet mois pen only, 40%",N
+16,ySurfaceOMString,"1, 1, 1",rue,202,xf,"wet mois pen only, 40%",N
+17,xMoistureString,"0,1,2",rue,202,xf,"wet mois pen only, 40%",N
+18,yMoistureString,"1, 1, 1",rue,202,xf,"wet mois pen only, 40%",N
+19,xTTString,"0,15,100",rue,202,xf,"wet mois pen only, 40%",N
+20,yTTString,"1, 1, 1",rue,202,xf,"wet mois pen only, 40%",N
+21,moistDaysBefore,14,xf,202,xf,"wet mois pen only, 40%",N
+22,moistDaysAfter,1,xf,202,xf,"wet mois pen only, 40%",N
+23,moistMaxLayers,2,xf,202,xf,"wet mois pen only, 40%",N
+24,coldStage,4,xf,202,xf,"wet mois pen only, 40%",N
+25,coldTT,4,xf,202,xf,"wet mois pen only, 40%",N
+26,xSurfaceOMString,"0,2500,10000",xf,202,xf,"wet mois pen only, 40%",N
+27,ySurfaceOMString,"1, 1, 1",xf,202,xf,"wet mois pen only, 40%",N
+28,xMoistureString,"0,1,2",xf,202,xf,"wet mois pen only, 40%",N
+29,yMoistureString,"1, 1, 0.60",xf,202,xf,"wet mois pen only, 40%",N
+30,xTTString,"0,15,100",xf,202,xf,"wet mois pen only, 40%",N
+31,yTTString,"1, 1, 1",xf,202,xf,"wet mois pen only, 40%",N
+1,startStage,1,kill,203,xf,"dry mois pen only, 40%",N
+2,endStage,3.5,kill,203,xf,"dry mois pen only, 40%",N
+3,maxLayer,3,kill,203,xf,"dry mois pen only, 40%",N
+4,moistLim,2,kill,203,xf,"dry mois pen only, 40%",N
+5,tempLim,2,kill,203,xf,"dry mois pen only, 40%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,203,xf,"dry mois pen only, 40%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,203,xf,"dry mois pen only, 40%",N
+8,xTempString,"-3.5, 0",kill,203,xf,"dry mois pen only, 40%",N
+9,yTempString,"0, 0",kill,203,xf,"dry mois pen only, 40%",N
+10,moistDaysBefore,14,rue,203,xf,"dry mois pen only, 40%",N
+11,moistDaysAfter,1,rue,203,xf,"dry mois pen only, 40%",N
+12,moistMaxLayers,2,rue,203,xf,"dry mois pen only, 40%",N
+13,coldStage,4,rue,203,xf,"dry mois pen only, 40%",N
+14,coldTT,4,rue,203,xf,"dry mois pen only, 40%",N
+15,xSurfaceOMString,"0,2500,10000",rue,203,xf,"dry mois pen only, 40%",N
+16,ySurfaceOMString,"1, 1, 1",rue,203,xf,"dry mois pen only, 40%",N
+17,xMoistureString,"0,1,2",rue,203,xf,"dry mois pen only, 40%",N
+18,yMoistureString,"1, 1, 1",rue,203,xf,"dry mois pen only, 40%",N
+19,xTTString,"0,15,100",rue,203,xf,"dry mois pen only, 40%",N
+20,yTTString,"1, 1, 1",rue,203,xf,"dry mois pen only, 40%",N
+21,moistDaysBefore,14,xf,203,xf,"dry mois pen only, 40%",N
+22,moistDaysAfter,1,xf,203,xf,"dry mois pen only, 40%",N
+23,moistMaxLayers,2,xf,203,xf,"dry mois pen only, 40%",N
+24,coldStage,4,xf,203,xf,"dry mois pen only, 40%",N
+25,coldTT,4,xf,203,xf,"dry mois pen only, 40%",N
+26,xSurfaceOMString,"0,2500,10000",xf,203,xf,"dry mois pen only, 40%",N
+27,ySurfaceOMString,"1, 1, 1",xf,203,xf,"dry mois pen only, 40%",N
+28,xMoistureString,"0,1,2",xf,203,xf,"dry mois pen only, 40%",N
+29,yMoistureString,"0.6, 1, 1",xf,203,xf,"dry mois pen only, 40%",N
+30,xTTString,"0,15,100",xf,203,xf,"dry mois pen only, 40%",N
+31,yTTString,"1, 1, 1",xf,203,xf,"dry mois pen only, 40%",N
+1,startStage,1,kill,204,xf,"wet+dry mois pen only, 40%",N
+2,endStage,3.5,kill,204,xf,"wet+dry mois pen only, 40%",N
+3,maxLayer,3,kill,204,xf,"wet+dry mois pen only, 40%",N
+4,moistLim,2,kill,204,xf,"wet+dry mois pen only, 40%",N
+5,tempLim,2,kill,204,xf,"wet+dry mois pen only, 40%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,204,xf,"wet+dry mois pen only, 40%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,204,xf,"wet+dry mois pen only, 40%",N
+8,xTempString,"-3.5, 0",kill,204,xf,"wet+dry mois pen only, 40%",N
+9,yTempString,"0, 0",kill,204,xf,"wet+dry mois pen only, 40%",N
+10,moistDaysBefore,14,rue,204,xf,"wet+dry mois pen only, 40%",N
+11,moistDaysAfter,1,rue,204,xf,"wet+dry mois pen only, 40%",N
+12,moistMaxLayers,2,rue,204,xf,"wet+dry mois pen only, 40%",N
+13,coldStage,4,rue,204,xf,"wet+dry mois pen only, 40%",N
+14,coldTT,4,rue,204,xf,"wet+dry mois pen only, 40%",N
+15,xSurfaceOMString,"0,2500,10000",rue,204,xf,"wet+dry mois pen only, 40%",N
+16,ySurfaceOMString,"1, 1, 1",rue,204,xf,"wet+dry mois pen only, 40%",N
+17,xMoistureString,"0,1,2",rue,204,xf,"wet+dry mois pen only, 40%",N
+18,yMoistureString,"1, 1, 1",rue,204,xf,"wet+dry mois pen only, 40%",N
+19,xTTString,"0,15,100",rue,204,xf,"wet+dry mois pen only, 40%",N
+20,yTTString,"1, 1, 1",rue,204,xf,"wet+dry mois pen only, 40%",N
+21,moistDaysBefore,14,xf,204,xf,"wet+dry mois pen only, 40%",N
+22,moistDaysAfter,1,xf,204,xf,"wet+dry mois pen only, 40%",N
+23,moistMaxLayers,2,xf,204,xf,"wet+dry mois pen only, 40%",N
+24,coldStage,4,xf,204,xf,"wet+dry mois pen only, 40%",N
+25,coldTT,4,xf,204,xf,"wet+dry mois pen only, 40%",N
+26,xSurfaceOMString,"0,2500,10000",xf,204,xf,"wet+dry mois pen only, 40%",N
+27,ySurfaceOMString,"1, 1, 1",xf,204,xf,"wet+dry mois pen only, 40%",N
+28,xMoistureString,"0,1,2",xf,204,xf,"wet+dry mois pen only, 40%",N
+29,yMoistureString,"0.60, 1, 0.60",xf,204,xf,"wet+dry mois pen only, 40%",N
+30,xTTString,"0,15,100",xf,204,xf,"wet+dry mois pen only, 40%",N
+31,yTTString,"1, 1, 1",xf,204,xf,"wet+dry mois pen only, 40%",N
+1,startStage,1,kill,205,xf,cold pen only (40-50%),N
+2,endStage,3.5,kill,205,xf,cold pen only (40-50%),N
+3,maxLayer,3,kill,205,xf,cold pen only (40-50%),N
+4,moistLim,2,kill,205,xf,cold pen only (40-50%),N
+5,tempLim,2,kill,205,xf,cold pen only (40-50%),N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,205,xf,cold pen only (40-50%),N
+7,yMoistString,"0, 0, 0, 0, 0",kill,205,xf,cold pen only (40-50%),N
+8,xTempString,"-3.5, 0",kill,205,xf,cold pen only (40-50%),N
+9,yTempString,"0, 0",kill,205,xf,cold pen only (40-50%),N
+10,moistDaysBefore,14,rue,205,xf,cold pen only (40-50%),N
+11,moistDaysAfter,1,rue,205,xf,cold pen only (40-50%),N
+12,moistMaxLayers,2,rue,205,xf,cold pen only (40-50%),N
+13,coldStage,4,rue,205,xf,cold pen only (40-50%),N
+14,coldTT,4,rue,205,xf,cold pen only (40-50%),N
+15,xSurfaceOMString,"0,2500,10000",rue,205,xf,cold pen only (40-50%),N
+16,ySurfaceOMString,"1, 1, 1",rue,205,xf,cold pen only (40-50%),N
+17,xMoistureString,"0,1,2",rue,205,xf,cold pen only (40-50%),N
+18,yMoistureString,"1, 1, 1",rue,205,xf,cold pen only (40-50%),N
+19,xTTString,"0,15,100",rue,205,xf,cold pen only (40-50%),N
+20,yTTString,"1, 1, 1",rue,205,xf,cold pen only (40-50%),N
+21,moistDaysBefore,14,xf,205,xf,cold pen only (40-50%),N
+22,moistDaysAfter,1,xf,205,xf,cold pen only (40-50%),N
+23,moistMaxLayers,2,xf,205,xf,cold pen only (40-50%),N
+24,coldStage,4,xf,205,xf,cold pen only (40-50%),N
+25,coldTT,4,xf,205,xf,cold pen only (40-50%),N
+26,xSurfaceOMString,"0,2500,10000",xf,205,xf,cold pen only (40-50%),N
+27,ySurfaceOMString,"1, 1, 1",xf,205,xf,cold pen only (40-50%),N
+28,xMoistureString,"0,1,2",xf,205,xf,cold pen only (40-50%),N
+29,yMoistureString,"1, 1, 1",xf,205,xf,cold pen only (40-50%),N
+30,xTTString,"0,15,100",xf,205,xf,cold pen only (40-50%),N
+31,yTTString,"1, 0.60, 0.50",xf,205,xf,cold pen only (40-50%),N
+1,startStage,1,kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+2,endStage,3.5,kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+3,maxLayer,3,kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+4,moistLim,2,kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+5,tempLim,2,kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+8,xTempString,"-3.5, 0",kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+9,yTempString,"0, 0",kill,206,xf,"cold pen only, 10 coldTT 40-50%",N
+10,moistDaysBefore,14,rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+11,moistDaysAfter,1,rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+12,moistMaxLayers,2,rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+13,coldStage,4,rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+14,coldTT,4,rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+15,xSurfaceOMString,"0,2500,10000",rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+16,ySurfaceOMString,"1, 1, 1",rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+17,xMoistureString,"0,1,2",rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+18,yMoistureString,"1, 1, 1",rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+19,xTTString,"0,15,100",rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+20,yTTString,"1, 1, 1",rue,206,xf,"cold pen only, 10 coldTT 40-50%",N
+21,moistDaysBefore,14,xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+22,moistDaysAfter,1,xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+23,moistMaxLayers,2,xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+24,coldStage,4,xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+25,coldTT,10,xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+26,xSurfaceOMString,"0,2500,10000",xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+27,ySurfaceOMString,"1, 1, 1",xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+28,xMoistureString,"0,1,2",xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+29,yMoistureString,"1, 1, 1",xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+30,xTTString,"0,15,100",xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+31,yTTString,"1, 0.40, 0.50",xf,206,xf,"cold pen only, 10 coldTT 40-50%",N
+1,startStage,1,kill,207,xf,"mois pen start <dul, 50%",N
+2,endStage,3.5,kill,207,xf,"mois pen start <dul, 50%",N
+3,maxLayer,3,kill,207,xf,"mois pen start <dul, 50%",N
+4,moistLim,2,kill,207,xf,"mois pen start <dul, 50%",N
+5,tempLim,2,kill,207,xf,"mois pen start <dul, 50%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,207,xf,"mois pen start <dul, 50%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,207,xf,"mois pen start <dul, 50%",N
+8,xTempString,"-3.5, 0",kill,207,xf,"mois pen start <dul, 50%",N
+9,yTempString,"0, 0",kill,207,xf,"mois pen start <dul, 50%",N
+10,moistDaysBefore,14,rue,207,xf,"mois pen start <dul, 50%",N
+11,moistDaysAfter,1,rue,207,xf,"mois pen start <dul, 50%",N
+12,moistMaxLayers,2,rue,207,xf,"mois pen start <dul, 50%",N
+13,coldStage,4,rue,207,xf,"mois pen start <dul, 50%",N
+14,coldTT,4,rue,207,xf,"mois pen start <dul, 50%",N
+15,xSurfaceOMString,"0,2500,10000",rue,207,xf,"mois pen start <dul, 50%",N
+16,ySurfaceOMString,"1, 1, 1",rue,207,xf,"mois pen start <dul, 50%",N
+17,xMoistureString,"0,1,2",rue,207,xf,"mois pen start <dul, 50%",N
+18,yMoistureString,"1, 1, 1",rue,207,xf,"mois pen start <dul, 50%",N
+19,xTTString,"0,15,100",rue,207,xf,"mois pen start <dul, 50%",N
+20,yTTString,"1, 1, 1",rue,207,xf,"mois pen start <dul, 50%",N
+21,moistDaysBefore,14,xf,207,xf,"mois pen start <dul, 50%",N
+22,moistDaysAfter,1,xf,207,xf,"mois pen start <dul, 50%",N
+23,moistMaxLayers,2,xf,207,xf,"mois pen start <dul, 50%",N
+24,coldStage,4,xf,207,xf,"mois pen start <dul, 50%",N
+25,coldTT,4,xf,207,xf,"mois pen start <dul, 50%",N
+26,xSurfaceOMString,"0,2500,10000",xf,207,xf,"mois pen start <dul, 50%",N
+27,ySurfaceOMString,"1, 1, 1",xf,207,xf,"mois pen start <dul, 50%",N
+28,xMoistureString,"0, 0.9, 2",xf,207,xf,"mois pen start <dul, 50%",N
+29,yMoistureString,"1, 1, 0.5",xf,207,xf,"mois pen start <dul, 50%",N
+30,xTTString,"0,15,100",xf,207,xf,"mois pen start <dul, 50%",N
+31,yTTString,"1, 1, 1",xf,207,xf,"mois pen start <dul, 50%",N
+1,startStage,1,kill,208,xf,"mois pen start <<dul, 50%",N
+2,endStage,3.5,kill,208,xf,"mois pen start <<dul, 50%",N
+3,maxLayer,3,kill,208,xf,"mois pen start <<dul, 50%",N
+4,moistLim,2,kill,208,xf,"mois pen start <<dul, 50%",N
+5,tempLim,2,kill,208,xf,"mois pen start <<dul, 50%",N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,208,xf,"mois pen start <<dul, 50%",N
+7,yMoistString,"0, 0, 0, 0, 0",kill,208,xf,"mois pen start <<dul, 50%",N
+8,xTempString,"-3.5, 0",kill,208,xf,"mois pen start <<dul, 50%",N
+9,yTempString,"0, 0",kill,208,xf,"mois pen start <<dul, 50%",N
+10,moistDaysBefore,14,rue,208,xf,"mois pen start <<dul, 50%",N
+11,moistDaysAfter,1,rue,208,xf,"mois pen start <<dul, 50%",N
+12,moistMaxLayers,2,rue,208,xf,"mois pen start <<dul, 50%",N
+13,coldStage,4,rue,208,xf,"mois pen start <<dul, 50%",N
+14,coldTT,4,rue,208,xf,"mois pen start <<dul, 50%",N
+15,xSurfaceOMString,"0,2500,10000",rue,208,xf,"mois pen start <<dul, 50%",N
+16,ySurfaceOMString,"1, 1, 1",rue,208,xf,"mois pen start <<dul, 50%",N
+17,xMoistureString,"0,1,2",rue,208,xf,"mois pen start <<dul, 50%",N
+18,yMoistureString,"1, 1, 1",rue,208,xf,"mois pen start <<dul, 50%",N
+19,xTTString,"0,15,100",rue,208,xf,"mois pen start <<dul, 50%",N
+20,yTTString,"1, 1, 1",rue,208,xf,"mois pen start <<dul, 50%",N
+21,moistDaysBefore,14,xf,208,xf,"mois pen start <<dul, 50%",N
+22,moistDaysAfter,1,xf,208,xf,"mois pen start <<dul, 50%",N
+23,moistMaxLayers,2,xf,208,xf,"mois pen start <<dul, 50%",N
+24,coldStage,4,xf,208,xf,"mois pen start <<dul, 50%",N
+25,coldTT,4,xf,208,xf,"mois pen start <<dul, 50%",N
+26,xSurfaceOMString,"0,2500,10000",xf,208,xf,"mois pen start <<dul, 50%",N
+27,ySurfaceOMString,"1, 1, 1",xf,208,xf,"mois pen start <<dul, 50%",N
+28,xMoistureString,"0, 0.75, 2",xf,208,xf,"mois pen start <<dul, 50%",N
+29,yMoistureString,"1, 1, 0.5",xf,208,xf,"mois pen start <<dul, 50%",N
+30,xTTString,"0,15,100",xf,208,xf,"mois pen start <<dul, 50%",N
+31,yTTString,"1, 1, 1",xf,208,xf,"mois pen start <<dul, 50%",N
+1,startStage,1,kill,209,xf,xf always dec 50%,N
+2,endStage,3.5,kill,209,xf,xf always dec 50%,N
+3,maxLayer,3,kill,209,xf,xf always dec 50%,N
+4,moistLim,2,kill,209,xf,xf always dec 50%,N
+5,tempLim,2,kill,209,xf,xf always dec 50%,N
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,209,xf,xf always dec 50%,N
+7,yMoistString,"0, 0, 0, 0, 0",kill,209,xf,xf always dec 50%,N
+8,xTempString,"-3.5, 0",kill,209,xf,xf always dec 50%,N
+9,yTempString,"0, 0",kill,209,xf,xf always dec 50%,N
+10,moistDaysBefore,14,rue,209,xf,xf always dec 50%,N
+11,moistDaysAfter,1,rue,209,xf,xf always dec 50%,N
+12,moistMaxLayers,2,rue,209,xf,xf always dec 50%,N
+13,coldStage,4,rue,209,xf,xf always dec 50%,N
+14,coldTT,4,rue,209,xf,xf always dec 50%,N
+15,xSurfaceOMString,"0,2500,10000",rue,209,xf,xf always dec 50%,N
+16,ySurfaceOMString,"1, 1, 1",rue,209,xf,xf always dec 50%,N
+17,xMoistureString,"0,1,2",rue,209,xf,xf always dec 50%,N
+18,yMoistureString,"1, 1, 1",rue,209,xf,xf always dec 50%,N
+19,xTTString,"0,15,100",rue,209,xf,xf always dec 50%,N
+20,yTTString,"1, 1, 1",rue,209,xf,xf always dec 50%,N
+21,moistDaysBefore,14,xf,209,xf,xf always dec 50%,N
+22,moistDaysAfter,1,xf,209,xf,xf always dec 50%,N
+23,moistMaxLayers,2,xf,209,xf,xf always dec 50%,N
+24,coldStage,4,xf,209,xf,xf always dec 50%,N
+25,coldTT,4,xf,209,xf,xf always dec 50%,N
+26,xSurfaceOMString,"0,2500,10000",xf,209,xf,xf always dec 50%,N
+27,ySurfaceOMString,"1, 1, 1",xf,209,xf,xf always dec 50%,N
+28,xMoistureString,"0, 0.75, 2",xf,209,xf,xf always dec 50%,N
+29,yMoistureString,"0.5, 0.5, 0.5",xf,209,xf,xf always dec 50%,N
+30,xTTString,"0,15,100",xf,209,xf,xf always dec 50%,N
+31,yTTString,"1, 1, 1",xf,209,xf,xf always dec 50%,N

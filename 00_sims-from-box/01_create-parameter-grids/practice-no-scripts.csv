@@ -1,0 +1,32 @@
+param_id,param_apsim,value,group_id,set_id,set_desc
+1,startStage,1,kill,1,no scripts
+2,endStage,3.5,kill,1,no scripts
+3,maxLayer,3,kill,1,no scripts
+4,moistLim,2,kill,1,no scripts
+5,tempLim,2,kill,1,no scripts
+6,xMoistString,"0, 0.5, 1, 1.5, 2",kill,1,no scripts
+7,yMoistString,"0, 0, 0, 0, 0",kill,1,no scripts
+8,xTempString,"-3.5, 0",kill,1,no scripts
+9,yTempString,"0, 0",kill,1,no scripts
+10,moistDaysBefore,14,rue,1,no scripts
+11,moistDaysAfter,1,rue,1,no scripts
+12,moistMaxLayers,2,rue,1,no scripts
+13,coldStage,4,rue,1,no scripts
+14,coldTT,4,rue,1,no scripts
+15,xSurfaceOMString,"0,2500,10000",rue,1,no scripts
+16,ySurfaceOMString,"1, 1, 1",rue,1,no scripts
+17,xMoistureString,"0,1,2",rue,1,no scripts
+18,yMoistureString,"1, 1, 1",rue,1,no scripts
+19,xTTString,"0,15,100",rue,1,no scripts
+20,yTTString,"1, 1, 1",rue,1,no scripts
+21,moistDaysBefore,14,xf,1,no scripts
+22,moistDaysAfter,1,xf,1,no scripts
+23,moistMaxLayers,2,xf,1,no scripts
+24,coldStage,4,xf,1,no scripts
+25,coldTT,4,xf,1,no scripts
+26,xSurfaceOMString,"0,2500,10000",xf,1,no scripts
+27,ySurfaceOMString,"1, 1, 1",xf,1,no scripts
+28,xMoistureString,"0,1,2",xf,1,no scripts
+29,yMoistureString,"1, 1, 1",xf,1,no scripts
+30,xTTString,"0,15,100",xf,1,no scripts
+31,yTTString,"1, 1, 1",xf,1,no scripts
