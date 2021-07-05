@@ -21,33 +21,49 @@ library(janitor)
 
 source("05_manu-figs/palettes.R")
 
-#--calculated in the named folder
-gaps_filt <- read_csv("01_sims-oat-by-hand/dat_tidy-hand-oats.csv")
-
-#--note, I want to get the errors on the experimentally observed ones
-
-
 #--wrote it, edited by hand
 # gaps_filt %>% 
 #   select(dtype, oat_nu, oat_what) %>% 
 #   distinct() %>% 
 #   write_csv("05_manu-figs/oats_nice.csv")
 # 
-
 oats_nice <- read_csv("05_manu-figs/oats_nice.csv")
 
+
+#--calculated in the named folder
+gaps_filt <- read_csv("01_sims-oat-by-hand/dat_tidy-hand-oats.csv")
+
+#--note, I want to get the errors on the experimentally observed ones
+
+cis <- read_csv("00_exp-variability/dat_gap-cis.csv") %>% 
+  filter(site == "ames")
+
+
+new_exp <- 
+  gaps_filt %>% 
+  select(dtype, oat_nu, year, oat_what, category, notes) %>% 
+  filter(dtype == "exp_gap") %>% 
+  left_join(
+    cis %>% 
+      select(year, gap_kgha, gap_hi, gap_lo)
+    )
+
+gaps_filt_cis <- 
+  gaps_filt %>% 
+  filter(dtype != "exp_gap") %>% 
+  bind_rows(new_exp)
 
 # windmill ----------------------------------------------------------------
 
 yrs_ord <- 
-  gaps_filt %>% 
+  gaps_filt_cis %>% 
   filter(oat_what == "exp gap", category == "1 factor") %>% 
-  arrange(gap_kgha) %>% 
+  arrange(-gap_kgha) %>% 
   select(year) %>% 
   pull()
 
 gaps_filt_wind <- 
-  gaps_filt %>%
+  gaps_filt_cis %>%
   left_join(oats_nice) %>% 
   arrange(oat_what_order) %>% 
   mutate(year = factor(year, levels = yrs_ord),
@@ -67,7 +83,8 @@ wind_theme_H <-    theme_bw() +
         axis.ticks.x = element_blank())
 
 
-# get 1 factor and 5 factor together
+
+# 1 and 5 together --------------------------------------------------------
 
 f1 <- 
   gaps_filt_wind %>%
@@ -84,7 +101,7 @@ f5 <-
 f1 %>% 
   bind_rows(f5) %>% 
   mutate(
-    year = factor(year, levels = yrs_ord),
+    #year = factor(year, levels = yrs_ord),
     col1 = case_when(
       oat_what == "exp gap" ~ "A",
       oat_what == "current apsim gap" ~ "B",
@@ -96,14 +113,17 @@ f1 %>%
            position = "dodge", 
            stat = "identity", 
            #color = "black"
-  ) + 
+  ) +
+  geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
-  scale_fill_manual(values = c("A" = dkbl1, "B" = grn1, "C" = ylw1, "D" = dkpnk1)) +
-  scale_color_manual(values = c("A" = dkbl1, "B" = grn1, "C" = ylw1, "D" = dkpnk1)) +
+  scale_fill_manual(values = c("C" = dkbl1, "B" = grn1, "A" = ylw1, "D" = dkpnk1)) +
+  scale_color_manual(values = c("C" = dkbl1, "B" = grn1, "A" = ylw1, "D" = dkpnk1)) +
   geom_hline(aes(yintercept = mngap), size = 1, type = "dashed") +
-  labs(title = "Ames",
+  labs(#title = "Ames",
        x = NULL,
-       y = "Continuous Maize Penalty (kg ha-1)") + 
+       y = "Continuous Maize Penalty at\nSite IA-4 (kg ha-1)") + 
   wind_theme_H
+
+ggsave("05_manu-figs/fig_apsim-oat-windmill.png", width = 9, height = 5)
 
