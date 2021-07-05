@@ -10,6 +10,7 @@
 # last edited:   3/31/2020 (I was confused...)
 #                11/23/2020 cleaning, added rfv50% (oat22)
 #                1/11/2021 moved sims to github, much easier
+#                7/5/2021 trying to figure out what I did...
 
 rm(list = ls())
 library(saapsim) #--has some functions
@@ -84,9 +85,12 @@ apw <-
 
 # calc yield gaps ---------------------------------------------------------
 
+#--7/5/2021, update obs gaps to be the diff between plateuas. 
+
 ewgap <-
-  ilia_gaps %>% 
-  ungroup() %>% 
+  read_csv("00_empirical-n-cont/dat_gap-components.csv") %>% 
+  select(site, year, nonngap) %>% 
+  rename("gap_kgha" = nonngap) %>% 
   filter(site == "ames") %>% 
   mutate(dtype = "exp_gap", 
          oat_nu = 0) %>%  #--just renaming it lazily
@@ -120,7 +124,8 @@ gaps <-
 gaps_filt <- 
   gaps %>% 
   #--2000 was the beginning year, sims are bad at first years
-  filter(year > 2000)
+  filter(year > 2000) %>% 
+  distinct()
   
 
 gaps_filt %>% write_csv("01_sims-oat-by-hand/dat_tidy-hand-oats.csv")

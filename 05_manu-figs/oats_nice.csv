@@ -1,0 +1,25 @@
+dtype,oat_nu,oat_what,oat_what_nice,oat_what_order
+exp_gap,0,exp gap,Experimentally obseved penalty,1
+oat_gap,1,lp by 1/m2,Lower plant density,3
+oat_gap,2,late emergence,Delay emergence,4
+oat_gap,3,dec RUE12%,Decrease radiation use effiency (RUE),5
+oat_gap,4,dec RFV10%,Decrease root front velocity (RFV),6
+oat_gap,5,dec maize KL,Decrease root uptake efficiency,7
+oat_gap,6,dec pot KN50,Reduce potential kernal number,8
+oat_gap,7,lp + rue + rfv,,9
+oat_gap,8,lp + rue + lowKL,,10
+oat_gap,9,lp + rue + less kernals,,11
+oat_gap,10,lp + rfv + lowKL,,12
+oat_gap,11,lp + rfv + less kernals,,13
+oat_gap,12,lp + lowKL + less kernals,,14
+oat_gap,13,lp  + less kernals + rue + lowKL,,15
+oat_gap,14,lp + rfv + less kernals + lowKL,,16
+oat_gap,15,lp + rue + rfv + lowKL,,17
+oat_gap,16,lp + rue + rfv + lowKL + less kernals,"Lower plant density; decreased RUE, RFV, root uptake efficiency, and potential kernal nu.",18
+oat_gap,17,RUE + RFV + KL,,19
+oat_gap,18,rue + rfv + less kernals,,20
+oat_gap,19,rue + kl + less kernals,,21
+oat_gap,20,rfv + lowkl + less kernals,,22
+oat_gap,21,rue + rfv + lowkl + less kernals,,23
+oat_gap,22,dec RFV50%,Decrease root front velocity (RFV),6
+oat_gapnotweaks,99,current apsim gap,Current modelled penalty,2
