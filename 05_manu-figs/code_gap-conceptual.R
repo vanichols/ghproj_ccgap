@@ -130,7 +130,7 @@ fig_conc <-
   geom_rect(aes(xmin = 340, xmax = 360,
                 ymin = cc_2/1000, ymax = sc_2/1000),
             fill = ltbl1, color = "black") +
-  geom_text(aes(x = 350, y = ((cc_2 + cc_1)/2)/1000, label = "N-closable yield gap"),
+  geom_text(aes(x = 350, y = ((cc_2 + cc_1)/2)/1000, label = "Continuous maize N penalty"),
             hjust = 1, fontface = "italic") +
     geom_text(aes(x = 350, y = ((sc_2 + cc_2)/2)/1000, label = "Continuous maize penalty"),
               hjust = 1, fontface = "italic") +
@@ -138,8 +138,11 @@ fig_conc <-
                                 "Rotated maize AONR" = dkbl1)) +
   scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
                                "Rotated maize AONR" = dkbl1)) +
-  labs(x = "Nitrogen fertilization rate\n(kg N ha-1)",
-       y = "Maize grain yield\n(dry Mg ha-1)",
+  labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
+       y = expression(Maize~grain~yield~(dry~Mg~ha^{-1})),
+       
+       #expression(flux*phantom(x)*(g~CO[2]~m^{-2}~h^{-1})))
+       
        color = NULL,
        fill = NULL) +
   theme_bw() + 

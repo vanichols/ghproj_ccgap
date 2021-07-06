@@ -45,8 +45,9 @@ mxylds <-
 m1a <- lmer(yield_kgha ~ rotation + (1|site) + (1|yearF), data = mxylds)
 summary(m1a)
 
-m1b <- lmer(yaonr ~ rotation + (1|site) + (1|yearF), data = platylds)
+m1b <- lmer(yaonr ~ rotation + (1|site) + (1|yearF), data = mxylds)
 summary(m1b)
+
 
 # gap summary -------------------------------------------------------------
 

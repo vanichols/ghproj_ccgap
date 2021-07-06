@@ -48,6 +48,7 @@ m2 <- lm(pen_kgha ~ .,
          
 sm2 <- step(m2, k = log(nrow(mdat)))
 summary(sm2)
+anova(sm2)
 
 m2vars <- 
   sm2$coefficients %>% 

@@ -878,6 +878,11 @@ m7rot <- lmer(yield_kgha ~ year0*rotation + (1|site),
 
 summary(m7rot) #--no
 
+#--ok fit a model without rotation
+m7 <- lmer(yield_kgha ~ year0 + (1|site), 
+              data = dat_mod %>% filter(rotation %in% c("cc", "sc")))
+
+summary(m7)
 
 #--so many ways to estimate the gap size...
 fig_gap %>% 
@@ -901,6 +906,12 @@ pcp_ann %>%
   geom_point() + 
   geom_smooth(method = "lm", se = F) +
   facet_wrap(~site)
+
+pcp_ann %>% 
+  ggplot(aes(year, pcp_mm)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = F) 
+
 
 ilia_yields %>% 
   filter(nrate_kgha == 0) %>% 
