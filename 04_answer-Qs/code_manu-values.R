@@ -82,3 +82,14 @@ gap %>%
   mutate(nover = ifelse(nonngap < 0.01, "Y", "N")) %>% 
   group_by(nover) %>% 
   summarise(n = n())
+
+# N values for each site-----------------------------------------------------------
+
+ilia_yields %>% 
+  select(site, nrate_kgha) %>% 
+  distinct() %>% 
+  group_by(site) %>% 
+  summarise(across(everything(), str_c, collapse= ",")) %>% 
+  write_csv("04_answer-Qs/sites-nrates.csv")
+
+

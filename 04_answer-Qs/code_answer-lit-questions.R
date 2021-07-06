@@ -857,28 +857,36 @@ fig_gap %>%
 
 ggsave("04_answer-Qs/fig_7-gap-over-time.png", height = 12)
 
-#--stats to get slope
-fig_gap
+#--stats to get slope, note rotation has weird things (gap pct, gap) from graphing
+dat_mod <- 
+  fig_gap %>% 
+  filter(grepl("High", nrateF)) %>% 
+  mutate(year0 = year - min(year))
 
-m7sc <- lmer(yield_kgha ~ year + (1|site),
-           data = fig_gap %>% filter(rotation == "sc",
-                                     grepl("High", nrateF)))
-m7cc <- lmer(yield_kgha ~ year + (1|site),
-           data = fig_gap %>% filter(rotation == "cc",
-                                     grepl("High", nrateF)))
-summary(m7cc)
-summary(m7sc)
+#sc over time at high nrates
+m7sc <- lmer(yield_kgha ~ year0 + (1|site),
+           data = dat_mod %>% filter(rotation == "sc"))
+summary(m7sc) #+175 kg/ha/yr
 
-summary(lmer(yield_kgha ~ 1 + (1|site),
-               data = fig_gap %>% filter(grepl("High", nrateF))))
-  
+m7cc <- lmer(yield_kgha ~ year0 + (1|site),
+           data = dat_mod %>% filter(rotation == "cc"))
+summary(m7cc) #+176 kg/ha/yr
 
+#--is there an interaction btwn rot and year?
+m7rot <- lmer(yield_kgha ~ year0*rotation + (1|site), 
+     data = dat_mod %>% filter(rotation %in% c("cc", "sc")))
+
+summary(m7rot) #--no
+
+
+#--so many ways to estimate the gap size...
 fig_gap %>% 
   filter(grepl("High", nrateF)) %>% 
   summarise(ogap_kgha = mean(ogap_kgha, na.rm = T))
 
-summary(lmer(ogap_kgha ~ 1 + (1|site),
-             data = fig_gap %>% filter(grepl("High", nrateF))))
+summary(lmer(ogap_kgha ~ year0 + (1|site),
+             data = dat_mod %>% filter(rotation == "gap")))
+
 fig_gap %>% 
   filter(grepl("Low", nrateF)) %>% 
   summarise(ogap_kgha = mean(ogap_kgha, na.rm = T))
