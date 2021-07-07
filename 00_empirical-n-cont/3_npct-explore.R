@@ -20,34 +20,23 @@ tst.tib <-
 aonrs <- 
   read_csv("00_empirical-n-cont/dat_aonrs.csv")
   
-npct <- 
-  read_csv("00_empirical-n-cont/dat_npct.csv") %>% 
-  left_join(tst.tib %>% select(state, site) %>% distinct())
+# npct <- 
+#   read_csv("00_empirical-n-cont/dat_gap-components.csv")
+#   left_join(tst.tib %>% select(state, site) %>% distinct())
 
 nsims <- 
   read_csv("00_empirical-n-cont/dat_npct-sims.csv") %>% 
   left_join(tst.tib %>% select(state, site) %>% distinct())
 
 #--gap components
-gapc <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>%
+npct <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>%
   mutate(gap = nonngap + ngap) %>% 
-  select(site, year, gap, nonngap, ngap)
-
-library(lme4)
-summary(lmer(gap ~ (1|site) + (1|year), data = gapc))
-summary(lmer(nonngap ~ (1|site) + (1|year), data = gapc))
-summary(lmer(ngap ~ (1|site) + (1|year), data = gapc))
-
-
+  left_join(ilia_siteinfo %>% select(site, state))
 
 npct_mean <- 
   npct %>% 
   summarise(ngap_frac = mean(ngap_frac, na.rm = T)) %>% 
   pull(ngap_frac)
-
-npct %>% 
-  ggplot(aes(ngap_frac)) + 
-  geom_histogram(bins = 40)
 
 
 # quad plat gap vs max N gap ----------------------------------------------
@@ -97,8 +86,8 @@ ilia_gaps %>%
 
 
 #--not related at all
-gapc %>% 
-  ggplot(aes(gap_n, gap_nonn)) + 
+npct %>% 
+  ggplot(aes(ngap, nonngap)) + 
   geom_point(aes(color = site, size = gap))
 
 
@@ -107,7 +96,7 @@ gapc %>%
 
 aonrs %>% 
   filter(aonr_rot == "aonr_sc") %>% 
-  left_join(gapc %>% 
+  left_join(npct %>% 
               mutate(gap_npct = gap_n/gap)) %>% 
   ggplot(aes(aonr_kgha, gap_npct)) + 
   geom_point()
@@ -132,7 +121,7 @@ p1 <-
 
 ggExtra::ggMarginal(p1, margins = "x", type = "histogram", bins = 40)
 
-ggsave("00_empirical-n-cont/fig_gap-nfrac-lollypop.png")
+#ggsave("00_empirical-n-cont/fig_gap-nfrac-lollypop.png")
 
 
 #--look at it by year
@@ -277,7 +266,7 @@ emmeans(m2, specs = "site") %>%
        y = "Percent of cont corn penalty due to nitrogen",
        title = "Nitrogen contribution to penalty, averaged over years")
 
-ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg.png")
+#ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg.png")
 
 # use random effect apporach ----------------------------------------------
 
@@ -458,7 +447,7 @@ npct %>%
   labs(title = "Percentage of penalty related to nitrogen",
        subtitle = "Empirical approach")
 
-ggsave("00_empirical-n-cont/fig_gap-nfrac.png")
+#ggsave("00_empirical-n-cont/fig_gap-nfrac.png")
 
 
 
@@ -488,7 +477,7 @@ npct %>%
   labs(title = "Percentage of penalty related to nitrogen",
        subtitle = "Empirical approach, averaged over site-years")
 
-ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg.png")
+#ggsave("00_empirical-n-cont/fig_gap-nfrac-site-avg.png")
 
 
 #--take averages of sites, just nfrac w/errors

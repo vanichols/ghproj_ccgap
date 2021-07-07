@@ -899,6 +899,30 @@ fig_gap %>%
 summary(lmer(ogap_kgha ~ 1 + (1|site),
              data = fig_gap %>% filter(grepl("Low", nrateF))))
 
+#--use the anor method. also do a pct
+
+preds <- read_csv("00_empirical-n-cont/dat_preds.csv")
+aonr <- read_csv("00_empirical-n-cont/dat_aonrs.csv")
+
+
+aonr_gaps <- 
+  aonr %>% 
+  separate(aonr_rot, into = c("aonr", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  left_join(preds) %>% 
+  select(-nrate_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = pred_yield) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  mutate(gap_kgha = ifelse(gap_kgha < 0, 0, gap_kgha)) %>% 
+  mutate(gap_pct = gap_kgha/sc)
+
+aonr_gaps %>% 
+  ggplot(aes(year, gap_pct)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
+
+lmer(gap_pct )
 
 #--yields and rain over time - confounded?
 pcp_ann %>% 
@@ -1036,4 +1060,18 @@ ilia_yields %>%
          rotation == "sc") %>% 
   left_join(ngap) %>% 
   ggplot(aes(yield_kgha, ngap)) + 
+  geom_point()
+
+# 11. does rainfall have a latitude gradient? -------------------------------------------------
+
+
+pcp_ann %>% 
+  left_join(ilia_siteinfo) %>% 
+  ggplot(aes(lat, pcp_mm)) + 
+  geom_point()
+
+
+tav_ann %>% 
+  left_join(ilia_siteinfo) %>% 
+  ggplot(aes(lat, tav_c)) + 
   geom_point()

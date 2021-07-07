@@ -19,7 +19,7 @@ sims_aonrs <- read_csv("00_empirical-n-cont/dat_aonrs-sims.csv")
 tst <- 
   ilia_yields %>%
   filter(site == "ames",
-         year %in% c(2000),
+         year %in% c(1999),
          rotation == "cc") 
 
 
@@ -85,6 +85,7 @@ qpcoefs_fun(tst = tst)
 
 
 #--note: what happens in years where no plateau is reached?
+#7/6/2021 - this isn't working any more?!?
 
 tst.tib <- 
   ilia_yields
@@ -93,7 +94,7 @@ tst.tib <-
 #--get preds at many values
 tst.mods <- 
   tst.tib %>% 
-  group_by(site, year, rotation) %>%
+  group_by(state, site, year, rotation) %>%
   nest() %>%
   mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
   rowwise() %>% 
