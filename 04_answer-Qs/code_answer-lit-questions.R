@@ -31,6 +31,9 @@ scale_this2 <- function(x){
 
 # data --------------------------------------------------------------------
 
+gap_cmpts <- read_csv("00_empirical-n-cont/dat_gap-components.csv")
+
+
 gaps_alln <-
   ilia_yields %>% 
   pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
@@ -734,6 +737,14 @@ gaps_alln %>%
 
 
 # 7. Penalty over time? ---------------------------------------
+# NOTE: moved official anlaysis to manu-values code
+
+gaps_alln <-
+  ilia_yields %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(ogap_kgha = sc - cc,
+         ogap_pct = ogap_kgha/sc)
+
 
 #--obseved gaps, all sites
 
@@ -855,7 +866,7 @@ fig_gap %>%
   labs(title = "179 site-years, IA and IL",
        subtitle = "Continuous corn penalty has not changed over time")
 
-ggsave("04_answer-Qs/fig_7-gap-over-time.png", height = 12)
+#ggsave("04_answer-Qs/fig_7-gap-over-time.png", height = 12)
 
 #--stats to get slope, note rotation has weird things (gap pct, gap) from graphing
 dat_mod <- 
@@ -866,7 +877,7 @@ dat_mod <-
 #sc over time at high nrates
 m7sc <- lmer(yield_kgha ~ year0 + (1|site),
            data = dat_mod %>% filter(rotation == "sc"))
-summary(m7sc) #+175 kg/ha/yr
+summary(m7sc) #+174 kg/ha/yr
 
 m7cc <- lmer(yield_kgha ~ year0 + (1|site),
            data = dat_mod %>% filter(rotation == "cc"))
@@ -882,7 +893,7 @@ summary(m7rot) #--no
 m7 <- lmer(yield_kgha ~ year0 + (1|site), 
               data = dat_mod %>% filter(rotation %in% c("cc", "sc")))
 
-summary(m7)
+summary(m7) #175
 
 #--so many ways to estimate the gap size...
 fig_gap %>% 
@@ -895,9 +906,6 @@ summary(lmer(ogap_kgha ~ year0 + (1|site),
 fig_gap %>% 
   filter(grepl("Low", nrateF)) %>% 
   summarise(ogap_kgha = mean(ogap_kgha, na.rm = T))
-
-summary(lmer(ogap_kgha ~ 1 + (1|site),
-             data = fig_gap %>% filter(grepl("Low", nrateF))))
 
 #--use the anor method. also do a pct
 
@@ -1075,3 +1083,30 @@ tav_ann %>%
   left_join(ilia_siteinfo) %>% 
   ggplot(aes(lat, tav_c)) + 
   geom_point()
+
+# 12. is n penalty related to amount of residue? -------------------------------------------------
+
+prev_yld <- 
+  ilia_yields %>% 
+  group_by(site) %>% 
+  filter(nrate_kgha == max(nrate_kgha)) %>% 
+  filter(rotation == "cc") %>% 
+  arrange(site, nrate_kgha, year) %>% 
+  group_by(site, nrate_kgha) %>%
+  mutate(prev_cc_yield = lag(yield_kgha)) %>% 
+  ungroup() %>% 
+  select(site, year, prev_cc_yield)
+
+gap_cmpts %>% 
+  left_join(prev_yld) %>% 
+  ggplot(aes(prev_cc_yield, ngap)) + 
+  geom_point()
+
+gap_cmpts %>% 
+  mutate(lgr = ifelse(nonngap > ngap, 1, 0)) %>% 
+  group_by(lgr) %>% 
+  summarise(n = n()) %>% 
+  filter(!is.na(lgr)) %>% 
+  mutate(ntot = sum(n),
+         frac = n/ntot)
+

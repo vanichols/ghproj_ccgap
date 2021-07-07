@@ -18,7 +18,7 @@ library(lmerTest)
 library(patchwork)
 
 
-# number of sites ---------------------------------------------------------
+# 1. number of sites ---------------------------------------------------------
 
 ilia_yields %>% 
   select(state, site) %>% 
@@ -27,7 +27,7 @@ ilia_yields %>%
   tally()
 
 
-# yield summary -----------------------------------------------------------
+# 2. yield summary -----------------------------------------------------------
 
 #--why aren't there 157 here?
 platylds <- 
@@ -49,48 +49,129 @@ m1b <- lmer(yaonr ~ rotation + (1|site) + (1|yearF), data = mxylds)
 summary(m1b)
 
 
-# gap summary -------------------------------------------------------------
+# 2. N values for each site for table-----------------------------------------------------------
+ 
+# ilia_yields %>% 
+#   select(site, nrate_kgha) %>% 
+#   distinct() %>% 
+#   group_by(site) %>% 
+#   summarise(across(everything(), str_c, collapse= ",")) %>% 
+#   write_csv("04_answer-Qs/sites-nrates.csv")
 
-#--there is only 157 here. Oh. There are NAs
-gap <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>% 
-  select(site, year, nonngap) %>% 
+
+
+# 3. avg ngap and nonngap from anor method----------------------------------------------------
+
+gap_comps <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>% 
   mutate(yearF = as.factor(year)) 
 
-#--36 NAs
-gap %>% 
-  filter(is.na(nonngap))
 
-#--12 0s
-gap %>% 
-  filter(nonngap == 0)
+m_nonn1 <- lmer(nonngap ~ (1|site) + (1|yearF), data = gap_comps)
+m_nonn2 <- lmer(nonngap ~ (1|site), data = gap_comps)
+anova(m_nonn1, m_nonn2)
+#--keep year
+summary(m_nonn1) #932
 
-157- (36)
 
-gap %>% 
-  ggplot(aes(nonngap)) + 
-  geom_histogram()
+m_n1 <- lmer(ngap ~ (1|site) + (1|yearF), data = gap_comps)
+m_n2 <- lmer(ngap ~ (1|site), data = gap_comps)
+anova(m_n1, m_n2)
+#--keep year
+summary(m_n1) #427 #932
 
-gap %>% 
-  summary()
 
-m2 <- lmer(nonngap ~ (1|site) + (1|yearF), data = gap)
+# 4. gap over time, non aonr method--------------------------------------------------------
 
-summary(m2)
 
-mean(ngap$nonngap)
 
-gap %>% 
-  mutate(nover = ifelse(nonngap < 0.01, "Y", "N")) %>% 
-  group_by(nover) %>% 
-  summarise(n = n())
+# 7. Penalty over time? ---------------------------------------
 
-# N values for each site-----------------------------------------------------------
+gaps_alln <-
+  ilia_yields %>% 
+  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
+  mutate(ogap_kgha = sc - cc,
+         ogap_pct = ogap_kgha/sc) %>% 
+  mutate(nrate = cut_interval(nrate_kgha, n = 3),
+         nrateF = as.numeric(nrate),
+         nrateF = case_when(
+           nrateF == 1 ~ "Low (0-90 kgN/ha)",
+           nrateF == 2 ~ "Med (90-180 kgN/ha)",
+           nrateF == 3 ~ "High (180-270 kgN/ha")
+  ) 
 
-ilia_yields %>% 
-  select(site, nrate_kgha) %>% 
-  distinct() %>% 
-  group_by(site) %>% 
-  summarise(across(everything(), str_c, collapse= ",")) %>% 
-  write_csv("04_answer-Qs/sites-nrates.csv")
 
+#--obseved gaps, all sites
+
+gaps_alln %>% 
+  arrange(nrate) %>% 
+  mutate(nrateF = fct_inorder(nrateF)) %>% 
+  ggplot(aes(year, ogap_kgha)) + 
+  geom_jitter() + 
+  geom_smooth(method = "lm", se = F, color = "red") +
+  facet_grid(.~nrateF, scales = "free_x") + 
+  labs(title = "Continuous corn penalty persists over time at all N rates")
+
+
+# aonr method -------------------------------------------------------------
+
+#--use the anor method. 
+
+preds <- read_csv("00_empirical-n-cont/dat_preds.csv")
+aonr <- read_csv("00_empirical-n-cont/dat_aonrs.csv")
+
+
+dat_modA <- 
+  aonr %>% 
+  separate(aonr_rot, into = c("aonr", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  left_join(preds) %>% 
+  select(-nrate_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = pred_yield) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  mutate(gap_kgha = ifelse(gap_kgha < 0, 0, gap_kgha),
+         gap_pct = gap_kgha/sc) %>% 
+  pivot_longer(cc:gap_pct) %>% 
+  mutate(year0 = year - min(year), 
+         yearF = as.factor(year))
+
+
+#--is there an interaction btwn rot and year?
+m9rot <- lmer(value ~ name*year0 + (1+year0|site), 
+              data = dat_modA %>% filter(name %in% c("cc", "sc")))
+
+summary(m9rot) #super no, but year is sig
+
+#--ok fit a model without rotation
+m9 <- lmer(value ~ year0 + (1 + year0|site), 
+           data = dat_modA %>% filter(name %in% c("cc", "sc")))
+
+summary(m9) #212 +-30
+
+#--what are the rotation yields though?
+m9b <- lmer(value ~ year0*name + (1 + year0|site), 
+           data = dat_modA %>% filter(name %in% c("cc", "sc")))
+
+
+
+emmeans::emmeans(m9b, specs = "name")
+
+#--gap size
+
+summary(lmer(value ~ year0 + (1 + year0|site),
+             data = dat_modA %>% filter(name == "gap_kgha")))
+
+emmeans::emmeans(m10, specs = "year0")
+# year not sig, ignore it? Or leave it in the model? IDK
+
+# just leave it, report the 1252 SE:227
+
+#--gap pct
+
+summary(lmer(value ~ year0 + (1 + year0|site),
+             data = dat_modA %>% filter(name == "gap_pct")))
+
+# year not sig, ignore it? Or leave it in the model? IDK
+
+# just leave it, report the 1252 SE:227
 
