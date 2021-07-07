@@ -130,9 +130,9 @@ fig_conc <-
   geom_rect(aes(xmin = 340, xmax = 360,
                 ymin = cc_2/1000, ymax = sc_2/1000),
             fill = grn1, color = "black") +
-  geom_text(aes(x = 350, y = ((cc_2 + cc_1)/2)/1000, label = "Continuous maize N penalty"),
+  geom_text(aes(x = 350, y = ((cc_2 + cc_1)/2)/1000, label = "N-compensatable yield penalty"),
             hjust = 1, fontface = "italic") +
-    geom_text(aes(x = 350, y = ((sc_2 + cc_2)/2)/1000, label = "Continuous maize penalty"),
+    geom_text(aes(x = 350, y = ((sc_2 + cc_2)/2)/1000, label = "Observed yield penalty"),
               hjust = 1, fontface = "italic") +
     scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
                                 "Rotated maize AONR" = dkbl1)) +

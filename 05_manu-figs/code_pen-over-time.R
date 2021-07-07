@@ -21,7 +21,7 @@ theme_set(theme_bw())
 source("05_manu-figs/palettes.R")
 
 
-# data --------------------------------------------------------------------
+# high N data --------------------------------------------------------------------
 
 gaps_alln <-
   ilia_yields %>% 
@@ -45,7 +45,6 @@ gaps_highn <-
 
 
 # over time ---------------------------------------------------------------
-
 
 fig_gap <-
   ilia_yields %>%
@@ -123,13 +122,63 @@ f1 <-
 
 
 f1
+#ggsave("05_manu-figs/fig_gap-over-time.png")
+
+
+
+# anor method -------------------------------------------------------------
+
+
+
+#--use the anor method. also do a pct?
+
+preds <- read_csv("00_empirical-n-cont/dat_preds.csv")
+aonr <- read_csv("00_empirical-n-cont/dat_aonrs.csv")
+
+
+dat_modA <- 
+  aonr %>% 
+  separate(aonr_rot, into = c("aonr", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  left_join(preds) %>% 
+  select(-nrate_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = pred_yield) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  mutate(gap_kgha = ifelse(gap_kgha < 0, 0, gap_kgha)) %>% 
+  mutate(gap_pct = gap_kgha/sc) %>% 
+  pivot_longer(cc:gap_pct) %>% 
+  mutate(year0 = year - min(year))
+
+
+dat_modA %>%
+  filter(name != "gap_pct") %>% 
+  mutate(rot_nice = case_when(
+    grepl("sc", name) ~ "Rotated maize",
+    grepl("cc", name) ~ "Continuous maize",
+    grepl("gap_kgha", name) ~ "Continuous maize penalty"),
+    rot_nice = factor(rot_nice, levels = c("Rotated maize", "Continuous maize", "Continuous maize penalty"))
+  ) %>% 
+  ggplot(aes(year, value/1000)) + 
+  geom_jitter(aes(shape = rot_nice, color = rot_nice)) + 
+  geom_smooth(method = "lm", se = F, aes(color = rot_nice), size = 2) +
+  scale_color_manual(values = c("Continuous maize" = pnk1, 
+                                "Rotated maize" = dkbl1,
+                                "Continuous maize penalty" = grn1)) +
+  scale_shape_manual(values = c("Continuous maize" = 24, 
+                                "Rotated maize" = 21,
+                                "Continuous maize penalty" = 22)) +
+  labs(x = NULL,
+       color = NULL,
+       shape = NULL,
+       y = expression(Maize~Grain~(dry~Mg~ha^{-1}))) + 
+  theme(legend.direction = "horizontal", 
+        legend.justification = c(0, 1),
+        legend.position = c(0.05, 0.95),
+        legend.background = element_rect(color = "black"),
+        legend.text = element_text(size = rel(1.1)),
+        axis.title.y = element_text(angle = 90, vjust = 0.5))
+
 ggsave("05_manu-figs/fig_gap-over-time.png")
 
 
-# combine -----------------------------------------------------------------
-
-library(patchwork)
-
-fmap + f1 + plot_layout(widths = c(1.8, 2))
-
-ggsave("05_manu-figs/fig_map-pen-over-time.png", width = 13)

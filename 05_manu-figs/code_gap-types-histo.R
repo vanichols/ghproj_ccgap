@@ -106,7 +106,7 @@ fig_pyr <-
          nonngap = ifelse(is.na(nonngap), 0, nonngap),
          ngap = -ngap) %>% 
   pivot_longer(nonngap:ngap) %>%
-  mutate(name = ifelse(name == "ngap", "Nitrogen penalty", "Yield penalty")) %>% 
+  mutate(name = ifelse(name == "ngap", "Nitrogen-compensatable penalty", "Observed penalty")) %>% 
   ggplot(aes(id, value/1000)) + 
   geom_col(aes(fill = name), width = 1) +#, color = "black") + 
  # geom_vline(xintercept = 0, color = "gray70") +
@@ -116,14 +116,14 @@ fig_pyr <-
   geom_hline(yintercept = 0, color = "gray70") +
   geom_text(x = 18, y = 1, label = "36 site-years, undetermined",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
-  geom_text(x = 40, y = 1, label = "6 site-years, no penalty",
+  geom_text(x = 40, y = 1, label = "6 site-years, no penalties",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
-  geom_text(x = 50, y = 1, label = "6 site-years, N penalty only",
+  geom_text(x = 50, y = 1, label = "6 site-years, N-compensatable penalty",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
-  geom_text(x = 90, y = 1, label = "109 site-years, yield penalty",
+  geom_text(x = 90, y = 1, label = "109 site-years, observed penalty",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
   scale_fill_manual(values = c(ylw1, grn1)) +
-  expand_limits(y = 4.5) +
+  expand_limits(y = 5) +
   scale_y_continuous(breaks = c(-2, 0, 2, 4),
                      labels = c(2, 0, 2, 4)) +
   theme(
@@ -172,7 +172,7 @@ fig_histo
 #--horiz
 fig_pyr + fig_histo + plot_layout(guides = "collect", widths = c(2.5, 1)) & theme(legend.position = 'top')
 
-ggsave("05_manu-figs/fig_gap-types-histo.png", height = 4)
+ggsave("05_manu-figs/fig_gap-types-histo.png", height = 4, width = 9.2)
 
 
 # separated by state? -----------------------------------------------------
@@ -208,7 +208,7 @@ dat %>%
   geom_text(x = 90, y = 1, label = "109 site-years, yield penalty",
             hjust = 0, check_overlap = T, fontface = "italic", color = "gray50") +
   scale_fill_manual(values = c(ylw1, grn1, rd2, dkbl1)) +
-  expand_limits(y = 4.5) +
+  expand_limits(y = 5) +
   scale_y_continuous(breaks = c(-2, 0, 2, 4),
                      labels = c(2, 0, 2, 4)) +
   guides(fill=guide_legend(nrow=2,byrow=TRUE)) +
