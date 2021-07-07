@@ -7,6 +7,7 @@
 #               4/30/2020 trying new folder structure
 #               6/4/2020 add drainage
 #               12/1/2020 add IL
+#               7/7/2021 fixing yields to be aonr-max yields and their diff
 
 
 #--make sure data is up-to-date, if you want
@@ -38,7 +39,7 @@ dat <-
   left_join(wea) %>% 
   left_join(soi) %>% 
   mutate(yearF = paste0("Y", year)) %>% #--to ensure it isn't numeric
-  select(crop, state, site, yearsincorn, yearF, year, everything()) 
+  select(state, site, yearsincorn, yearF, year, everything(), -aonr) 
 
 
 # independence?----------------------------------------------------------
@@ -46,7 +47,7 @@ dat <-
 dat_cor <- 
   dat %>%
   ungroup() %>%
-  select(-year, -nrate_kgha, -cc_kgha, -sc_kgha) %>% 
+  select(-year) %>% 
   select_if(is.numeric) %>% 
   cor(., use="complete.obs")
 corrplot::corrplot.mixed(dat_cor)
@@ -73,7 +74,7 @@ library(psych)
 
 dat_4table <-
   dat %>% 
-  select(cc_kgha, sc_kgha, pen_kgha, pen_pct, yearsincorn, everything()) %>% 
+  select(cc_kgha, sc_kgha, gap_kgha, gap_pct, yearsincorn, everything()) %>% 
   select(-year, -yearF, -drainage)
   
 
@@ -106,15 +107,15 @@ dat_nice <-
                             "aveyield_kgha" = "Average site-year yield",
                             "cc_kgha" = "CC yield*",
                             "sc_kgha" = "SC yield*",
-                            "pen_kgha" = "CC/SC gap at max N rate*",
-                            "pen_pct" = "CC/SC gap at max N rate as % of SC yield*",
+                            "gap_kgha" = "CC/SC gap at max yields*",
+                            "gap_pct" = "CC/SC gap as % of SC yield*",
                             "prev_ccyield" = "Prev year CC yield at max N rate\n (indicative of residue amount)",
                             "avg_yield" = "Avg yield at max N at that site",
                             "years_in_corn" = "Number of Years in Cont Corn",
                             "heatstress_n" = "# Days w/Tmax > 30oC from planting to 120 DAP",
                             "ndays_gdd140" = "# DAP to acheive 140 GDDs",
                             "p2wk_precip_mm_tot" = "Total precip 0-14 DAP",
-                            "prep2wk_precip_mm_tot" = "Total precip 2 wks before pl",
+                            "prep2wk_precip_mm_tot" = "Total precip 2 wks before planting",
                             "pre2wkp2wk_tl_mean" = "Mean low temp 4 weeks around planting",
                             "wintcolddays_n" = "Days < 4degF before Jan 1 - planting",
                             "p2mo_gdd" = "GDDs 0-2mo after planting",

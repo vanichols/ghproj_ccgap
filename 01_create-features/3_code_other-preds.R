@@ -7,7 +7,7 @@
 #               4/30/2020 trying new folder structure
 #               6/4/2020 add drainage
 #               12/1/2020 add IL
-
+#               7/7/2021 fixing yields to be aonr-max yields and their diff
 
 #--make sure data is up-to-date, if you want
 #source("01_create-features/1_code_preds-wea.R")
@@ -24,57 +24,65 @@ library(readr)
 library(tidyr)
 
 
-# what else should we add? ------------------------------------------------
 
-#--add previous year's continuous corn yield at max nrate (indicative of residue amt)
+# yields est via aonr -----------------------------------------------------
+
+aonr_preds <- read_csv("00_empirical-n-cont/dat_preds.csv")
+aonr <- read_csv("00_empirical-n-cont/dat_aonrs.csv")
+
+
+aonr_gaps <- 
+  aonr %>% 
+  separate(aonr_rot, into = c("aonr", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  left_join(aonr_preds) %>% 
+  select(-nrate_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = pred_yield) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  mutate(gap_kgha = ifelse(gap_kgha < 0, 0, gap_kgha)) %>% 
+  mutate(gap_pct = gap_kgha/sc)
+
+
+# prev years cc yield, indicative of res amt ------------------------------
+
+
 prev_yield <- 
-  ilia_yields %>%
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "cc") %>% 
-  mutate(prevyrccyield_kgha = lag(yield_kgha)) %>% 
+  aonr_gaps %>% 
+  mutate(prevyrccyield_kgha = lag(cc)) %>% 
   select(site, year, prevyrccyield_kgha)
 
 #--use 'site production index' of cs at max n rate
 avg_yieldsc <- 
-  ilia_yields %>% 
+  aonr_gaps%>% 
   group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "sc") %>% 
-  summarise(avescyield_kgha = mean(yield_kgha, na.rm = T)) %>% 
+  summarise(avescyield_kgha = mean(sc, na.rm = T)) %>% 
   select(site, avescyield_kgha)
 
 avg_yieldcc <- 
-  ilia_yields %>% 
+  aonr_gaps%>% 
   group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  #--make sure it's taken over the same time frame?
-  select(site, year, rotation, yield_kgha) %>%
-  filter(rotation == "cc") %>% 
-  summarise(aveccyield_kgha = mean(yield_kgha, na.rm = T)) %>% 
+  summarise(aveccyield_kgha = mean(cc, na.rm = T)) %>% 
   select(site, aveccyield_kgha)
 
 
 avg_yield <- 
-  ilia_yields %>% 
+  aonr_gaps %>% 
   group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  #--make sure it's taken over the same time frame
-  select(site, year, rotation, yield_kgha) %>%
-  summarise(aveyield_kgha = mean(yield_kgha, na.rm = T)) %>% 
+  summarise(a_sc_kgha = mean(sc, na.rm = T),
+            a_cc_kgha = mean(cc, na.rm = T)) %>% 
+  mutate(aveyield_kgha = (a_sc_kgha + a_cc_kgha)/2) %>% 
   select(site, aveyield_kgha)
 
 #--is one better than the other? are they different?
 avg_yield %>% 
-  left_join(aveccyield_kgha) %>% 
-  left_join(avescyield_kgha) %>%
-  pivot_longer(3:4) %>% 
-  ggplot(aes(aveyield_kgha, value)) + 
+  left_join(avg_yieldcc) %>% 
+  left_join(avg_yieldsc) %>%
+  pivot_longer(2:ncol(.)) %>% 
+  ggplot(aes(name, value)) + 
   geom_point(aes(color = name))
 
-#--I think the overall average is the best
+#--They represent different things. Is it even meaningful? No
 
 
 #--include # of years in corn
@@ -103,21 +111,20 @@ drainage <-
 
 # independence?
 
-dat <-  
-  ilia_yields %>% 
-  group_by(site) %>% 
-  filter(nrate_kgha == max(nrate_kgha)) %>% 
-  pivot_wider(names_from = rotation, values_from = yield_kgha) %>% 
-  mutate(pen_kgha = sc - cc,
-         pen_pct = pen_kgha/sc * 100) %>% 
-  filter(pen_kgha > -1500) %>% #--that one lewis point, just seems weird
+dat <- 
+  aonr_gaps %>%  
+  #filter(pen_kgha > -1500) %>% #--that one lewis point, just seems weird
   rename(cc_kgha = cc,
          sc_kgha = sc) %>% 
   left_join(drainage) %>%
   left_join(prev_yield) %>% 
   left_join(avg_yield) %>% 
   left_join(yrs_corn) %>% 
-  filter(!is.na(prevyrccyield_kgha))
+  filter(!is.na(prevyrccyield_kgha)) %>% 
+  left_join(ilia_siteinfo %>% select(site, state)) %>% 
+  mutate(gap_pct = gap_pct*100)
+
+dat
 
 #--I'm fine?
 dat %>% 
@@ -125,11 +132,6 @@ dat %>%
   select(prevyrccyield_kgha, aveyield_kgha, yearsincorn) %>% 
   cor(., use="complete.obs")
 
-#--does pct gap dec over years? yes.
-dat %>% 
-  ggplot(aes(yearF, pen_pct)) + 
-  geom_point() + 
-  facet_grid(.~state, scales = "free_x")
 
 # save data ---------------------------------------------------------------
 
