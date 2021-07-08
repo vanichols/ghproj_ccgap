@@ -5,6 +5,7 @@
 # notes: 
 #
 # last edited:   12/2/2020
+#                 july 7 2021 (trying to rerun things w/anor things)
 #
 
 rm(list = ls())
@@ -16,50 +17,42 @@ library(tidyverse)
 datraw <- read_csv("01_create-features/4_dat_preds-all.csv")
 
 
+datraw %>% 
+  ggplot(aes(yearsincorn, gap_kgha)) + 
+  geom_point()+ 
+  geom_smooth(method = "lm")
+
 mdat <- 
   datraw %>% 
   unite(state, site, year, col = "site_year") %>% 
-  dplyr::select(-crop, -yearF, -nrate_kgha, -cc_kgha, -sc_kgha, -drainage)
+  dplyr::select(-yearF, -cc_kgha, -sc_kgha, -drainage)
 
 # simple regression -------------------------------------------------------
 library(MASS) #--messes up select, has stepAIC but don't know diff btwn that and step
-#--no interactions
-
-#--with pen% as response
- m1 <- lm(pen_pct ~ .,
-          data = mdat %>% dplyr::select(-site_year, -pen_kgha))
-
-sm1 <- step(m1, ,
-             k = log(nrow(mdat))) #--gives BIC instead of AIC, this seriously limits what gets in
-
-m1vars <- 
-  sm1$coefficients %>% 
-  enframe() %>% 
-  filter(name != "(Intercept)") %>% 
-  mutate(respvar = "pen_pct") %>% 
-  arrange(value)
-
-summary(sm1)
-anova(sm1)
 
 #--with rawgap as response
-m2 <- lm(pen_kgha ~ ., 
-         data = mdat %>% dplyr::select(-site_year, -pen_pct))
+m2 <- lm(gap_kgha ~ ., 
+         data = mdat %>% dplyr::select(-site_year, -gap_pct))
          
 sm2 <- step(m2, k = log(nrow(mdat)))
-summary(sm2)
-anova(sm2)
 
 m2vars <- 
-  sm2$coefficients %>% 
-  enframe() %>% 
-  filter(name != "(Intercept)") %>% 
-  mutate(respvar = "pen_kgha") %>% 
-  arrange(value)
+  summary(sm2) %>% 
+  broom::tidy() %>% 
+  arrange(p.value) %>% 
+  mutate(respvar = "gap_kgha")
 
-m1vars %>% 
-  bind_rows(m2vars) %>% 
-  write_csv("02_fit-models/02_stepwise-selections.csv")
+# what if I don't include yearsincorn?
+m2b <- lm(gap_kgha ~ ., 
+         data = mdat %>% dplyr::select(-site_year, -gap_pct, -yearsincorn))
+
+sm2b <- step(m2b, k = log(nrow(mdat)))
+summary(sm2b)
+
+#--should I do a leave-one-predictor out analysis? probably
+
+m2vars %>% 
+  write_csv("02_fit-models/02_stepwise-selections-gap.csv")
 
 
 #resid(sm2)
@@ -72,8 +65,8 @@ resid_panel(sm2)
 #--let's try with interactions, only including things from m1a
 
 #--on percentage
-m1a <- lm(pen_pct ~ .*.,
-         data = mdat %>% dplyr::select(-site_year, -pen_kgha))
+m1a <- lm(gap_pct ~ .*.,
+         data = mdat %>% dplyr::select(-site_year, -gap_kgha))
 sm1a <- step(m1a)
 sm1a
 
@@ -85,9 +78,9 @@ summary(sm1a)$coefficients %>%
   arrange(pr_t)
 
 #--on raw diff
-m1b <- lm(pen_kgha ~ .*.,
-          data = mdat %>% dplyr::select(-site_year, -pen_pct))
-sm1b <- step(m1b)
+m1b <- lm(gap_kgha ~ .*.,
+          data = mdat %>% dplyr::select(-site_year, -gap_pct))
+sm1b <- step(m1b, k = log(nrow(mdat)))
 sm1b
 
 summary(sm1b)$coefficients %>% 

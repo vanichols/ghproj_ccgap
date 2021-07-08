@@ -5,6 +5,7 @@
 # notes: 
 #
 # last edited:   12/2/2020
+#                 july 7 2021, looking at
 #
 
 rm(list = ls())
@@ -16,11 +17,10 @@ library(caret) # for varImp function
 
 # data --------------------------------------------------------------------
 
-gapc <- read_csv("00_empirical-n-cont/dat_npct.csv") %>% 
-  rename("gap" = 3,
-         "gap_nonn" = 4) %>% 
-  mutate(gap_n = gap - gap_nonn) %>% 
-  select(site, year, gap, gap_n, gap_nonn)
+gapc <- read_csv("00_empirical-n-cont/dat_gap-components.csv") %>% 
+  mutate(gap_n = ngap,
+         gap_nonn = nonngap) %>% 
+  dplyr::select(site, year, gap_n, gap_nonn)
 
 wea <- read_csv("01_create-features/1_dat_preds-wea.csv")
 soi <- read_csv("01_create-features/2_dat_preds-soil.csv")
@@ -35,23 +35,9 @@ mdat <-
   unite(state, site, year, col = "site_year") 
 
 
-md_gap <-
-  mdat %>% 
-  select(-site_year, -gap_nonn, -gap_n) %>% 
-  ungroup() %>%
-  mutate_all(list(scale))
-
-
-md_n <-
-  mdat %>% 
-  select(-site_year, -gap, -gap_nonn) %>% 
-  ungroup() %>%
-  mutate_all(list(scale))
-
-
 md_nonn <-
   mdat %>% 
-  select(-site_year, -gap, -gap_n) %>% 
+  select(-site_year, -gap_n) %>% 
   ungroup() %>%
   mutate_all(list(scale))
 
@@ -66,7 +52,7 @@ pls_tmp <- plsr(gap_nonn ~ ., data = md_nonn, validation = "LOO")
 
 # Find the number of dimensions with lowest cross validation error
 # RMSEP = root mean squared error prediction
-plot(RMSEP(pls_n, legendpos = "topright"))
+plot(RMSEP(pls_tmp, legendpos = "topright"))
 cvs_tmp <- RMSEP(pls_tmp)
 generous <-
   as.numeric(which.min(cvs_tmp$val[estimate = "adjCV", ,]) - 1) # Subtract 1 bc it's counting the intercept
@@ -113,6 +99,6 @@ coef_C2 <- coef_C * 100 / sum.coef
          imp = Overall) %>%
   mutate(imps = imp / sum(imp) * 100,
          coefs = as.numeric(coef_C)) %>% 
-  ggplot(aes(reorder(var, imps), coefs)) + 
+  ggplot(aes(reorder(var, imps), abs(coefs))) + 
     geom_col(aes(fill = imps)) + 
     coord_flip()
