@@ -80,11 +80,7 @@ anova(m_n1, m_n2)
 summary(m_n1) #427 #932
 
 
-# 4. gap over time, non aonr method--------------------------------------------------------
-
-
-
-# 7. Penalty over time? ---------------------------------------
+# 4. Penalty over time? ---------------------------------------
 
 gaps_alln <-
   ilia_yields %>% 
@@ -175,3 +171,10 @@ summary(lmer(value ~ year0 + (1 + year0|site),
 
 # just leave it, report the 1252 SE:227
 
+
+
+# 5. avergage sd in iowa --------------------------------------------------
+
+
+ia_yields_se %>% 
+  summarise(sd_kgha = mean(sd_kgha, na.rm = T))
