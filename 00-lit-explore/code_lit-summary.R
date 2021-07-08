@@ -15,22 +15,23 @@ library(tidysawyer2)
 
 # data to inform filling in 'over-years' tab ------------------------------
 
-rd <- read_excel("00_exp-explore/lit_summary-penalty-over-years.xlsx", sheet = "ind-studies-years") %>% 
-  fill(location)
-
-rd %>% 
-  pivot_wider(names_from = corn_year, values_from = yield) %>% 
-  clean_names() %>% 
-  pivot_longer(x2:x10) %>% 
-  mutate(pct = value/x1 * 100) %>%
-  rename(years_in_corn = name) %>% 
-  select(location, years_in_corn, pct)   %>% 
-  write_csv("data/lit/lit_for-over-years.csv")
+# rd <- read_excel("00_lit-explore/lit_summary-penalty-over-years.xlsx", sheet = "ind-studies-years") %>% 
+#   fill(location)
+# 
+# rd %>% 
+#   pivot_wider(names_from = corn_year, values_from = yield) %>% 
+#   clean_names() %>% 
+#   pivot_longer(x2:x10) %>% 
+#   mutate(pct = value/x1 * 100) %>%
+#   rename(years_in_corn = name) %>% 
+#   select(location, years_in_corn, pct)   %>% 
+#   write_csv("data/lit/lit_for-over-years.csv")
 
 
 # data --------------------------------------------------------------------
 
-dat <- read_excel("00_exp-explore/lit_summary-penalty-over-years.xlsx", sheet = "over-years") %>% 
+dat <- 
+  read_excel("00-lit-explore/lit_summary-penalty-over-years.xlsx", sheet = "over-years") %>% 
   fill(scope)
 
 
@@ -72,7 +73,6 @@ dat %>%
         legend.justification = c(1,1))
 
 ggsave("00_exp-explore/fig_lit-pen-over-time-v2.png")
-ggsave("../../../Box/Gina_APSIM_modeling/docs/fig_lit-pen-over-time-v2.png")
 
 
 # try adding erikson ------------------------------------------------------
