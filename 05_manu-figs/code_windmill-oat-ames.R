@@ -12,6 +12,7 @@
 #                1/11/2021 moved sims to github, much easier
 #                7/5/2021 trying to figure out what I did...
 #                7/5/2021 moving fig creation to separate folder for manu figs
+#               7/8/2021 ordering by scenarios listed in manu NEVERMIND
 
 rm(list = ls())
 library(saapsim) #--has some functions
@@ -55,6 +56,8 @@ gaps_filt_cis <-
 
 # windmill ----------------------------------------------------------------
 
+
+
 yrs_ord <- 
   gaps_filt_cis %>% 
   filter(oat_what == "exp gap", category == "1 factor") %>% 
@@ -96,10 +99,22 @@ f5 <-
   filter(!grepl("gap", oat_what))
   
 
+#--kl, rfv, k#, rue, emerg, plant pop
 
+f_dat <- 
+  f1 %>% 
+  bind_rows(f5)  %>% 
+  mutate(oat_scen1 = oat_what_order - 2,
+         oat_scen_lab = ifelse(oat_scen1 <= 0, paste(oat_what_nice),
+                           ifelse(oat_scen1 == 16, "Combine Scenarios 1, 3, 4, 5, 6",
+                                  paste0("Scenario ", oat_scen1)))
+         ) 
 
-f1 %>% 
-  bind_rows(f5) %>% 
+f_dat_oat_labs <- f_dat %>% pull(oat_scen_lab) %>% unique()
+
+f_dat %>% 
+  ungroup() %>% 
+  mutate(oat_scen_lab = factor(oat_scen_lab, levels = f_dat_oat_labs)) %>% 
   mutate(
     #year = factor(year, levels = yrs_ord),
     col1 = case_when(
@@ -115,7 +130,7 @@ f1 %>%
            #color = "black"
   ) +
   geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
-  facet_grid(.~oat_what_nice, labeller = label_wrap_gen(width = 10)) + 
+  facet_grid(.~oat_scen_lab, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
   scale_fill_manual(values = c("C" = dkbl1, "B" = grn1, "A" = ylw1, "D" = dkpnk1)) +
   scale_color_manual(values = c("C" = dkbl1, "B" = grn1, "A" = ylw1, "D" = dkpnk1)) +
