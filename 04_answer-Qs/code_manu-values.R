@@ -3,7 +3,7 @@
 # purpose: calc things for manu
 #
 # notes: 
-# last edited:   
+# last edited:   july 9 2021 - adding cc and sc as preds of penalty
 
 
 rm(list = ls())
@@ -178,3 +178,34 @@ summary(lmer(value ~ year0 + (1 + year0|site),
 
 ia_yields_se %>% 
   summarise(sd_kgha = mean(sd_kgha, na.rm = T))
+
+
+
+
+# 6. cc vs sc as predictor of pen-------------------------------------------------
+
+preds <- read_csv("00_empirical-n-cont/dat_preds.csv")
+aonr <- read_csv("00_empirical-n-cont/dat_aonrs.csv")
+
+
+dat_mod6 <- 
+  aonr %>% 
+  separate(aonr_rot, into = c("aonr", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  left_join(preds) %>% 
+  select(-nrate_kgha) %>% 
+  pivot_wider(names_from = rotation, values_from = pred_yield) %>% 
+  mutate(gap_kgha = sc - cc) %>% 
+  filter(!is.na(gap_kgha)) %>% 
+  mutate(gap_kgha = ifelse(gap_kgha < 0, 0, gap_kgha),
+         gap_pct = gap_kgha/sc) %>% 
+  mutate(year0 = year - min(year), 
+         yearF = as.factor(year))
+
+
+m6cc <- lmer(gap_kgha ~ cc + (1+ year0|site), data = dat_mod6)
+
+m6sc <- lmer(gap_kgha ~ sc + (1+ year0|site), data = dat_mod6)
+
+summary(m6cc)
+summary(m6sc)

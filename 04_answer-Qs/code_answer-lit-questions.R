@@ -942,3 +942,6 @@ gap_cmpts %>%
   mutate(ntot = sum(n),
          frac = n/ntot)
 
+
+# 13. cc vs sc as predictor of pen-------------------------------------------------
+
