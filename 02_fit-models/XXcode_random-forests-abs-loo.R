@@ -22,7 +22,7 @@ library(lubridate)
 
 # master data -------------------------------------------------------------
 
-dat <- read_csv("01_create-features/cf_preds-all.csv")
+dat <- read_csv("01_create-features/4_dat_preds-all.csv")
 
 # try a decision tree -----------------------------------------------------
 
@@ -32,16 +32,16 @@ library(iml)
 #--prep data by removing things we don't want in the tree
 ccgap <- 
   dat %>% 
-  filter(year > 2000) %>% #--this year is an outlier in the exp data, always high gaps in sims
+  #filter(year > 2000) %>% #--this year is an outlier in the exp data, always high gaps in sims
   ungroup() %>% 
-  dplyr::select(-cgap_max_pct) %>% #--dont want pct
-  dplyr::select(-crop, -year) %>%
-  dplyr::select(-avg_yield) %>% 
-  dplyr::select(-p2mo_gdd) %>% 
+  dplyr::select(-gap_pct) %>% #--dont want pct
+  dplyr::select(-yearF, -year) %>%
+  dplyr::select(-aveyield_kgha) %>% 
+#  dplyr::select(-p2mo_gdd) %>% 
   dplyr::select(-pre2wkp2wk_tl_mean) %>% 
-  dplyr::select(-paw_150cm_mm) %>% 
-  dplyr::select(-p2wk_precip_mm_tot) %>% 
-  filter(!is.na(prev_ccyield))
+#  dplyr::select(-paw_150cm_mm) %>% 
+  dplyr::select(-p2wk_precip_mm_tot)# %>% 
+  #filter(!is.na(prev_ccyield))
 
 ccgap <- na.omit(ccgap)
 
