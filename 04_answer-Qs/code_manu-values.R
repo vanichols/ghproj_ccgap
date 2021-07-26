@@ -4,6 +4,7 @@
 #
 # notes: 
 # last edited:   july 9 2021 - adding cc and sc as preds of penalty
+#               july 26 - addressing sotiris comments
 
 
 rm(list = ls())
@@ -29,6 +30,10 @@ ilia_yields %>%
 
 # 2. yield summary -----------------------------------------------------------
 
+#--what values did I wind up using? I say  8.7 and 9.7. Hmm. 
+
+(9.7-8.7)/9.7
+
 #--why aren't there 157 here?
 platylds <- 
   ilia_aonr %>% 
@@ -42,10 +47,12 @@ mxylds <-
   filter(nrate_kgha == max(nrate_kgha)) %>% 
   mutate(yearF = as.factor(year))
 
+#--yields of cc and sc averaged over time, using yields at max N rate
 m1a <- lmer(yield_kgha ~ rotation + (1|site) + (1|yearF), data = mxylds)
 summary(m1a)
 
-m1b <- lmer(yaonr ~ rotation + (1|site) + (1|yearF), data = mxylds)
+#--yields of cc and sc averaged over time, using yields at aonr plateua
+m1b <- lmer(yaonr ~ rotation + (1|site) + (1|yearF), data = platylds)
 summary(m1b)
 
 
