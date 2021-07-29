@@ -9,11 +9,9 @@ rm(list = ls())
 library(tidysawyer2) 
 library(tidyverse)
 library(saapsim)
-library(fancycut)
 library(patchwork)
 library(scales)
-library(naniar)
-
+library(ggrepel)
 
 theme_set(theme_bw())
 
@@ -42,8 +40,10 @@ p_box <-
                       high = ylw2) + 
   labs(#title = "Ames",
     x = NULL,
+    fill = "Latitude\n(deg N)",
     y = (expression(atop("Continuous maize penalty", paste("(kg "~ha^-1*")"))))) 
 
+p_box
 
 # map ---------------------------------------------------------------------
 
@@ -64,29 +64,33 @@ p_map <-
   ggplot() + 
   geom_polygon(data = iail, 
                aes(x = long, y = lat, group = group), color = "white", fill = "gray80") +
-  geom_point(data = ilia_gap,
-             aes(x = long, y = lat, size = mngap, fill = lat), pch = 21) + 
-  geom_text(data = ilia_gap %>% mutate(lat = ifelse(manu_id == "IL-7", lat - 0.2, lat)),
+  # geom_point(data = ilia_gap,
+  #            aes(x = long, y = lat, fill = lat), pch = 21, fill = "black", size = 1) + 
+  geom_text(data = ilia_gap %>% mutate(lat = ifelse(manu_id == "IL-7", lat - 0.3, lat)),
             aes(x = long + 0.25, y = lat, label = manu_id),
-            hjust = 0) + 
+            #hjust = 0, 
+            size = 3) + 
   scale_fill_gradient(low = dkbl1, 
                       high = ylw2) + 
-  labs(x = "Longitude", 
-       y = "Latitude",
-       size = bquote("Mean Penalty (kg "~ha^-1*")")) + 
+  labs(x = NULL, y = NULL) + 
   coord_quickmap() +
   guides(fill = F) +
+  ggpubr::theme_pubclean() +
   #coord_cartesian() + 
-  theme(legend.justification = c(0, 0),
-        legend.position = c(0.1, 0.1),
-        legend.background = element_rect(color = "black"),
-        plot.background = element_blank())
+  theme(panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        #plot.background = element_rect(fill = "transparent"),
+        panel.grid = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
 
 
+p_map
 
 # together ----------------------------------------------------------------
-library(patchwork)
 
-p_box + inset_element(p_map, 0.6, 0.6, 1, 1)
+p_box + inset_element(p_map, 0.52, 0.52, 1, 1)
 
-ggsave("05_manu-figs/fig_map.png")
+ggsave("05_manu-figs/fig_gap-smy-map.png", width = 9.45, height = 7.31)

@@ -3,7 +3,7 @@
 # purpose: make gap over time fig
 #
 # notes: 
-# last edited:   
+# last edited:   7/29/2021 - moved to an inset in gap summary figure
 
 rm(list = ls())
 #devtools::install_github("femiguez/nlraa")
