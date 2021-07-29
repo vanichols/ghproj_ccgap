@@ -13,6 +13,7 @@
 #                7/5/2021 trying to figure out what I did...
 #                7/5/2021 moving fig creation to separate folder for manu figs
 #               7/8/2021 ordering by scenarios listed in manu NEVERMIND
+#               7/29/2021 adding x axis labels
 
 rm(list = ls())
 library(saapsim) #--has some functions
@@ -113,6 +114,11 @@ f_dat <-
 f_dat_oat_labs <- f_dat %>% pull(oat_scen_lab) %>% unique()
 
 f_dat %>% 
+  filter(oat_nu == 0) %>% 
+  arrange(gap_kgha) %>% 
+  filter(gap_kgha == min(gap_kgha)|gap_kgha == max(gap_kgha))
+  
+f_dat %>% 
   ungroup() %>% 
   mutate(oat_scen_lab = factor(oat_scen_lab, levels = f_dat_oat_labs)) %>% 
   mutate(
@@ -132,12 +138,13 @@ f_dat %>%
   geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_scen_lab, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
+  scale_x_discrete(breaks = c(NA, NA)) +
   scale_fill_manual(values = c("C" = dkbl1, "B" = grn1, "A" = ylw1, "D" = dkpnk1)) +
   scale_color_manual(values = c("C" = dkbl1, "B" = grn1, "A" = ylw1, "D" = dkpnk1)) +
   geom_hline(aes(yintercept = mngap), size = 1, type = "dashed") +
   labs(#title = "Ames",
-       x = NULL,
-       y = "Continuous Maize Penalty at\nSite IA-4 (kg ha-1)") + 
+       x = "Year, ordered by largest to smallest observed penalty",
+       y = (expression(atop("Continuous maize penalty at site IA-4", paste("(kg "~ha^-1*")"))))) + 
   wind_theme_H
 
 ggsave("05_manu-figs/fig_apsim-oat-windmill.png", width = 9, height = 5)
