@@ -1,343 +1,343 @@
-site,year,aonr_rot,aonr_kgha
-ames,1999,aonr_cc,178
-ames,2000,aonr_cc,255
-ames,2001,aonr_cc,185
-ames,2002,aonr_cc,229
-ames,2003,aonr_cc,261
-ames,2005,aonr_cc,279
-ames,2006,aonr_cc,160
-ames,2007,aonr_cc,209
-ames,2008,aonr_cc,258
-ames,2009,aonr_cc,248
-ames,2010,aonr_cc,251
-ames,2011,aonr_cc,142
-ames,2012,aonr_cc,169
-ames,2013,aonr_cc,220
-ames,2014,aonr_cc,262
-ames,2015,aonr_cc,181
-ames,2016,aonr_cc,201
-ames,2018,aonr_cc,119
-ames,2019,aonr_cc,105
-ames,1999,aonr_sc,78
-ames,2001,aonr_sc,76
-ames,2003,aonr_sc,116
-ames,2005,aonr_sc,96
-ames,2007,aonr_sc,91
-ames,2009,aonr_sc,142
-ames,2011,aonr_sc,74
-ames,2013,aonr_sc,116
-ames,2015,aonr_sc,89
-ames,2019,aonr_sc,98
-ames,2000,aonr_sc,77
-ames,2002,aonr_sc,122
-ames,2004,aonr_sc,175
-ames,2006,aonr_sc,92
-ames,2008,aonr_sc,152
-ames,2010,aonr_sc,153
-ames,2012,aonr_sc,74
-ames,2014,aonr_sc,122
-ames,2016,aonr_sc,115
-craw,1999,aonr_cc,110
-craw,2001,aonr_cc,69
-craw,2002,aonr_cc,172
-craw,2003,aonr_cc,190
-craw,2004,aonr_cc,214
-craw,2005,aonr_cc,213
-craw,2006,aonr_cc,111
-craw,2007,aonr_cc,113
-craw,2008,aonr_cc,163
-craw,2009,aonr_cc,337
-craw,2010,aonr_cc,130
-craw,2011,aonr_cc,153
-craw,2012,aonr_cc,91
-craw,2013,aonr_cc,174
-craw,2014,aonr_cc,204
-craw,2015,aonr_cc,219
-craw,2016,aonr_cc,138
-craw,2018,aonr_cc,115
-craw,2019,aonr_cc,154
-craw,1999,aonr_sc,54
-craw,2001,aonr_sc,72
-craw,2003,aonr_sc,119
-craw,2005,aonr_sc,97
-craw,2007,aonr_sc,62
-craw,2009,aonr_sc,116
-craw,2011,aonr_sc,83
-craw,2013,aonr_sc,106
-craw,2015,aonr_sc,69
-craw,2019,aonr_sc,127
-craw,2000,aonr_sc,70
-craw,2002,aonr_sc,88
-craw,2004,aonr_sc,99
-craw,2006,aonr_sc,57
-craw,2008,aonr_sc,74
-craw,2010,aonr_sc,52
-craw,2012,aonr_sc,49
-craw,2014,aonr_sc,164
-craw,2016,aonr_sc,104
-kana,2005,aonr_cc,91
-kana,2006,aonr_cc,210
-kana,2009,aonr_cc,278
-kana,2010,aonr_cc,277
-kana,2011,aonr_cc,226
-kana,2012,aonr_cc,160
-kana,2013,aonr_cc,109
-kana,2014,aonr_cc,229
-kana,2015,aonr_cc,198
-kana,2016,aonr_cc,217
-kana,2018,aonr_cc,185
-kana,2019,aonr_cc,229
-kana,2005,aonr_sc,79
-kana,2007,aonr_sc,148
-kana,2009,aonr_sc,137
-kana,2011,aonr_sc,142
-kana,2015,aonr_sc,88
-kana,2018,aonr_sc,168
-kana,2019,aonr_sc,220
-kana,2008,aonr_sc,106
-kana,2010,aonr_sc,118
-kana,2012,aonr_sc,66
-kana,2014,aonr_sc,135
-kana,2016,aonr_sc,125
-lewi,2001,aonr_cc,186
-lewi,2002,aonr_cc,132
-lewi,2003,aonr_cc,201
-lewi,2004,aonr_cc,210
-lewi,2005,aonr_cc,163
-lewi,2006,aonr_cc,121
-lewi,2007,aonr_cc,186
-lewi,2008,aonr_cc,188
-lewi,2009,aonr_cc,198
-lewi,2010,aonr_cc,185
-lewi,2011,aonr_cc,122
-lewi,2012,aonr_cc,142
-lewi,2013,aonr_cc,225
-lewi,2014,aonr_cc,209
-lewi,2015,aonr_cc,151
-lewi,2016,aonr_cc,139
-lewi,2018,aonr_cc,123
-lewi,2019,aonr_cc,115
-lewi,2001,aonr_sc,186
-lewi,2003,aonr_sc,89
-lewi,2005,aonr_sc,63
-lewi,2007,aonr_sc,99
-lewi,2009,aonr_sc,124
-lewi,2011,aonr_sc,51
-lewi,2013,aonr_sc,131
-lewi,2015,aonr_sc,52
-lewi,2018,aonr_sc,76
-lewi,2019,aonr_sc,117
-lewi,2002,aonr_sc,237
-lewi,2004,aonr_sc,52
-lewi,2008,aonr_sc,94
-lewi,2010,aonr_sc,105
-lewi,2014,aonr_sc,108
-lewi,2016,aonr_sc,50
-mcna,2000,aonr_cc,57
-mcna,2001,aonr_cc,188
-mcna,2002,aonr_cc,134
-mcna,2003,aonr_cc,203
-mcna,2004,aonr_cc,221
-mcna,2005,aonr_cc,242
-mcna,2006,aonr_cc,154
-mcna,2007,aonr_cc,174
-mcna,2014,aonr_cc,186
-mcna,1999,aonr_sc,193
-mcna,2001,aonr_sc,88
-mcna,2003,aonr_sc,142
-mcna,2005,aonr_sc,78
-mcna,2009,aonr_sc,106
-mcna,2011,aonr_sc,84
-mcna,2013,aonr_sc,124
-mcna,2015,aonr_sc,133
-mcna,2000,aonr_sc,55
-mcna,2004,aonr_sc,113
-mcna,2008,aonr_sc,157
-nash,2004,aonr_cc,190
-nash,2006,aonr_cc,271
-nash,2011,aonr_cc,194
-nash,2012,aonr_cc,206
-nash,2015,aonr_cc,267
-nash,2016,aonr_cc,277
-nash,2018,aonr_cc,215
-nash,2019,aonr_cc,169
-nash,2005,aonr_sc,172
-nash,2007,aonr_sc,203
-nash,2009,aonr_sc,237
-nash,2011,aonr_sc,120
-nash,2013,aonr_sc,183
-nash,2015,aonr_sc,171
-nash,2018,aonr_sc,145
-nash,2019,aonr_sc,190
-nash,2006,aonr_sc,127
-nash,2008,aonr_sc,162
-nash,2010,aonr_sc,163
-nash,2012,aonr_sc,85
-nash,2014,aonr_sc,175
-nash,2016,aonr_sc,126
-suth,2000,aonr_cc,86
-suth,2001,aonr_cc,106
-suth,2003,aonr_cc,128
-suth,2005,aonr_cc,135
-suth,2006,aonr_cc,56
-suth,2007,aonr_cc,136
-suth,2008,aonr_cc,205
-suth,2009,aonr_cc,230
-suth,2011,aonr_cc,179
-suth,2012,aonr_cc,84
-suth,2013,aonr_cc,138
-suth,2014,aonr_cc,204
-suth,2015,aonr_cc,236
-suth,2016,aonr_cc,161
-suth,2018,aonr_cc,828
-suth,2019,aonr_cc,174
-suth,2003,aonr_sc,91
-suth,2005,aonr_sc,64
-suth,2007,aonr_sc,94
-suth,2009,aonr_sc,123
-suth,2011,aonr_sc,52
-suth,2013,aonr_sc,52
-suth,2015,aonr_sc,61
-suth,2019,aonr_sc,225
-suth,2000,aonr_sc,223
-suth,2002,aonr_sc,180
-suth,2004,aonr_sc,51
-suth,2006,aonr_sc,63
-suth,2008,aonr_sc,61
-suth,2010,aonr_sc,73
-suth,2012,aonr_sc,131
-suth,2014,aonr_sc,87
-suth,2016,aonr_sc,83
-brow,1999,aonr_cc,138
-brow,2000,aonr_cc,164
-brow,2001,aonr_cc,186
-brow,2002,aonr_cc,161
-brow,2003,aonr_cc,175
-brow,2004,aonr_cc,250
-brow,2005,aonr_cc,152
-brow,2006,aonr_cc,149
-brow,2007,aonr_cc,183
-brow,2008,aonr_cc,198
-brow,1999,aonr_sc,93
-brow,2001,aonr_sc,112
-brow,2003,aonr_sc,120
-brow,2007,aonr_sc,98
-brow,2000,aonr_sc,56
-brow,2002,aonr_sc,73
-brow,2004,aonr_sc,136
-brow,2006,aonr_sc,133
-brow,2008,aonr_sc,137
-deka,1999,aonr_cc,123
-deka,2000,aonr_cc,276
-deka,2002,aonr_cc,232
-deka,2003,aonr_cc,144
-deka,2004,aonr_cc,220
-deka,2005,aonr_cc,239
-deka,2006,aonr_cc,153
-deka,2007,aonr_cc,255
-deka,2008,aonr_cc,222
-deka,1999,aonr_sc,63
-deka,2001,aonr_sc,133
-deka,2005,aonr_sc,111
-deka,2007,aonr_sc,61
-deka,2000,aonr_sc,56
-deka,2002,aonr_sc,110
-deka,2004,aonr_sc,117
-deka,2006,aonr_sc,107
-deka,2008,aonr_sc,84
-dslo,1998,aonr_cc,198
-dslo,1999,aonr_cc,197
-dslo,2000,aonr_cc,193
-dslo,2001,aonr_cc,167
-dslo,2002,aonr_cc,120
-dslo,2003,aonr_cc,136
-dslo,2004,aonr_cc,179
-dslo,2005,aonr_cc,140
-dslo,2006,aonr_cc,86
-dslo,2007,aonr_cc,162
-dslo,2008,aonr_cc,163
-dslo,1999,aonr_sc,81
-dslo,2001,aonr_sc,70
-dslo,2003,aonr_sc,55
-dslo,2007,aonr_sc,118
-dslo,1998,aonr_sc,165
-dslo,2000,aonr_sc,140
-dslo,2002,aonr_sc,59
-dslo,2004,aonr_sc,136
-dslo,2006,aonr_sc,51
-dslo,2008,aonr_sc,99
-dsup,1998,aonr_cc,213
-dsup,1999,aonr_cc,185
-dsup,2000,aonr_cc,197
-dsup,2001,aonr_cc,159
-dsup,2002,aonr_cc,124
-dsup,2003,aonr_cc,135
-dsup,2004,aonr_cc,180
-dsup,2005,aonr_cc,141
-dsup,2006,aonr_cc,85
-dsup,2007,aonr_cc,159
-dsup,2008,aonr_cc,166
-dsup,2001,aonr_sc,58
-dsup,2003,aonr_sc,56
-dsup,2007,aonr_sc,115
-dsup,1998,aonr_sc,152
-dsup,2000,aonr_sc,135
-dsup,2002,aonr_sc,61
-dsup,2004,aonr_sc,132
-dsup,2008,aonr_sc,104
-monm,1999,aonr_cc,205
-monm,2001,aonr_cc,281
-monm,2002,aonr_cc,288
-monm,2003,aonr_cc,284
-monm,2004,aonr_cc,227
-monm,2005,aonr_cc,271
-monm,2006,aonr_cc,194
-monm,2007,aonr_cc,221
-monm,2008,aonr_cc,233
-monm,1999,aonr_sc,105
-monm,2001,aonr_sc,133
-monm,2003,aonr_sc,134
-monm,2005,aonr_sc,159
-monm,2007,aonr_sc,127
-monm,2000,aonr_sc,95
-monm,2002,aonr_sc,130
-monm,2004,aonr_sc,134
-monm,2006,aonr_sc,131
-monm,2008,aonr_sc,132
-orrc,1999,aonr_cc,133
-orrc,2001,aonr_cc,200
-orrc,2002,aonr_cc,209
-orrc,2003,aonr_cc,229
-orrc,2004,aonr_cc,253
-orrc,2005,aonr_cc,283
-orrc,2006,aonr_cc,165
-orrc,2007,aonr_cc,213
-orrc,2008,aonr_cc,136
-orrc,2001,aonr_sc,55
-orrc,2003,aonr_sc,122
-orrc,2005,aonr_sc,141
-orrc,2007,aonr_sc,63
-orrc,2000,aonr_sc,101
-orrc,2002,aonr_sc,55
-orrc,2004,aonr_sc,114
-orrc,2006,aonr_sc,82
-orrc,2008,aonr_sc,60
-urba,1999,aonr_cc,127
-urba,2000,aonr_cc,295
-urba,2001,aonr_cc,204
-urba,2002,aonr_cc,187
-urba,2003,aonr_cc,194
-urba,2004,aonr_cc,179
-urba,2005,aonr_cc,120
-urba,2006,aonr_cc,88
-urba,2007,aonr_cc,111
-urba,2008,aonr_cc,154
-urba,1999,aonr_sc,57
-urba,2001,aonr_sc,123
-urba,2003,aonr_sc,83
-urba,2005,aonr_sc,281
-urba,2000,aonr_sc,99
-urba,2002,aonr_sc,96
-urba,2004,aonr_sc,58
-urba,2006,aonr_sc,260
-urba,2008,aonr_sc,110
+site,year,aonr_rot,aonr_kgha,desc
+ames,1999,aonr_cc,178,cal no scripts
+ames,2000,aonr_cc,255,cal no scripts
+ames,2001,aonr_cc,185,cal no scripts
+ames,2002,aonr_cc,229,cal no scripts
+ames,2003,aonr_cc,261,cal no scripts
+ames,2005,aonr_cc,279,cal no scripts
+ames,2006,aonr_cc,160,cal no scripts
+ames,2007,aonr_cc,209,cal no scripts
+ames,2008,aonr_cc,258,cal no scripts
+ames,2009,aonr_cc,248,cal no scripts
+ames,2010,aonr_cc,251,cal no scripts
+ames,2011,aonr_cc,142,cal no scripts
+ames,2012,aonr_cc,169,cal no scripts
+ames,2013,aonr_cc,220,cal no scripts
+ames,2014,aonr_cc,262,cal no scripts
+ames,2015,aonr_cc,181,cal no scripts
+ames,2016,aonr_cc,201,cal no scripts
+ames,2018,aonr_cc,119,cal no scripts
+ames,2019,aonr_cc,105,cal no scripts
+ames,1999,aonr_sc,78,cal no scripts
+ames,2001,aonr_sc,76,cal no scripts
+ames,2003,aonr_sc,116,cal no scripts
+ames,2005,aonr_sc,96,cal no scripts
+ames,2007,aonr_sc,91,cal no scripts
+ames,2009,aonr_sc,142,cal no scripts
+ames,2011,aonr_sc,74,cal no scripts
+ames,2013,aonr_sc,116,cal no scripts
+ames,2015,aonr_sc,89,cal no scripts
+ames,2019,aonr_sc,98,cal no scripts
+ames,2000,aonr_sc,77,cal no scripts
+ames,2002,aonr_sc,122,cal no scripts
+ames,2004,aonr_sc,175,cal no scripts
+ames,2006,aonr_sc,92,cal no scripts
+ames,2008,aonr_sc,152,cal no scripts
+ames,2010,aonr_sc,153,cal no scripts
+ames,2012,aonr_sc,74,cal no scripts
+ames,2014,aonr_sc,122,cal no scripts
+ames,2016,aonr_sc,115,cal no scripts
+craw,1999,aonr_cc,110,cal no scripts
+craw,2001,aonr_cc,69,cal no scripts
+craw,2002,aonr_cc,172,cal no scripts
+craw,2003,aonr_cc,190,cal no scripts
+craw,2004,aonr_cc,214,cal no scripts
+craw,2005,aonr_cc,213,cal no scripts
+craw,2006,aonr_cc,111,cal no scripts
+craw,2007,aonr_cc,113,cal no scripts
+craw,2008,aonr_cc,163,cal no scripts
+craw,2009,aonr_cc,337,cal no scripts
+craw,2010,aonr_cc,130,cal no scripts
+craw,2011,aonr_cc,153,cal no scripts
+craw,2012,aonr_cc,91,cal no scripts
+craw,2013,aonr_cc,174,cal no scripts
+craw,2014,aonr_cc,204,cal no scripts
+craw,2015,aonr_cc,219,cal no scripts
+craw,2016,aonr_cc,138,cal no scripts
+craw,2018,aonr_cc,115,cal no scripts
+craw,2019,aonr_cc,154,cal no scripts
+craw,1999,aonr_sc,54,cal no scripts
+craw,2001,aonr_sc,72,cal no scripts
+craw,2003,aonr_sc,119,cal no scripts
+craw,2005,aonr_sc,97,cal no scripts
+craw,2007,aonr_sc,62,cal no scripts
+craw,2009,aonr_sc,116,cal no scripts
+craw,2011,aonr_sc,83,cal no scripts
+craw,2013,aonr_sc,106,cal no scripts
+craw,2015,aonr_sc,69,cal no scripts
+craw,2019,aonr_sc,127,cal no scripts
+craw,2000,aonr_sc,70,cal no scripts
+craw,2002,aonr_sc,88,cal no scripts
+craw,2004,aonr_sc,99,cal no scripts
+craw,2006,aonr_sc,57,cal no scripts
+craw,2008,aonr_sc,74,cal no scripts
+craw,2010,aonr_sc,52,cal no scripts
+craw,2012,aonr_sc,49,cal no scripts
+craw,2014,aonr_sc,164,cal no scripts
+craw,2016,aonr_sc,104,cal no scripts
+kana,2005,aonr_cc,91,cal no scripts
+kana,2006,aonr_cc,210,cal no scripts
+kana,2009,aonr_cc,278,cal no scripts
+kana,2010,aonr_cc,277,cal no scripts
+kana,2011,aonr_cc,226,cal no scripts
+kana,2012,aonr_cc,160,cal no scripts
+kana,2013,aonr_cc,109,cal no scripts
+kana,2014,aonr_cc,229,cal no scripts
+kana,2015,aonr_cc,198,cal no scripts
+kana,2016,aonr_cc,217,cal no scripts
+kana,2018,aonr_cc,185,cal no scripts
+kana,2019,aonr_cc,229,cal no scripts
+kana,2005,aonr_sc,79,cal no scripts
+kana,2007,aonr_sc,148,cal no scripts
+kana,2009,aonr_sc,137,cal no scripts
+kana,2011,aonr_sc,142,cal no scripts
+kana,2015,aonr_sc,88,cal no scripts
+kana,2018,aonr_sc,168,cal no scripts
+kana,2019,aonr_sc,220,cal no scripts
+kana,2008,aonr_sc,106,cal no scripts
+kana,2010,aonr_sc,118,cal no scripts
+kana,2012,aonr_sc,66,cal no scripts
+kana,2014,aonr_sc,135,cal no scripts
+kana,2016,aonr_sc,125,cal no scripts
+lewi,2001,aonr_cc,186,cal no scripts
+lewi,2002,aonr_cc,132,cal no scripts
+lewi,2003,aonr_cc,201,cal no scripts
+lewi,2004,aonr_cc,210,cal no scripts
+lewi,2005,aonr_cc,163,cal no scripts
+lewi,2006,aonr_cc,121,cal no scripts
+lewi,2007,aonr_cc,186,cal no scripts
+lewi,2008,aonr_cc,188,cal no scripts
+lewi,2009,aonr_cc,198,cal no scripts
+lewi,2010,aonr_cc,185,cal no scripts
+lewi,2011,aonr_cc,122,cal no scripts
+lewi,2012,aonr_cc,142,cal no scripts
+lewi,2013,aonr_cc,225,cal no scripts
+lewi,2014,aonr_cc,209,cal no scripts
+lewi,2015,aonr_cc,151,cal no scripts
+lewi,2016,aonr_cc,139,cal no scripts
+lewi,2018,aonr_cc,123,cal no scripts
+lewi,2019,aonr_cc,115,cal no scripts
+lewi,2001,aonr_sc,186,cal no scripts
+lewi,2003,aonr_sc,89,cal no scripts
+lewi,2005,aonr_sc,63,cal no scripts
+lewi,2007,aonr_sc,99,cal no scripts
+lewi,2009,aonr_sc,124,cal no scripts
+lewi,2011,aonr_sc,51,cal no scripts
+lewi,2013,aonr_sc,131,cal no scripts
+lewi,2015,aonr_sc,52,cal no scripts
+lewi,2018,aonr_sc,76,cal no scripts
+lewi,2019,aonr_sc,117,cal no scripts
+lewi,2002,aonr_sc,237,cal no scripts
+lewi,2004,aonr_sc,52,cal no scripts
+lewi,2008,aonr_sc,94,cal no scripts
+lewi,2010,aonr_sc,105,cal no scripts
+lewi,2014,aonr_sc,108,cal no scripts
+lewi,2016,aonr_sc,50,cal no scripts
+mcna,2000,aonr_cc,57,cal no scripts
+mcna,2001,aonr_cc,188,cal no scripts
+mcna,2002,aonr_cc,134,cal no scripts
+mcna,2003,aonr_cc,203,cal no scripts
+mcna,2004,aonr_cc,221,cal no scripts
+mcna,2005,aonr_cc,242,cal no scripts
+mcna,2006,aonr_cc,154,cal no scripts
+mcna,2007,aonr_cc,174,cal no scripts
+mcna,2014,aonr_cc,186,cal no scripts
+mcna,1999,aonr_sc,193,cal no scripts
+mcna,2001,aonr_sc,88,cal no scripts
+mcna,2003,aonr_sc,142,cal no scripts
+mcna,2005,aonr_sc,78,cal no scripts
+mcna,2009,aonr_sc,106,cal no scripts
+mcna,2011,aonr_sc,84,cal no scripts
+mcna,2013,aonr_sc,124,cal no scripts
+mcna,2015,aonr_sc,133,cal no scripts
+mcna,2000,aonr_sc,55,cal no scripts
+mcna,2004,aonr_sc,113,cal no scripts
+mcna,2008,aonr_sc,157,cal no scripts
+nash,2004,aonr_cc,190,cal no scripts
+nash,2006,aonr_cc,271,cal no scripts
+nash,2011,aonr_cc,194,cal no scripts
+nash,2012,aonr_cc,206,cal no scripts
+nash,2015,aonr_cc,267,cal no scripts
+nash,2016,aonr_cc,277,cal no scripts
+nash,2018,aonr_cc,215,cal no scripts
+nash,2019,aonr_cc,169,cal no scripts
+nash,2005,aonr_sc,172,cal no scripts
+nash,2007,aonr_sc,203,cal no scripts
+nash,2009,aonr_sc,237,cal no scripts
+nash,2011,aonr_sc,120,cal no scripts
+nash,2013,aonr_sc,183,cal no scripts
+nash,2015,aonr_sc,171,cal no scripts
+nash,2018,aonr_sc,145,cal no scripts
+nash,2019,aonr_sc,190,cal no scripts
+nash,2006,aonr_sc,127,cal no scripts
+nash,2008,aonr_sc,162,cal no scripts
+nash,2010,aonr_sc,163,cal no scripts
+nash,2012,aonr_sc,85,cal no scripts
+nash,2014,aonr_sc,175,cal no scripts
+nash,2016,aonr_sc,126,cal no scripts
+suth,2000,aonr_cc,86,cal no scripts
+suth,2001,aonr_cc,106,cal no scripts
+suth,2003,aonr_cc,128,cal no scripts
+suth,2005,aonr_cc,135,cal no scripts
+suth,2006,aonr_cc,56,cal no scripts
+suth,2007,aonr_cc,136,cal no scripts
+suth,2008,aonr_cc,205,cal no scripts
+suth,2009,aonr_cc,230,cal no scripts
+suth,2011,aonr_cc,179,cal no scripts
+suth,2012,aonr_cc,84,cal no scripts
+suth,2013,aonr_cc,138,cal no scripts
+suth,2014,aonr_cc,204,cal no scripts
+suth,2015,aonr_cc,236,cal no scripts
+suth,2016,aonr_cc,161,cal no scripts
+suth,2018,aonr_cc,828,cal no scripts
+suth,2019,aonr_cc,174,cal no scripts
+suth,2003,aonr_sc,91,cal no scripts
+suth,2005,aonr_sc,64,cal no scripts
+suth,2007,aonr_sc,94,cal no scripts
+suth,2009,aonr_sc,123,cal no scripts
+suth,2011,aonr_sc,52,cal no scripts
+suth,2013,aonr_sc,52,cal no scripts
+suth,2015,aonr_sc,61,cal no scripts
+suth,2019,aonr_sc,225,cal no scripts
+suth,2000,aonr_sc,223,cal no scripts
+suth,2002,aonr_sc,180,cal no scripts
+suth,2004,aonr_sc,51,cal no scripts
+suth,2006,aonr_sc,63,cal no scripts
+suth,2008,aonr_sc,61,cal no scripts
+suth,2010,aonr_sc,73,cal no scripts
+suth,2012,aonr_sc,131,cal no scripts
+suth,2014,aonr_sc,87,cal no scripts
+suth,2016,aonr_sc,83,cal no scripts
+brow,1999,aonr_cc,138,cal no scripts
+brow,2000,aonr_cc,164,cal no scripts
+brow,2001,aonr_cc,186,cal no scripts
+brow,2002,aonr_cc,161,cal no scripts
+brow,2003,aonr_cc,175,cal no scripts
+brow,2004,aonr_cc,250,cal no scripts
+brow,2005,aonr_cc,152,cal no scripts
+brow,2006,aonr_cc,149,cal no scripts
+brow,2007,aonr_cc,183,cal no scripts
+brow,2008,aonr_cc,198,cal no scripts
+brow,1999,aonr_sc,93,cal no scripts
+brow,2001,aonr_sc,112,cal no scripts
+brow,2003,aonr_sc,120,cal no scripts
+brow,2007,aonr_sc,98,cal no scripts
+brow,2000,aonr_sc,56,cal no scripts
+brow,2002,aonr_sc,73,cal no scripts
+brow,2004,aonr_sc,136,cal no scripts
+brow,2006,aonr_sc,133,cal no scripts
+brow,2008,aonr_sc,137,cal no scripts
+deka,1999,aonr_cc,123,cal no scripts
+deka,2000,aonr_cc,276,cal no scripts
+deka,2002,aonr_cc,232,cal no scripts
+deka,2003,aonr_cc,144,cal no scripts
+deka,2004,aonr_cc,220,cal no scripts
+deka,2005,aonr_cc,239,cal no scripts
+deka,2006,aonr_cc,153,cal no scripts
+deka,2007,aonr_cc,255,cal no scripts
+deka,2008,aonr_cc,222,cal no scripts
+deka,1999,aonr_sc,63,cal no scripts
+deka,2001,aonr_sc,133,cal no scripts
+deka,2005,aonr_sc,111,cal no scripts
+deka,2007,aonr_sc,61,cal no scripts
+deka,2000,aonr_sc,56,cal no scripts
+deka,2002,aonr_sc,110,cal no scripts
+deka,2004,aonr_sc,117,cal no scripts
+deka,2006,aonr_sc,107,cal no scripts
+deka,2008,aonr_sc,84,cal no scripts
+dslo,1998,aonr_cc,198,cal no scripts
+dslo,1999,aonr_cc,197,cal no scripts
+dslo,2000,aonr_cc,193,cal no scripts
+dslo,2001,aonr_cc,167,cal no scripts
+dslo,2002,aonr_cc,120,cal no scripts
+dslo,2003,aonr_cc,136,cal no scripts
+dslo,2004,aonr_cc,179,cal no scripts
+dslo,2005,aonr_cc,140,cal no scripts
+dslo,2006,aonr_cc,86,cal no scripts
+dslo,2007,aonr_cc,162,cal no scripts
+dslo,2008,aonr_cc,163,cal no scripts
+dslo,1999,aonr_sc,81,cal no scripts
+dslo,2001,aonr_sc,70,cal no scripts
+dslo,2003,aonr_sc,55,cal no scripts
+dslo,2007,aonr_sc,118,cal no scripts
+dslo,1998,aonr_sc,165,cal no scripts
+dslo,2000,aonr_sc,140,cal no scripts
+dslo,2002,aonr_sc,59,cal no scripts
+dslo,2004,aonr_sc,136,cal no scripts
+dslo,2006,aonr_sc,51,cal no scripts
+dslo,2008,aonr_sc,99,cal no scripts
+dsup,1998,aonr_cc,213,cal no scripts
+dsup,1999,aonr_cc,185,cal no scripts
+dsup,2000,aonr_cc,197,cal no scripts
+dsup,2001,aonr_cc,159,cal no scripts
+dsup,2002,aonr_cc,124,cal no scripts
+dsup,2003,aonr_cc,135,cal no scripts
+dsup,2004,aonr_cc,180,cal no scripts
+dsup,2005,aonr_cc,141,cal no scripts
+dsup,2006,aonr_cc,85,cal no scripts
+dsup,2007,aonr_cc,159,cal no scripts
+dsup,2008,aonr_cc,166,cal no scripts
+dsup,2001,aonr_sc,58,cal no scripts
+dsup,2003,aonr_sc,56,cal no scripts
+dsup,2007,aonr_sc,115,cal no scripts
+dsup,1998,aonr_sc,152,cal no scripts
+dsup,2000,aonr_sc,135,cal no scripts
+dsup,2002,aonr_sc,61,cal no scripts
+dsup,2004,aonr_sc,132,cal no scripts
+dsup,2008,aonr_sc,104,cal no scripts
+monm,1999,aonr_cc,205,cal no scripts
+monm,2001,aonr_cc,281,cal no scripts
+monm,2002,aonr_cc,288,cal no scripts
+monm,2003,aonr_cc,284,cal no scripts
+monm,2004,aonr_cc,227,cal no scripts
+monm,2005,aonr_cc,271,cal no scripts
+monm,2006,aonr_cc,194,cal no scripts
+monm,2007,aonr_cc,221,cal no scripts
+monm,2008,aonr_cc,233,cal no scripts
+monm,1999,aonr_sc,105,cal no scripts
+monm,2001,aonr_sc,133,cal no scripts
+monm,2003,aonr_sc,134,cal no scripts
+monm,2005,aonr_sc,159,cal no scripts
+monm,2007,aonr_sc,127,cal no scripts
+monm,2000,aonr_sc,95,cal no scripts
+monm,2002,aonr_sc,130,cal no scripts
+monm,2004,aonr_sc,134,cal no scripts
+monm,2006,aonr_sc,131,cal no scripts
+monm,2008,aonr_sc,132,cal no scripts
+orrc,1999,aonr_cc,133,cal no scripts
+orrc,2001,aonr_cc,200,cal no scripts
+orrc,2002,aonr_cc,209,cal no scripts
+orrc,2003,aonr_cc,229,cal no scripts
+orrc,2004,aonr_cc,253,cal no scripts
+orrc,2005,aonr_cc,283,cal no scripts
+orrc,2006,aonr_cc,165,cal no scripts
+orrc,2007,aonr_cc,213,cal no scripts
+orrc,2008,aonr_cc,136,cal no scripts
+orrc,2001,aonr_sc,55,cal no scripts
+orrc,2003,aonr_sc,122,cal no scripts
+orrc,2005,aonr_sc,141,cal no scripts
+orrc,2007,aonr_sc,63,cal no scripts
+orrc,2000,aonr_sc,101,cal no scripts
+orrc,2002,aonr_sc,55,cal no scripts
+orrc,2004,aonr_sc,114,cal no scripts
+orrc,2006,aonr_sc,82,cal no scripts
+orrc,2008,aonr_sc,60,cal no scripts
+urba,1999,aonr_cc,127,cal no scripts
+urba,2000,aonr_cc,295,cal no scripts
+urba,2001,aonr_cc,204,cal no scripts
+urba,2002,aonr_cc,187,cal no scripts
+urba,2003,aonr_cc,194,cal no scripts
+urba,2004,aonr_cc,179,cal no scripts
+urba,2005,aonr_cc,120,cal no scripts
+urba,2006,aonr_cc,88,cal no scripts
+urba,2007,aonr_cc,111,cal no scripts
+urba,2008,aonr_cc,154,cal no scripts
+urba,1999,aonr_sc,57,cal no scripts
+urba,2001,aonr_sc,123,cal no scripts
+urba,2003,aonr_sc,83,cal no scripts
+urba,2005,aonr_sc,281,cal no scripts
+urba,2000,aonr_sc,99,cal no scripts
+urba,2002,aonr_sc,96,cal no scripts
+urba,2004,aonr_sc,58,cal no scripts
+urba,2006,aonr_sc,260,cal no scripts
+urba,2008,aonr_sc,110,cal no scripts

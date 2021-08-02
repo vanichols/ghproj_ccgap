@@ -99,31 +99,3 @@ tst.aonrs <-
 tst.aonrs %>% 
   write_csv("00_empirical-n-cont/dat_aonrs.csv")
 
-
-# all sites, simulated data -----------------------------------------------
-
-ilia_simsyields
-ilia_yields
-
-sims.tib <- 
-  ilia_simsyields %>% 
-  select(state, site, year, rotation2, nrate_kgha, cal_nosc) %>% 
-  rename("rotation" = rotation2,
-         "yield_kgha" = cal_nosc)
-
-sims.aonrs <- 
-  sims.tib %>% 
-  group_by(site, year, rotation) %>%
-  nest() %>%
-  mutate(model = map(data, possibly(qpcoefs_fun, NULL))) %>% 
-  rowwise() %>% 
-  filter(!is.null(model)) %>%
-  unnest(cols = c(model)) %>% 
-  mutate(aonr_kgha = -0.5 * (b/c)) %>% 
-  select(site, year, rotation, aonr_kgha) %>% 
-  mutate(rotation = paste0("aonr_", rotation),
-         aonr_kgha = round(aonr_kgha, 0)) %>% 
-  rename("aonr_rot" = rotation)  
-
-sims.aonrs %>% 
-  write_csv("00_empirical-n-cont/dat_aonrs-sims.csv")
