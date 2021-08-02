@@ -216,3 +216,49 @@ m6sc <- lmer(gap_kgha ~ sc + (1+ year0|site), data = dat_mod6)
 
 summary(m6cc)
 summary(m6sc)
+
+
+# highest and lowest obs pens ---------------------------------------------
+
+gaps <- 
+  read_csv("00_empirical-n-cont/dat_aonrs.csv") %>% 
+  filter(aonr_rot == "aonr_sc") %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  left_join(
+    read_csv("00_empirical-n-cont/dat_preds.csv") %>% 
+  filter(rotation == "sc")
+  ) %>% 
+  left_join(gaps) %>% 
+  mutate(gap_pct = nonngap/pred_yield) %>% 
+  filter(!is.na(nonngap)) 
+
+#--by year
+gaps %>% 
+  group_by(year) %>% 
+  summarise(gap = mean(nonngap, na.rm = T),
+            n = n()) %>% 
+  arrange(-gap)
+#--max?
+gaps %>% 
+  filter(nonngap == max(nonngap, na.rm = T))
+
+gaps %>% 
+  filter(gap_pct == max(gap_pct, na.rm = T))
+
+gaps %>% 
+  mutate(sz = ifelse(gap_pct > 0.1, ">.1", "less")) %>% 
+  group_by(sz) %>% 
+  tally() %>% 
+  mutate(sum = sum(n),
+         pct = n/sum)
+
+gaps %>% 
+  ggplot(aes(pred_yield, gap_pct)) + 
+  geom_point()
+  
+
+gaps %>% 
+  group_by(site) %>% 
+  summarise(nonngap = mean(nonngap, na.rm = T)) %>% 
+  arrange(nonngap)
+  

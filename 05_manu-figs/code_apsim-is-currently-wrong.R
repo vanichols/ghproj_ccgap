@@ -1,17 +1,21 @@
-# created 2/12/21
+# created aug 2 2021
 # gina
-# purpose: mike thinks I can get some kind of info from aonr stuff
-# updated:3/19/21 separated aonr and npct calcs
-#         3/24/2021 added calcs on simulated data
+# purpose: calc things for fig
+# updated:
 
+rm(list = ls())
 library(tidysawyer2)
 library(tidyverse)
 library(nlraa)
+library(patchwork)
 
+theme_set(theme_bw())
+source("05_manu-figs/palettes.R")
 
+# data ----------------------------------------------------------------
 
-# sim data ----------------------------------------------------------------
-
+obs <- 
+  ilia_yields
 
 sims_cal <- 
   ilia_simsyields %>% 
@@ -93,28 +97,57 @@ qpfit_fun(tst = tst)
 qpcoefs_fun(tst = tst)
 
 
+# fit models --------------------------------------------------------------
+
+obs_mods <- 
+  obs %>% 
+  group_by(rotation) %>%
+  nest() %>%
+  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
+  rowwise() %>% 
+  filter(!is.null(model)) %>%
+  ungroup()
+
+
+cal_mods <- 
+  sims_cal %>% 
+  group_by(rotation) %>%
+  nest() %>%
+  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
+  rowwise() %>% 
+  filter(!is.null(model)) %>%
+  ungroup()
+
+uncal_mods <- 
+  sims_uncal %>% 
+  group_by(rotation) %>%
+  nest() %>%
+  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
+  rowwise() %>% 
+  filter(!is.null(model)) %>%
+  ungroup()
+
+
 # get aonrs ---------------------------------------------------------------
 
-#--fit separately for each site-year
-cal_aonrs <- 
-  sims_cal %>% 
-  group_by(site, year, rotation) %>%
+#--fit all site-years together
+
+obs_aonrs_allsites <- 
+  obs %>% 
+  group_by(rotation) %>%
   nest() %>%
   mutate(model = map(data, possibly(qpcoefs_fun, NULL))) %>% 
   rowwise() %>% 
   filter(!is.null(model)) %>%
   unnest(cols = c(model)) %>% 
   mutate(aonr_kgha = -0.5 * (b/c)) %>% 
-  select(site, year, rotation, aonr_kgha) %>% 
+  select(rotation, aonr_kgha) %>% 
   mutate(rotation = paste0("aonr_", rotation),
          aonr_kgha = round(aonr_kgha, 0)) %>% 
-  rename("aonr_rot" = rotation)  %>% 
-  mutate(desc = "cal no scripts")
-
-cal_aonrs %>% write_csv("00_empirical-n-cont/dat_aonrs-sims.csv")
+  rename("aonr_rot" = rotation)   %>% 
+  mutate(desc  = "observed")
 
 
-#--fit all site-years together
 cal_aonrs_allsites <- 
   sims_cal %>% 
   group_by(rotation) %>%
@@ -130,7 +163,6 @@ cal_aonrs_allsites <-
   rename("aonr_rot" = rotation)   %>% 
   mutate(desc  = "cal no scripts")
 
-cal_aonrs_allsites %>% write_csv("00_empirical-n-cont/dat_aonrs-sims-by-rot-only.csv")
 
 uncal_aonrs_allsites <- 
   sims_uncal %>% 
@@ -147,92 +179,90 @@ uncal_aonrs_allsites <-
   rename("aonr_rot" = rotation)   %>% 
   mutate(desc  = "uncal no scripts")
 
-uncal_aonrs_allsites %>% write_csv("00_empirical-n-cont/dat_aonrs-sims-by-rot-only-uncal.csv")
-
+aonrs <- 
+obs_aonrs_allsites %>% 
+  bind_rows(uncal_aonrs_allsites) %>% 
+  bind_rows(cal_aonrs_allsites)
+  
 
 # get preds ---------------------------------------------------------------
 
-#--get preds at many values
-cal_mods <- 
-  sims_cal%>% 
-  group_by(state, site, year, rotation) %>%
-  nest() %>%
-  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
-  rowwise() %>% 
-  filter(!is.null(model)) %>%
-  ungroup()
-
-
-# all sites, simulated data -----------------------------------------------
-
-#--get preds at many values
-cal_mods <- 
-  sims_cal %>% 
-  group_by(site, year, rotation) %>%
-  nest() %>%
-  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
-  rowwise() %>% 
-  filter(!is.null(model)) %>%
-  ungroup()
-
-#--342 didn't converge?!  
-cal_mods %>% 
-  group_by(site, year, rotation) %>%
-  nest() %>%
-  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
-  rowwise() %>% 
-  filter(is.null(model)) %>%
-  ungroup()
-
-#--ignore it for now, but this seems like a problem
-
-#--get preds at many values
-cal_mods_allsites <- 
-  sims_cal %>% 
-  group_by(rotation) %>%
-  nest() %>%
-  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
-  rowwise() %>% 
-  filter(!is.null(model)) %>%
-  ungroup()
-
-uncal_mods_allsites <- 
-  sims_uncal %>% 
-  group_by(rotation) %>%
-  nest() %>%
-  mutate(model = map(data, possibly(qpfit_fun, NULL))) %>% 
-  rowwise() %>% 
-  filter(!is.null(model)) %>%
-  ungroup()
-
-
-#--get yield preds at 0-300 N kga/ha
-cal_prds <- 
+cal_prds_allsites <- 
   cal_mods %>%
   mutate(pred_yield = map(model, .f = predict, newdata = data.frame(nrate_kgha = seq(0,300)))) %>%
   unnest(pred_yield) %>%
-  group_by(site, year, rotation) %>%
-  mutate(nrate_kgha = as.numeric(as.character(seq(0,300)))) %>% 
-  select(site, year, rotation, nrate_kgha, pred_yield) 
-
-cal_prds %>% write_csv("00_empirical-n-cont/dat_preds-sims.csv")
-
-cal_prds_allsites <- 
-  cal_mods_allsites %>%
-  mutate(pred_yield = map(model, .f = predict, newdata = data.frame(nrate_kgha = seq(0,300)))) %>%
-  unnest(pred_yield) %>%
   group_by(rotation) %>%
   mutate(nrate_kgha = as.numeric(as.character(seq(0,300)))) %>% 
-  select(rotation, nrate_kgha, pred_yield) 
-
-cal_prds_allsites %>% write_csv("00_empirical-n-cont/dat_preds-sims-by-rot-only.csv")
+  select(rotation, nrate_kgha, pred_yield)   %>% 
+  mutate(desc  = "cal no scripts")
 
 uncal_prds_allsites <- 
-  uncal_mods_allsites %>%
+  uncal_mods %>%
   mutate(pred_yield = map(model, .f = predict, newdata = data.frame(nrate_kgha = seq(0,300)))) %>%
   unnest(pred_yield) %>%
   group_by(rotation) %>%
   mutate(nrate_kgha = as.numeric(as.character(seq(0,300)))) %>% 
-  select(rotation, nrate_kgha, pred_yield) 
+  select(rotation, nrate_kgha, pred_yield)   %>% 
+  mutate(desc  = "uncal no scripts")
 
-uncal_prds_allsites %>% write_csv("00_empirical-n-cont/dat_preds-sims-by-rot-only-uncal.csv")
+obs_prds_allsites <- 
+  obs_mods %>%
+  mutate(pred_yield = map(model, .f = predict, newdata = data.frame(nrate_kgha = seq(0,300)))) %>%
+  unnest(pred_yield) %>%
+  group_by(rotation) %>%
+  mutate(nrate_kgha = as.numeric(as.character(seq(0,300)))) %>% 
+  select(rotation, nrate_kgha, pred_yield)   %>% 
+  mutate(desc  = "observed")
+
+prds <- 
+  cal_prds_allsites %>% 
+  bind_rows(uncal_prds_allsites) %>% 
+  bind_rows(obs_prds_allsites)
+
+# figure ------------------------------------------------------------------
+
+viz.aonr <- 
+  aonrs %>% 
+  separate(aonr_rot, into = c("x", "rotation")) %>% 
+  rename("nrate_kgha" = aonr_kgha) %>% 
+  select(-x) %>% 
+  left_join(prds) %>% 
+  mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR")) %>% 
+  filter(desc != "cal no scripts") %>% #--this doesn't look good
+  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Uncalibrated Modelled Data"))
+
+viz.prds <- 
+  prds %>% 
+  filter(nrate_kgha < 300) %>% 
+  mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR")) %>% 
+  filter(desc != "cal no scripts") %>% #--this doesn't look good
+  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Uncalibrated Modelled Data"))
+
+
+ggplot() + 
+  geom_line(data = viz.prds, aes(x = nrate_kgha, y = pred_yield/1000, color = rot), size = 2) + 
+  geom_point(data = viz.aonr, aes(x = nrate_kgha, y = pred_yield/1000, fill = rot), pch = 23, size = 4, stroke = 2) + 
+  scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
+                                "Rotated maize AONR" = dkbl1)) +
+  scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
+                               "Rotated maize AONR" = dkbl1)) +
+  labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
+       y = expression(Maize~grain~yield~(dry~Mg~ha^{-1})),
+       
+       #expression(flux*phantom(x)*(g~CO[2]~m^{-2}~h^{-1})))
+       
+       color = NULL,
+       fill = NULL) +
+  theme_bw() + 
+  theme(legend.position = c(0.95, 0.05),
+        legend.justification = c(1, 0),
+        legend.background = element_rect(color= "black"),
+        axis.title.y = element_text(angle = 90, vjust = 0.5)) + 
+  facet_grid(.~desc) + 
+  theme(strip.background = element_blank(),
+        strip.text = element_text(size =rel(1.2)))
+
+ggsave("05_manu-figs/fig_current-model-problem.png", width = 8.39, height = 5.19)
+
+
+
