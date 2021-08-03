@@ -13,7 +13,13 @@ library(apsimx)
 
 dat <- read_csv("00_soil-water-reset-Qs/sw_all.csv") %>% select(-Date, -dul_mm)
 
+dat %>% 
+  select(year, site) %>% 
+  distinct()
 
+dat %>% 
+  select(year) %>% 
+  distinct()
 
 swtop <- 
   dat %>% 
@@ -64,7 +70,7 @@ ggplot(data = ames_prd,
   geom_line(aes(y = Estimate)) + 
   geom_ribbon(aes(ymin = Q2.5, ymax = Q97.5, fill = rot, color = NULL), alpha = 0.3)
 
-## How does the model change when we incorporate the random effect of block?
+## How does the model change when we incorporate the random effect of year
 mod_v2 <- mgcv::gam(value ~ s(day, by = rot, bs = "cr", k = 35) + rot + s(year, bs = "re"),
                     data = ames, method = "REML")
 
@@ -138,15 +144,24 @@ ggplot(data = mod_all, aes(x = day, y = value, color = rot)) +
   geom_ribbon(aes(ymin = cilo, ymax = cihi, fill = rot, color = NULL), alpha = 0.3) + 
   facet_grid(modtype~site)
 
+source("05_manu-figs/palettes.R")
+
 ggplot(data = mod_all %>% filter(modtype == "ran"),
        aes(x = day, y = value, color = rot)) + 
   geom_line(aes(y = est)) + 
   geom_ribbon(aes(ymin = cilo, ymax = cihi, fill = rot, color = NULL), alpha = 0.3) + 
   facet_grid(modtype~site)+ 
+  scale_y_continuous(labels = scales::label_percent(accuracy = 2)) +
   labs(title = "Soil water at 7cm",
        subtitle = "GAM fit with year as random effect",
-       x = NULL,
-       y = "soil volumetric water")
+       x = "Day of year",
+       y = "Soil volumetric water",
+       fill = "Rotation",
+       color = "Rotation") + 
+  theme_bw() +
+  scale_fill_manual(values = c(pnk1, dkbl1)) + 
+  scale_color_manual(values = c(pnk1, dkbl1))
+  
 
 ggsave("00_soil-water-reset-Qs/fig_sw7cm.png")
 
