@@ -41,15 +41,16 @@ fig_dat %>%
 ggsave("00-lit-explore/fig_alkaisi-tillage-absolute.png")
 
 fig_dat %>%
-    filter(site != "mcna") %>% 
+    #filter(site != "mcna") %>% 
   ggplot(aes(tillage2, gap_pct)) + 
   geom_line(aes(color = site, group = site), alpha= 0.5, size = 2) + 
   stat_summary(fun = "mean", geom = "line",  size = 4) +
-  scale_x_continuous(labels = c("notill", "striptill", "chisel", "deeprip", "moldboard")) +
+  scale_x_continuous(labels = c("No-till", "Strip-till", "Chisel", "Deep rip", "Moldboard")) +
   scale_y_continuous(labels = scales::label_percent()) +
-  labs(y = "Contin. Corn Penalty (%)",
+  labs(y = "Continuous maize penalty (%)",
        title = "Higher tillage intensity relieves penalty?",
-       subtitle = "Maybe. Data from Al Kaisi, Iowa, excluding McNay",
-       x = "Tillage intensity (low to high)")
+       subtitle = "Inconclusive. Data from Al Kaisi et al. 2015",
+       x = "Tillage intensity (low to high)") + 
+  theme_bw()
 
 ggsave("00-lit-explore/fig_alkaisi-tillage-pct.png")
