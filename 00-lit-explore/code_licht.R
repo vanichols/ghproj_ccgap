@@ -13,7 +13,6 @@ library(lme4)
 library(lmerTest)
 library(emmeans)
 
-
 # data --------------------------------------------------------------------
 
 datraw <- read_csv("00-lit-explore/td_licht.csv")
@@ -24,7 +23,7 @@ datraw %>%
   stat_summary(aes(color = PrevCrop, group = PrevCrop, pch = PrevCrop), size = 2) + 
   scale_color_manual(values = c("gold3", "green4")) + 
   labs(y = "Corn stand density (pl/ac)",
-       subtitle = "Licht data, 11-site years",
+       subtitle = "Unpublished data from Licht, 11-site years",
        title = "Rotation effect on stand count depends on tillage")
 
 ggsave("00-lit-explore/fig_licht.png")

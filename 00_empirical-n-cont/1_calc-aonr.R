@@ -3,11 +3,12 @@
 # purpose: mike thinks I can get some kind of info from aonr stuff
 # updated: 3/19/2021 separated aonr calcs from npct calcs
 #          3/24/2021 - do calcs on sim data also
+#         8/3/2021 - moved sim calcs to own folder, cleaned up
+
+rm(list = ls())
 
 library(tidysawyer2)
 library(tidyverse)
-library(scales)
-library(ggmosaic)
 library(nlraa)
 
 # functions ---------------------------------------------------------------------
@@ -79,11 +80,30 @@ qpcoefs_fun(tst = tst)
 # do on all sites, observed data --------------------------------------------
 #--note: what happens in years where no plateau is reached?
 
-tst.tib <- 
+dat <- 
   ilia_yields
 
-tst.aonrs <- 
-  tst.tib %>% 
+sy <- 
+  dat %>% 
+  select(site, year, rotation) %>% 
+  distinct()
+
+# coefficients ------------------------------------------------------------
+
+d.coefs <- 
+  dat %>% 
+  group_by(site, year, rotation) %>%
+  nest() %>%
+  mutate(model = map(data, possibly(qpcoefs_fun, NULL))) %>% 
+  rowwise() %>% 
+  filter(!is.null(model)) %>%
+  unnest(cols = c(model)) 
+
+
+# aonrs -------------------------------------------------------------------
+
+d.aonrs <- 
+  dat %>% 
   group_by(site, year, rotation) %>%
   nest() %>%
   mutate(model = map(data, possibly(qpcoefs_fun, NULL))) %>% 
@@ -91,11 +111,33 @@ tst.aonrs <-
   filter(!is.null(model)) %>%
   unnest(cols = c(model)) %>% 
   mutate(aonr_kgha = -0.5 * (b/c)) %>% 
-  select(site, year, rotation, aonr_kgha) %>% 
+#  select(site, year, rotation, aonr_kgha) %>% 
   mutate(rotation = paste0("aonr_", rotation),
          aonr_kgha = round(aonr_kgha, 0)) %>% 
   rename("aonr_rot" = rotation)  
 
-tst.aonrs %>% 
+d.aonrs %>% 
   write_csv("00_empirical-n-cont/dat_aonrs.csv")
 
+
+
+# combine for manu table --------------------------------------------------
+
+d.manu <- 
+  dat %>% 
+  group_by(site, year, rotation) %>%
+  nest() %>%
+  mutate(model = map(data, possibly(qpcoefs_fun, NULL))) %>% 
+  rowwise() %>% 
+  filter(!is.null(model)) %>%
+  unnest(cols = c(model)) %>% 
+  mutate(aonr_kgha = -0.5 * (b/c)) %>% 
+  mutate(aonr_kgha = round(aonr_kgha, 0))
+
+d.manu %>% 
+  ungroup() %>% 
+  right_join(sy) %>% 
+  left_join(ilia_siteinfo %>% select(site, manu_id)) %>% 
+  select(manu_id, year, rotation, a, b, c, aonr_kgha) %>% 
+  arrange(manu_id, year, rotation) %>% 
+  write_csv("00_empirical-n-cont/dat_manu-params-aonrs.csv")
