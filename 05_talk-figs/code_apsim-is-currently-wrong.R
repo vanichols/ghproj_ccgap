@@ -1,6 +1,6 @@
 # created aug 13 2021
 # gina
-# purpose: explain n response curve
+# purpose: show that apsim is wrong
 # updated:
 
 rm(list = ls())
@@ -10,7 +10,7 @@ library(nlraa)
 library(patchwork)
 
 theme_set(theme_bw())
-source("05_talk-figs/palettes.R")
+source("05_talk-figs/talk-palette.R")
 
 # data ----------------------------------------------------------------
 
@@ -229,39 +229,45 @@ viz.aonr <-
   left_join(prds) %>% 
   mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR")) %>% 
   filter(desc != "cal no scripts") %>% #--this doesn't look good
-  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Uncalibrated Modelled Data"))
+  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Models"))
 
 viz.prds <- 
   prds %>% 
   filter(nrate_kgha < 300) %>% 
   mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR")) %>% 
   filter(desc != "cal no scripts") %>% #--this doesn't look good
-  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Uncalibrated Modelled Data"))
+  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Models"))
+
 
 
 # all the goodies ---------------------------------------------------------
+yld_lab <- (expression(atop("Corn Yield", paste("(Mg "~ha^-1*")"))))
 
+n_lab <- (expression("Nitrogen fertilization rate (kg N "~ha^-1*")"))
 
 ggplot() + 
-  geom_line(data = viz.prds, aes(x = nrate_kgha, y = pred_yield/1000, color = rot), size = 2) + 
+  geom_line(data = viz.prds, aes(x = nrate_kgha, y = pred_yield/1000, color = rot, linetype = desc), size = 2) + 
   geom_point(data = viz.aonr, aes(x = nrate_kgha, y = pred_yield/1000, fill = rot), pch = 23, size = 4, stroke = 2) + 
-  scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
-                                "Rotated maize AONR" = dkbl1)) +
-  scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
-                               "Rotated maize AONR" = dkbl1)) +
-  labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
-       y = expression(Maize~grain~yield~(dry~Mg~ha^{-1})),
+  scale_color_manual(values = c("Continuous maize AONR" = clr_cc, 
+                                "Rotated maize AONR" = clr_rot)) +
+  scale_fill_manual(values = c("Continuous maize AONR" = clr_cc, 
+                               "Rotated maize AONR" = clr_rot)) +
+  labs(x = n_lab,
+       y = yld_lab,
        
        #expression(flux*phantom(x)*(g~CO[2]~m^{-2}~h^{-1})))
        
        color = NULL,
        fill = NULL) +
+  guides(fill = F, #guide_legend(nrow = 2),
+         color = F, #guide_legend(nrow = 2),
+         linetype = F) +
   theme_bw() + 
   facet_grid(.~desc) + 
   theme(legend.background = element_rect(color= "black"),
-        axis.title.y = element_text(angle = 90, vjust = 0.5),
+        axis.title.y = element_text(angle = 0, vjust = 0.5),
         strip.background = element_blank(),
-        strip.text = element_text(size =rel(1.2)),
+        strip.text = element_text(size =rel(1.5)),
         panel.grid = element_blank(),
         legend.position = "top",
         legend.justification = "center",
@@ -269,7 +275,9 @@ ggplot() +
         axis.text = element_text(size = rel(1.5)),
         axis.title = element_text(size = rel(1.5)))
 
-ggsave("05_manu-figs/fig_current-model-problem.png", width = 8.39, height = 5.19)
+ggsave("05_talk-figs/fig_current-model-problem.png", 
+       width = 11, 
+       height = 6)
 
 
 
