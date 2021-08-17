@@ -1,6 +1,6 @@
-# Created:    april 17 2021
+# Created:    aug 17 2021
 #
-# purpose: comparing n- and non-n gaps
+# purpose: make conceptual fig for talk
 #
 # notes: 
 # last edited:   
@@ -17,10 +17,10 @@ library(naniar)
 
 theme_set(theme_bw())
 
-source("05_manu-figs/palettes.R")
+source("05_talk-figs/talk-palette3.R")
 
 
-yld_lab <- (expression(atop("Maize grain yield", paste("(dry Mg "~ha^-1*")"))))
+yld_lab <- (expression(atop("Corn grain yield", paste("(dry Mg "~ha^-1*")"))))
 
 # gap components --------------------------------------------------------------------
 
@@ -53,21 +53,21 @@ viz.aonr <-
   left_join(tst.prds) %>% 
   filter(site == "ames",
          year == 2003) %>% 
-  mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR"))
+  mutate(rot = ifelse(rotation == "cc", "Continuous corn AONR", "Rotated corn AONR"))
 
 viz.prds <- 
   tst.prds %>% 
   filter(site == "ames",
          year == 2003) %>% 
   filter(nrate_kgha < 300) %>% 
-  mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR"))
+  mutate(rot = ifelse(rotation == "cc", "Continuous corn AONR", "Rotated corn AONR"))
 
 viz.obs <- 
   ilia_yields %>% 
   mutate(nrate_kgha = round(nrate_kgha, 0)) %>% 
   filter(site == "ames",
          year == 2003) %>% 
-  mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR"))
+  mutate(rot = ifelse(rotation == "cc", "Continuous corn AONR", "Rotated corn AONR"))
 
 viz.aonr
 
@@ -120,17 +120,17 @@ ggplot() +
     #--rectangles
   geom_rect(aes(xmin = 340, xmax = 360,
                 ymin = cc_2/1000, ymax = sc_2/1000),
-            fill = grn1, color = "black") +
+            fill = clr_red, color = "black") +
     geom_text(aes(x = 330, y = ((sc_2 + cc_2)/2)/1000+0.3, 
-                  label = "Continuous maize penalty"),
+                  label = "Continuous corn penalty"),
               hjust = 1, fontface = "italic", size = 7) +
   geom_text(aes(x = 330, y = ((sc_2 + cc_2)/2)/1000-0.3, 
                 label = paste(expression(2~Mg~ha^-1))),
             hjust = 1, fontface = "italic", size = 7, parse = T) +
-    scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
-                                "Rotated maize AONR" = dkbl1)) +
-  scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
-                               "Rotated maize AONR" = dkbl1)) +
+    scale_color_manual(values = c("Continuous corn AONR" = clr_cc, 
+                                "Rotated corn AONR" = clr_rot)) +
+  scale_fill_manual(values = c("Continuous corn AONR" = clr_cc, 
+                               "Rotated corn AONR" = clr_rot)) +
   labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
        y = yld_lab,
        color = NULL,
@@ -147,7 +147,7 @@ ggplot() +
         panel.grid = element_blank())
 
 
-ggsave("05_talk-figs/fig_conceptual.png", width = 8.73, height = 4.7)
+ggsave("05_talk-figs/fig_concep3.png", width = 8.73, height = 4.7)
 
 
 # no rectange/labels ---------------------------------------------------------
@@ -166,17 +166,17 @@ ggplot() +
   # #--rectangles
   # geom_rect(aes(xmin = 340, xmax = 360,
   #               ymin = cc_2/1000, ymax = sc_2/1000),
-  #           fill = grn1, color = "black") +
+  #           fill = clr_red, color = "black") +
   # geom_text(aes(x = 330, y = ((sc_2 + cc_2)/2)/1000+0.3, 
-  #               label = "Continuous maize penalty"),
+  #               label = "Continuous corn penalty"),
   #           hjust = 1, fontface = "italic", size = 7) +
   # geom_text(aes(x = 330, y = ((sc_2 + cc_2)/2)/1000-0.3, 
   #               label = paste(expression(2~Mg~ha^-1))),
   #           hjust = 1, fontface = "italic", size = 7, parse = T) +
-  scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
-                                "Rotated maize AONR" = dkbl1)) +
-  scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
-                               "Rotated maize AONR" = dkbl1)) +
+  scale_color_manual(values = c("Continuous corn AONR" = clr_cc, 
+                                "Rotated corn AONR" = clr_rot)) +
+  scale_fill_manual(values = c("Continuous corn AONR" = clr_cc, 
+                               "Rotated corn AONR" = clr_rot)) +
   labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
        y = yld_lab,
        color = NULL,
@@ -193,7 +193,7 @@ ggplot() +
         panel.grid = element_blank())
 
 
-ggsave("05_talk-figs/fig_conceptual-no-rect.png", width = 8.73, height = 4.7)
+ggsave("05_talk-figs/fig_concep2.png", width = 8.73, height = 4.7)
 
 
 # no aonr diamond ---------------------------------------------------------
@@ -211,17 +211,17 @@ ggplot() +
   #--rectangles
   # geom_rect(aes(xmin = 340, xmax = 360,
   #               ymin = cc_2/1000, ymax = sc_2/1000),
-  #           fill = grn1, color = "black") +
+  #           fill = clr_red, color = "black") +
   # geom_text(aes(x = 330, y = ((sc_2 + cc_2)/2)/1000+0.3, 
-  #               label = "Continuous maize penalty"),
+  #               label = "Continuous corn penalty"),
   #           hjust = 1, fontface = "italic", size = 7) +
   # geom_text(aes(x = 330, y = ((sc_2 + cc_2)/2)/1000-0.3, 
   #               label = paste(expression(2~Mg~ha^-1))),
   #           hjust = 1, fontface = "italic", size = 7, parse = T) +
-  scale_color_manual(values = c("Continuous maize AONR" = pnk1, 
-                                "Rotated maize AONR" = dkbl1)) +
-  scale_fill_manual(values = c("Continuous maize AONR" = pnk1, 
-                               "Rotated maize AONR" = dkbl1)) +
+  scale_color_manual(values = c("Continuous corn AONR" = clr_cc, 
+                                "Rotated corn AONR" = clr_rot)) +
+  scale_fill_manual(values = c("Continuous corn AONR" = clr_cc, 
+                               "Rotated corn AONR" = clr_rot)) +
   labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
        y = yld_lab,
        color = NULL,
@@ -238,6 +238,6 @@ ggplot() +
         panel.grid = element_blank())
 
 
-ggsave("05_talk-figs/fig_conceptual-no-aonr.png", width = 8.73, height = 4.7)
+ggsave("05_talk-figs/fig_concep1-no-aonr.png", width = 8.73, height = 4.7)
 
 

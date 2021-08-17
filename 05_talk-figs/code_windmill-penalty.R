@@ -3,7 +3,7 @@
 # purpose: just showing obs gaps
 #
 # notes: 
-# last edited:   
+# last edited:   aug 15 changing colors
 
 rm(list = ls())
 library(tidysawyer2) 
@@ -15,11 +15,22 @@ library(scales)
 library(naniar)
 
 
+source("05_talk-figs/talk-palette.R")
+
+raw_lab <- (expression(atop("Continuous corn penalty", paste("(Mg "~ha^-1*")"))))
+pct_lab <- (expression(atop("Continuous corn penalty", paste("(%)"))))
+
 theme_set(theme_bw())
 
-source("05_manu-figs/palettes.R")
-
-myyieldlab <- (expression(atop("Continuous maize penalties", paste("(Mg "~ha^-1*")"))))
+wind_theme <- theme(
+  legend.position = "bottom",
+  legend.background = element_blank(),
+  axis.title.y = element_text(angle = 0, vjust = 0.5),
+  axis.text.y = element_text(color = c("black", clr_blu,
+                                       "black","black",
+                                       "black","black")),
+  axis.title = element_text(size = rel(1.5)),
+  axis.text = element_text(size = rel(1.4)))
 
 
 
@@ -52,100 +63,36 @@ dat %>%
   mutate(id = 1:n(),
          gap_pct = ifelse(is.na(gap_pct), 0, gap_pct)) %>% 
   ggplot(aes(id, gap_pct)) + 
-  geom_rect(xmin = 0, xmax = 109, 
-            ymin = 0 , ymax = 1, fill = ylw1, alpha = 0.2) +
+  geom_rect(xmin = 1, xmax = 109, 
+            ymin = 0 , ymax = 1, fill = "white", alpha = 0.2, color = "black") +
   geom_rect(xmin = 109, xmax = 121, 
-            ymin = 0 , ymax = 1, fill = "white", alpha = 0.2) +
-  geom_rect(xmin = 121, xmax = 147, 
-            ymin = 0 , ymax = 1, fill = "gray80", alpha = 0.2) +
-  geom_col(width = 1, fill = grn1, color = "black") +
-  geom_hline(yintercept = 0, color = "gray70") +
-  geom_text(x = 134, y = .3, 
-            label = "36 site-years,\nundetermined",
-            hjust = 0.5, check_overlap = T, 
-            fontface = "italic", color = "gray10", size = 5) +
-  geom_text(x = 115, y = .55, 
-            label = "12 site-years,\nno penalties",
-            hjust = 0.5, check_overlap = T, 
-            fontface = "italic", color = "gray10", size = 5) +
-  geom_text(x = 55, y = .7, 
-            label = "109 site-years,\npenalty",
-            hjust = 0.5, check_overlap = T, 
-            fontface = "italic", color = "gray10", size = 5) +
-  geom_hline(yintercept = 0.1, color = rd2) +
-  scale_y_continuous(limits = c(0, 1), 
-                     breaks = c(0, 0.1, .25, .5, .75, 1),
-                     labels = label_percent()) +
-  theme(
-    legend.position = "bottom",
-    legend.background = element_blank(),
-    axis.title.y = element_text(angle = 0, vjust = 0.5),
-    axis.text.y = element_text(color = c("black", "red",
-                                         "black","black",
-                                         "black","black")),
-    axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(1.4))) +
-  scale_x_continuous(limits = c(0, 150)) +
-  labs(fill = NULL,
-       y = myyieldlab,
-       x = "Site-year") 
-
-
-ggsave("05_talk-figs/fig_windmill-horiz.png", width = 10.2, height = 4.7)
-
-
-# windmill % simple----------------------------------------------------------------
-
-
-dat %>% 
-  left_join(yld) %>% 
-  mutate(gap_pct = nonngap/pred_yield) %>% 
-  arrange(-gap_pct) %>% 
-  mutate(id = 1:n(),
-         gap_pct = ifelse(is.na(gap_pct), 0, gap_pct)) %>% 
-  ggplot(aes(id, gap_pct)) + 
-  # geom_rect(xmin = 0, xmax = 109, 
-  #           ymin = 0 , ymax = 1, fill = ylw1, alpha = 0.2) +
-  # geom_rect(xmin = 109, xmax = 121, 
-  #           ymin = 0 , ymax = 1, fill = "white", alpha = 0.2) +
+            ymin = 0 , ymax = 1, fill = "gray80", color = "black") +
   # geom_rect(xmin = 121, xmax = 147, 
   #           ymin = 0 , ymax = 1, fill = "gray80", alpha = 0.2) +
-  geom_col(width = 1, fill = grn1, color = "black") +
-  # geom_text(x = 134, y = .3, 
-  #           label = "36 site-years,\nundetermined",
-  #           hjust = 0.5, check_overlap = T, 
-  #           fontface = "italic", color = "gray10", size = 5) +
-  # geom_text(x = 115, y = .55, 
-  #           label = "12 site-years,\nno penalties",
-  #           hjust = 0.5, check_overlap = T, 
-  #           fontface = "italic", color = "gray10", size = 5) +
+  geom_col(width = 1, fill = clr_red, color = "black") +
+  geom_hline(yintercept = 0, color = "gray70") +
   # geom_text(x = 55, y = .7, 
   #           label = "109 site-years,\npenalty",
   #           hjust = 0.5, check_overlap = T, 
   #           fontface = "italic", color = "gray10", size = 5) +
-  # geom_hline(yintercept = 0.1, color = rd2) +
+  # geom_text(x = 115, y = .7, 
+  #           label = "12 site-years,\nno penalties",
+  #           hjust = 0.5, check_overlap = T, 
+  #           fontface = "italic", color = "gray10", size = 5) +
+  geom_segment(aes(x = 0, xend = 121,
+                   y = 0.1, yend = 0.1), color = clr_blu, size = 3) +
   scale_y_continuous(limits = c(0, 1), 
-#                     breaks = c(0, 0.1, .25, .5, .75, 1),
+                     breaks = c(0, 0.1, .25, .5, .75, 1),
                      labels = label_percent()) +
-  theme(
-    legend.position = "bottom",
-    legend.background = element_blank(),
-    axis.title.y = element_text(angle = 0, vjust = 0.5),
-    # axis.text.y = element_text(color = c("black", "red",
-    #                                      "black","black",
-    #                                      "black","black")),
-    axis.title = element_text(size = rel(1.5)),
-    axis.text = element_text(size = rel(1.4))) +
-  scale_x_continuous(limits = c(0, 150)) +
+  wind_theme +
+  scale_x_continuous(limits = c(0, 130)) +
   labs(fill = NULL,
-       y = myyieldlab,
-       x = "Site-year") 
+       y = pct_lab,
+       x = "Site year",
+       caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") 
 
 
-ggsave("05_talk-figs/fig_windmill-horiz-plain.png", width = 10.2, height = 4.7)
-
-
-
+ggsave("05_talk-figs/fig_windmill-horiz-pct.png", width = 10.2, height = 4.7)
 
 
 
@@ -157,34 +104,42 @@ dat %>%
   mutate(id = 1:n(),
          nonngap = ifelse(is.na(nonngap), 0, nonngap)) %>% 
   ggplot(aes(id, nonngap/1000)) + 
-  geom_rect(xmin = 0, xmax = 109, 
-            ymin = 0 , ymax = 5, fill = ylw1, alpha = 0.2) +
+  geom_rect(xmin = 1, xmax = 109, 
+            ymin = 0 , ymax = 5, fill = "white", color = "black") +
   geom_rect(xmin = 109, xmax = 121, 
-            ymin = 0 , ymax = 5, fill = "white", alpha = 0.2) +
-  geom_rect(xmin = 121, xmax = 147, 
-            ymin = 0 , ymax = 5, fill = "gray80", alpha = 0.2) +
-  geom_col(width = 1, fill = grn1, color = "black") +
-  geom_hline(yintercept = 0, color = "gray70") +
-  geom_text(x = 134, y = 2, label = "36 site-years,\nundetermined",
-            hjust = 0.5, check_overlap = T, fontface = "italic", color = "gray10") +
-  geom_text(x = 115, y = 3, label = "12 site-years,\nno penalties",
-            hjust = 0.5, check_overlap = T, fontface = "italic", color = "gray10") +
-  geom_text(x = 55, y = 4, label = "109 site-years,\npenalty",
-            hjust = 0.5, check_overlap = T, fontface = "italic", color = "gray10") +
-  # expand_limits(y = 5) +
-  # scale_y_continuous(breaks = c(-2, 0, 2, 4),
-  #                    labels = c(2, 0, 2, 4)) +
-   theme(
-    #legend.justification = c(0,0),
-    #   legend.position = c(0.05, 0.05),
-    legend.position = "bottom",
-    legend.background = element_blank(),
-    axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+            ymin = 0 , ymax = 5, fill = "gray80", color= "black") +
+  # geom_rect(xmin = 121, xmax = 147, 
+  #           ymin = 0 , ymax = 5, fill = "gray80", alpha = 0.2) +
+  geom_col(width = 1, fill = clr_red, color = "black") +
+  geom_segment(aes(x = 0, xend = 121,
+                   y = 1, yend = 1), color = clr_blu, size = 3) +
+  geom_hline(yintercept = 0, color = "gray70")  +
+  scale_x_continuous(limits = c(0, 121)) +
   labs(fill = NULL,
-       y = myyieldlab,
-       x = "Site-year") 
+       y = raw_lab,
+       x = "Site-year",
+       caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") +
+  wind_theme 
+
+ggsave("05_talk-figs/fig_horiz-raw.png", width = 10.2, height = 4.7)
 
 
+
+# -------------------------------------------------------------------------
+
+dat %>% 
+  left_join(yld) %>% 
+  mutate(gap_pct = nonngap/pred_yield) %>% 
+  arrange(-gap_pct) %>% 
+  ggplot(aes(pred_yield/1000, gap_pct)) + 
+  geom_point(fill = clr_red, size = 4, pch= 21) + 
+  scale_y_continuous(labels = label_percent(accuracy = 2)) +
+  labs(x = raw_lab,
+       y = pct_lab) + 
+  wind_theme + 
+  theme(axis.text.y = element_text(color= "black"))
+
+ggsave("05_talk-figs/fig_raw-vs-pct.png")  
 
 
 
