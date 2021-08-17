@@ -21,7 +21,7 @@ library(tidysawyer2) #--has sawyer data
 library(tidyverse)
 library(janitor)
 
-source("05_talk-figs/talk-palette2.R")
+source("05_talk-figs/talk-palette3.R")
 
 
 #--wrote it, edited by hand
@@ -298,4 +298,3 @@ f_dat %>%
         axis.title = element_text(size = rel(1.5)))
 
 ggsave("05_talk-figs/fig_oat4.png", width = 12, height = 6.25)
-♠

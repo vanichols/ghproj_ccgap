@@ -17,7 +17,7 @@ library(naniar)
 
 theme_set(theme_bw())
 
-source("05_talk-figs/talk-palette.R")
+source("05_talk-figs/talk-palette3.R")
 
 
 yld_lab <- (expression(atop("Corn grain yield", paste("(dry Mg "~ha^-1*")"))))
