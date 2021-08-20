@@ -33,8 +33,9 @@ source("05_talk-figs/talk-palette3.R")
 oats_nice <- 
   read_csv("05_manu-figs/oats_nice.csv") %>% 
   mutate(oat_what_nice = case_when(
+    oat_nu == 0 ~ "Penalty in Ames Iowa",
     oat_nu == 1 ~ "Less plants",
-    oat_nu == 2 ~ "Delayed emergence",
+    oat_nu == 2 ~ "Delayed emerg.",
     oat_nu == 3 ~ "Foliar disease",
     oat_nu == 22 ~ "Less root growth",
     oat_nu == 5 ~ "Less root function",
@@ -94,10 +95,12 @@ wind_theme_V <-    theme_bw() +
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank())
 
-wind_theme_H <-    theme_bw() +
-  theme(strip.text.y = element_text(angle = 0),
+wind_theme_H <-    
+  theme_bw() +
+  theme(strip.text = element_text(size = rel(1.4)),
         axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size = rel(1.3)))
 
 
 
@@ -146,7 +149,7 @@ f1 %>%
 f_dat %>% 
   ungroup() %>% 
   #--make last once less wordy
-  mutate(oat_what_nice2 = ifelse(category == "5 factor", "Combination", as.character(oat_what_nice)),
+  mutate(oat_what_nice2 = ifelse(category == "5 factor", "Combo", as.character(oat_what_nice)),
          oat_what_nice2 = fct_inorder(oat_what_nice2)) %>% 
   mutate(oat_scen_lab = factor(oat_scen_lab, levels = f_dat_oat_labs)) %>% 
   mutate(
@@ -157,7 +160,7 @@ f_dat %>%
       oat_what == "late emergence" ~ "C",
       TRUE ~ "D")
   ) %>% 
-  ggplot(aes(year, gap_kgha)) + 
+  ggplot(aes(year, gap_kgha/1000)) + 
   geom_bar(aes(fill = col1, color = col1),
            position = "dodge", 
            stat = "identity", 
@@ -171,23 +174,24 @@ f_dat %>%
   scale_fill_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   scale_color_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
-    x = "Year, ordered by largest to smallest observed penalty",
-    y = (expression(atop("Continuous maize penalty", 
-                         paste("Ames IA, (kg "~ha^-1*")"))))) + 
+    x = "Year, ordered by largest to smallest Ames penalty",
+    y = "Continuous\nmaize\npenalty") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
         axis.title = element_text(size = rel(1.5)))
   
-ggsave("05_talk-figs/fig_oat1.png", width = 12, height = 6.25)
+ggsave("05_talk-figs/fig_oat1.png", width = 11, height = 6)
+
 
 
 # means appear ------------------------------------------------------------
 
 
+
 f_dat %>% 
   ungroup() %>% 
   #--make last once less wordy
-  mutate(oat_what_nice2 = ifelse(category == "5 factor", "Combination", as.character(oat_what_nice)),
+  mutate(oat_what_nice2 = ifelse(category == "5 factor", "Combo", as.character(oat_what_nice)),
          oat_what_nice2 = fct_inorder(oat_what_nice2)) %>% 
   mutate(oat_scen_lab = factor(oat_scen_lab, levels = f_dat_oat_labs)) %>% 
   mutate(
@@ -198,28 +202,30 @@ f_dat %>%
       oat_what == "late emergence" ~ "C",
       TRUE ~ "D")
   ) %>% 
-  ggplot(aes(year, gap_kgha)) + 
+  ggplot(aes(year, gap_kgha/1000)) + 
   geom_bar(aes(fill = col1, color = col1),
            position = "dodge", 
            stat = "identity", 
            #color = "black"
   ) +
- geom_hline(aes(yintercept = mngap), size = 1, type = "dotted") +
+ geom_hline(aes(yintercept = mngap/1000), size = 1, linetype = "dashed") +
   #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
   scale_x_discrete(breaks = c(NA, NA)) +
-  scale_fill_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
-  scale_color_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_fill_manual(values = c("C" ="gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_color_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
-    x = "Year, ordered by largest to smallest observed penalty",
-    y = (expression(atop("Continuous maize penalty", 
-                         paste("Ames IA, (kg "~ha^-1*")"))))) + 
+    x = "Year, ordered by largest to smallest Ames penalty",
+    y = "Continuous\nmaize\npenalty") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
         axis.title = element_text(size = rel(1.5)))
 
-ggsave("05_talk-figs/fig_oat2.png", width = 12, height = 6.25)
+ggsave("05_talk-figs/fig_oat2.png", width = 11, height = 6)
+
+
+
 
 # colors change-------------------------------------------------------
 
@@ -291,10 +297,10 @@ f_dat %>%
   scale_color_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
     x = "Year, ordered by largest to smallest observed penalty",
-    y = (expression(atop("Continuous maize penalty", 
-                         paste("Ames IA, (kg "~ha^-1*")"))))) + 
+    y = "Continuous\nmaize penalty\nAmes IA") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
-        axis.title = element_text(size = rel(1.5)))
+        axis.title = element_text(size = rel(1.5)),
+        strip.text = element_text(size = rel(1.3)))
 
 ggsave("05_talk-figs/fig_oat4.png", width = 12, height = 6.25)
