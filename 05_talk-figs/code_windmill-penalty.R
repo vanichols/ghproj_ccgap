@@ -15,7 +15,7 @@ library(scales)
 library(naniar)
 
 
-source("05_talk-figs/talk-palette.R")
+source("05_talk-figs/talk-palette3.R")
 
 raw_lab <- (expression(atop("Continuous corn penalty", paste("(Mg "~ha^-1*")"))))
 pct_lab <- (expression(atop("Continuous corn penalty", paste("(%)"))))
@@ -84,15 +84,15 @@ dat %>%
   scale_y_continuous(limits = c(0, 1), 
                      breaks = c(0, 0.1, .25, .5, .75, 1),
                      labels = label_percent()) +
+  scale_x_continuous(limits = c(0, 121)) +
   wind_theme +
-  scale_x_continuous(limits = c(0, 130)) +
   labs(fill = NULL,
        y = pct_lab,
        x = "Site year",
        caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") 
 
 
-ggsave("05_talk-figs/fig_windmill-horiz-pct.png", width = 10.2, height = 4.7)
+ggsave("05_talk-figs/fig_windmill-horiz-pct.png", width = 7.26, height = 4.7)
 
 
 
