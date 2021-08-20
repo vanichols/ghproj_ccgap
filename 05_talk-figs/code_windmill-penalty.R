@@ -17,12 +17,13 @@ library(naniar)
 
 source("05_talk-figs/talk-palette3.R")
 
-raw_lab <- (expression(atop("Continuous corn penalty", paste("(Mg "~ha^-1*")"))))
+raw_lab <- (expression(atop("Continuous corn penalty", paste("(Mg"~ha^-1*")"))))
 pct_lab <- (expression(atop("Continuous corn penalty", paste("(%)"))))
 
 theme_set(theme_bw())
 
-wind_theme <- theme(
+wind_theme <- 
+  theme(
   legend.position = "bottom",
   legend.background = element_blank(),
   axis.title.y = element_text(angle = 0, vjust = 0.5),
@@ -96,33 +97,53 @@ ggsave("05_talk-figs/fig_windmill-horiz-pct.png", width = 7.26, height = 4.7)
 
 
 
+# windmill raw Mg ha-1 no mean line----------------------------------------------------------------
+
+
+dat %>%
+  filter(!is.na(nonngap)) %>% 
+  arrange(-nonngap) %>% 
+  mutate(id = 1:n(),
+         nonngap = ifelse(nonngap == 0, 10, nonngap)) %>% 
+  ggplot(aes(id, nonngap/1000)) + 
+  geom_col(width = 1, fill = clr_red, color = "black") +
+   scale_x_continuous(limits = c(0, 121), ) +
+  labs(fill = NULL,
+       y = "Continuous\nCorn\nPenalty",
+       x = "Environment",
+       caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") +
+  wind_theme +
+  theme(axis.text.y = element_text(color = "black"))
+
+ggsave("05_talk-figs/fig_horiz-raw1.png", width = 10.2, height = 4.7)
+
 # windmill raw Mg ha-1----------------------------------------------------------------
 
 
 dat %>%
+  filter(!is.na(nonngap)) %>% 
   arrange(-nonngap) %>% 
   mutate(id = 1:n(),
-         nonngap = ifelse(is.na(nonngap), 0, nonngap)) %>% 
+         nonngap = ifelse(nonngap == 0, 10, nonngap)) %>% 
   ggplot(aes(id, nonngap/1000)) + 
-  geom_rect(xmin = 1, xmax = 109, 
-            ymin = 0 , ymax = 5, fill = "white", color = "black") +
-  geom_rect(xmin = 109, xmax = 121, 
-            ymin = 0 , ymax = 5, fill = "gray80", color= "black") +
+  # geom_rect(xmin = 1, xmax = 109, 
+  #           ymin = 0 , ymax = 5, fill = "white", color = "black") +
+  # geom_rect(xmin = 109, xmax = 121, 
+  #           ymin = 0 , ymax = 5, fill = "gray80", color= "black") +
   # geom_rect(xmin = 121, xmax = 147, 
   #           ymin = 0 , ymax = 5, fill = "gray80", alpha = 0.2) +
   geom_col(width = 1, fill = clr_red, color = "black") +
   geom_segment(aes(x = 0, xend = 121,
                    y = 1, yend = 1), color = clr_blu, size = 3) +
   geom_hline(yintercept = 0, color = "gray70")  +
-  scale_x_continuous(limits = c(0, 121)) +
+  scale_x_continuous(limits = c(0, 121), ) +
   labs(fill = NULL,
-       y = raw_lab,
-       x = "Site-year",
+       y = "Continuous\nCorn\nPenalty",
+       x = "Environment",
        caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") +
   wind_theme 
 
-ggsave("05_talk-figs/fig_horiz-raw.png", width = 10.2, height = 4.7)
-
+ggsave("05_talk-figs/fig_horiz-raw2.png", width = 10.2, height = 4.7)
 
 
 # -------------------------------------------------------------------------
