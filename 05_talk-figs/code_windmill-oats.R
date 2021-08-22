@@ -183,6 +183,48 @@ f_dat %>%
 ggsave("05_talk-figs/fig_oat1.png", width = 11, height = 6)
 
 
+# colors change ------------------------------------------------------------
+
+
+
+f_dat %>% 
+  ungroup() %>% 
+  #--make last once less wordy
+  mutate(oat_what_nice2 = ifelse(category == "5 factor", "Combo", as.character(oat_what_nice)),
+         oat_what_nice2 = fct_inorder(oat_what_nice2)) %>% 
+  mutate(oat_scen_lab = factor(oat_scen_lab, levels = f_dat_oat_labs)) %>% 
+  mutate(
+    #year = factor(year, levels = yrs_ord),
+    col1 = case_when(
+      oat_what == "exp gap" ~ "A",
+      oat_what == "current apsim gap" ~ "B",
+      oat_what == "late emergence" ~ "C",
+      TRUE ~ "D")
+  ) %>% 
+  ggplot(aes(year, gap_kgha/1000)) + 
+  geom_bar(aes(fill = col1, color = col1),
+           position = "dodge", 
+           stat = "identity", 
+           #color = "black"
+  ) +
+  #geom_hline(aes(yintercept = mngap/1000), size = 1, linetype = "dashed") +
+  #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
+  facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
+  guides(fill = F, color = F) +
+  scale_x_discrete(breaks = c(NA, NA)) +
+  scale_fill_manual(values = c("C" ="gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_color_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  labs(#title = "Ames",
+    x = "Year, ordered by largest to smallest Ames penalty",
+    y = "Continuous\nmaize\npenalty") + 
+  wind_theme_H  +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
+        axis.title = element_text(size = rel(1.5)))
+
+ggsave("05_talk-figs/fig_oat2.png", width = 11, height = 6)
+
+
+
 
 # means appear ------------------------------------------------------------
 
@@ -222,7 +264,7 @@ f_dat %>%
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
         axis.title = element_text(size = rel(1.5)))
 
-ggsave("05_talk-figs/fig_oat2.png", width = 11, height = 6)
+ggsave("05_talk-figs/fig_oat3.png", width = 11, height = 6)
 
 
 
@@ -249,7 +291,7 @@ f_dat %>%
            stat = "identity", 
            #color = "black"
   ) +
-  geom_hline(aes(yintercept = mngap), size = 1, type = "dotted") +
+ # geom_hline(aes(yintercept = mngap), size = 1, type = "dotted") +
   #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
@@ -264,7 +306,7 @@ f_dat %>%
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
         axis.title = element_text(size = rel(1.5)))
 
-ggsave("05_talk-figs/fig_oat3.png", width = 12, height = 6.25)
+ggsave("05_talk-figs/fig_oat2.png", width = 12, height = 6.25)
 
 # error bars-------------------------------------------------------
 

@@ -229,14 +229,22 @@ viz.aonr <-
   left_join(prds) %>% 
   mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR")) %>% 
   filter(desc != "cal no scripts") %>% #--this doesn't look good
-  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Models"))
+  mutate(desc = ifelse(desc == "observed", 
+                       "Experimental Data,\nAll Site-Years", 
+                       "Modelled,\nAll Site-Years"),
+         #desc = fct_rev(desc)
+         )
 
 viz.prds <- 
   prds %>% 
   filter(nrate_kgha < 300) %>% 
   mutate(rot = ifelse(rotation == "cc", "Continuous maize AONR", "Rotated maize AONR")) %>% 
   filter(desc != "cal no scripts") %>% #--this doesn't look good
-  mutate(desc = ifelse(desc == "observed", "Experimental Data", "Models"))
+  mutate(desc = ifelse(desc == "observed", 
+                       "Experimental Data,\nAll Site-Years", 
+                       "Modelled,\nAll Site-Years"),
+         #desc = fct_rev(desc)
+         )
 
 
 
@@ -252,6 +260,7 @@ ggplot() +
                                 "Rotated maize AONR" = clr_rot)) +
   scale_fill_manual(values = c("Continuous maize AONR" = clr_cc, 
                                "Rotated maize AONR" = clr_rot)) +
+ # scale_linetype_manual(values = c("dashed", "solid")) +
   labs(x = n_lab,
        y = yld_lab,
        

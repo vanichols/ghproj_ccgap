@@ -134,7 +134,8 @@ ggplot() +
   labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
        y = yld_lab,
        color = NULL,
-       fill = NULL) +
+       fill = NULL,
+       title = "Ames, 2008") +
   scale_x_continuous(limits = c(0, 360)) +
   theme_bw() + 
   theme(legend.position = c(0.95, 0.05),
@@ -144,7 +145,8 @@ ggplot() +
         legend.text = element_text(size = rel(1.5)),
         axis.text = element_text(size = rel(1.4)),
         axis.title = element_text(size =rel(1.5)),
-        panel.grid = element_blank())
+        panel.grid = element_blank(),
+        plot.title = element_text(size = rel(2)))
 
 
 ggsave("05_talk-figs/fig_concep3.png", width = 8.73, height = 4.7)
@@ -180,7 +182,8 @@ ggplot() +
   labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
        y = yld_lab,
        color = NULL,
-       fill = NULL) +
+       fill = NULL,
+       title = "Ames, 2008") +
   scale_x_continuous(limits = c(0, 360)) +
   theme_bw() + 
   theme(legend.position = c(0.95, 0.05),
@@ -190,7 +193,8 @@ ggplot() +
         legend.text = element_text(size = rel(1.5)),
         axis.text = element_text(size = rel(1.4)),
         axis.title = element_text(size =rel(1.5)),
-        panel.grid = element_blank())
+        panel.grid = element_blank(),
+        plot.title = element_text(size = rel(2)))
 
 
 ggsave("05_talk-figs/fig_concep2.png", width = 8.73, height = 4.7)
@@ -225,7 +229,8 @@ ggplot() +
   labs(x = expression(Nitrogen~fertilization~rate~(kg~N~ha^{-1})),
        y = yld_lab,
        color = NULL,
-       fill = NULL) +
+       fill = NULL,
+       title = "Ames, 2008") +
   theme_bw() + 
   scale_x_continuous(limits = c(0, 360)) +
   theme(legend.position = c(0.95, 0.05),
@@ -235,7 +240,8 @@ ggplot() +
         legend.text = element_text(size = rel(1.5)),
         axis.text = element_text(size = rel(1.4)),
         axis.title = element_text(size =rel(1.5)),
-        panel.grid = element_blank())
+        panel.grid = element_blank(),
+        plot.title = element_text(size = rel(2)))
 
 
 ggsave("05_talk-figs/fig_concep1-no-aonr.png", width = 8.73, height = 4.7)
