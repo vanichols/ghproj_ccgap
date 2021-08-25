@@ -69,12 +69,14 @@ dat %>%
   scale_y_continuous(labels = scales::label_percent(accuracy = 1),
                      limits = c(0, 0.5)) +
   labs(pch = NULL,
+       title = "Experimental data from literature",
        caption = "Crookston et al. 1991;\nMeese et al. 1991;\nPorter et al. 1997") +
   theme_bw() + 
   theme(legend.background = element_rect(color = "black"),
         legend.position = c(0.9, 0.1),
         legend.justification = c(1,0),
-        axis.title.y = element_text(angle = 0, vjust = 0.5)) + 
+        axis.title.y = element_text(angle = 0, vjust = 0.5),
+        plot.title = element_text(size = rel(2))) + 
   bigtheme
 
 ggsave("05_talk-figs/fig_lit-pen-over-time.png", width = 9, height= 5)

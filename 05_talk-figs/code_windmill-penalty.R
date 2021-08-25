@@ -110,7 +110,7 @@ dat %>%
    scale_x_continuous(limits = c(0, 121), ) +
   labs(fill = NULL,
        y = "Continuous\nCorn\nPenalty",
-       x = "Environment",
+       x = "Site-year",
        caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") +
   wind_theme +
   theme(axis.text.y = element_text(color = "black"))
@@ -139,7 +139,7 @@ dat %>%
   scale_x_continuous(limits = c(0, 121), ) +
   labs(fill = NULL,
        y = "Continuous\nCorn\nPenalty",
-       x = "Environment",
+       x = "Site-year",
        caption = "Penalty (109);\n No penalty (12);\nIn-estimable (36)") +
   wind_theme 
 

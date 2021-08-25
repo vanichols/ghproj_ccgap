@@ -98,8 +98,8 @@ wind_theme_V <-    theme_bw() +
 wind_theme_H <-    
   theme_bw() +
   theme(strip.text = element_text(size = rel(1.4)),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
+        #axis.text.x = element_blank(),
+        #axis.ticks.x = element_blank(),
         axis.text.y = element_text(size = rel(1.3)))
 
 
@@ -143,8 +143,12 @@ f_dat %>%
 f1 %>% 
   bind_rows(f5) %>% 
   select(oat_nu, oat_what, oat_what_nice) %>% 
-  distinct()
+  distinct() 
 
+
+f_dat %>% 
+  filter(oat_nu == 0) %>% 
+  arrange(-year)
 
 f_dat %>% 
   ungroup() %>% 
@@ -170,15 +174,17 @@ f_dat %>%
   #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
-  scale_x_discrete(breaks = c(NA, NA)) +
+  #scale_x_discrete(breaks = c(NA, NA)) +
+  scale_x_discrete(breaks = c(2003)) +
   scale_fill_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   scale_color_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
-    x = "Year, ordered by largest to smallest Ames penalty",
-    y = "Continuous\nmaize\npenalty") + 
+    x = "Year, ordered by largest to smallest Ames penalty 2001-2016",
+    y = "Continuous\ncorn\npenalty") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
-        axis.title = element_text(size = rel(1.5)))
+        axis.title = element_text(size = rel(1.5)),
+        axis.text.x = element_text(angle = 0, vjust = 0.5))
   
 ggsave("05_talk-figs/fig_oat1.png", width = 11, height = 6)
 
@@ -211,15 +217,16 @@ f_dat %>%
   #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
-  scale_x_discrete(breaks = c(NA, NA)) +
-  scale_fill_manual(values = c("C" ="gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_x_discrete(breaks = c(2003)) +
+  scale_fill_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   scale_color_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
-    x = "Year, ordered by largest to smallest Ames penalty",
-    y = "Continuous\nmaize\npenalty") + 
+    x = "Year, ordered by largest to smallest Ames penalty 2001-2016",
+    y = "Continuous\ncorn\npenalty") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
-        axis.title = element_text(size = rel(1.5)))
+        axis.title = element_text(size = rel(1.5)),
+        axis.text.x = element_text(angle = 0, vjust = 0.5))
 
 ggsave("05_talk-figs/fig_oat2.png", width = 11, height = 6)
 
@@ -254,15 +261,16 @@ f_dat %>%
   #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
-  scale_x_discrete(breaks = c(NA, NA)) +
-  scale_fill_manual(values = c("C" ="gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_x_discrete(breaks = c(2003)) +
+  scale_fill_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   scale_color_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
-    x = "Year, ordered by largest to smallest Ames penalty",
-    y = "Continuous\nmaize\npenalty") + 
+    x = "Year, ordered by largest to smallest Ames penalty 2001-2016",
+    y = "Continuous\ncorn\npenalty") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
-        axis.title = element_text(size = rel(1.5)))
+        axis.title = element_text(size = rel(1.5)),
+        axis.text.x = element_text(angle = 0, vjust = 0.5))
 
 ggsave("05_talk-figs/fig_oat3.png", width = 11, height = 6)
 
@@ -295,16 +303,16 @@ f_dat %>%
   #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
   facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
   guides(fill = F, color = F) +
-  scale_x_discrete(breaks = c(NA, NA)) +
-  scale_fill_manual(values = c("C" ="gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
-  scale_color_manual(values = c("C" = "gray80", "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_x_discrete(breaks = c(2003)) +
+  scale_fill_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_color_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
   labs(#title = "Ames",
-    x = "Year, ordered by largest to smallest observed penalty",
-    y = (expression(atop("Continuous maize penalty", 
-                         paste("Ames IA, (kg "~ha^-1*")"))))) + 
+    x = "Year, ordered by largest to smallest Ames penalty 2001-2016",
+    y = "Continuous\ncorn\npenalty") + 
   wind_theme_H  +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
-        axis.title = element_text(size = rel(1.5)))
+        axis.title = element_text(size = rel(1.5)),
+        axis.text.x = element_text(angle = 0, vjust = 0.5))
 
 ggsave("05_talk-figs/fig_oat2.png", width = 12, height = 6.25)
 
