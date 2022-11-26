@@ -15,6 +15,7 @@
 #
 # NOTES: need to get colors updated, palette is on laptop??
 
+
 rm(list = ls())
 library(saapsim) #--has some functions
 library(tidysawyer2) #--has sawyer data
@@ -354,3 +355,54 @@ f_dat %>%
         strip.text = element_text(size = rel(1.3)))
 
 ggsave("05_talk-figs/fig_oat4.png", width = 12, height = 6.25)
+
+
+# make seminar fig -------------------------------------------------------
+
+pre_dat <- 
+  f_dat %>% 
+  ungroup() %>% 
+  #--make last once less wordy
+  mutate(oat_what_nice2 = ifelse(category == "5 factor", "Combo", as.character(oat_what_nice)),
+         oat_what_nice2 = fct_inorder(oat_what_nice2)) %>% 
+  mutate(oat_scen_lab = factor(oat_scen_lab, levels = f_dat_oat_labs)) %>% 
+  mutate(
+    #year = factor(year, levels = yrs_ord),
+    col1 = case_when(
+      oat_what == "exp gap" ~ "A",
+      oat_what == "current apsim gap" ~ "B",
+      oat_what == "late emergence" ~ "C",
+      TRUE ~ "D")
+  )
+
+pre_dat
+names(pre_dat)
+  
+pre_dat %>%   
+  filter(dtype != "exp_gap",
+         dtype != "oat_gapnotweaks",
+         oat_what_nice2 != "Combo") %>% 
+  mutate(year2 = as.numeric(paste(year))) %>% 
+  ggplot(aes(year2, gap_kgha/1000)) + 
+  geom_bar(aes(fill = col1, color = col1),
+           position = "dodge", 
+           stat = "identity", 
+           #color = "black"
+  ) +
+  #geom_hline(aes(yintercept = mngap), size = 1, type = "dotted") +
+  #geom_linerange(aes(ymin = gap_lo, ymax = gap_hi), color = "gray40") +
+  facet_grid(.~oat_what_nice2, labeller = label_wrap_gen(width = 10)) + 
+  guides(fill = F, color = F) +
+  #scale_x_discrete(breaks = c(NA, NA)) +
+  #scale_x_discrete(breaks = c(2003)) +
+  scale_fill_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  scale_color_manual(values = c("C" = clr_blu, "B" = clr_div, "A" = clr_red, "D" = clr_blu)) +
+  labs(#title = "Ames",
+    x = "Year",
+    y = "Continuous\nmaize\npenalty\n(Mg ha)") + 
+  wind_theme_H  +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5),
+        axis.title = element_text(size = rel(1.5)),
+        axis.text.x = element_text(angle = 45, vjust = 0.5))
+
+ggsave("05_talk-figs/fig_seminar-windmill.png", width = 7.5, height = 4)
